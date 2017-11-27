@@ -69,7 +69,7 @@ static class GUI
 		//viewport zoom
 		float zoomVal;
 		float zoomAmount = 0.05;
-		float maxZoomIn = 3, maxZoomOut = 0.9;
+		float maxZoomIn = 2.5, maxZoomOut = 0.9;
 
 		//bool for menubar windows
 		bool aPrefWin, newSimWindow, openSimWindow;
@@ -122,7 +122,7 @@ GUI::GUI(SDL_Renderer *renderer)
 	bkgColour = ImColor(0, 0, 44);
 
 	//load the worldmap texture
-	SDL_Surface *worldSurf = IMG_Load("res\\img\\world.png");
+	SDL_Surface *worldSurf = IMG_Load("res\\img\\world1.png");
 	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
 	//remove the surface, no longer needed
 	SDL_FreeSurface(worldSurf);
@@ -300,6 +300,10 @@ void GUI::render(SDL_Renderer *renderer)
 	vp.w = (int)ImGui::GetIO().DisplaySize.x * zoomVal;
 	vp.h = (int)ImGui::GetIO().DisplaySize.y * zoomVal;
 
+
+
+	std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
+
 	//move the viewport to the correct place
 	vp.x = vpCenter.x;
 	vp.y = vpCenter.y;
@@ -441,9 +445,9 @@ void GUI::zoom(int zoomType, SDL_Point mousePos)
 	vp.w = (int)ImGui::GetIO().DisplaySize.x;
 	vp.h = (int)ImGui::GetIO().DisplaySize.y;
 
-	//center on the mouse
-	vpCenter.x = mousePos.x - vp.w/2;
-	vpCenter.y = mousePos.y - vp.h/2;
+	////center on the mouse
+	//vpCenter.x = vp.x + vp.w / 2;
+	//vpCenter.y = vp.y + vp.h / 2;
 
 	//std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
 
@@ -452,6 +456,9 @@ void GUI::zoom(int zoomType, SDL_Point mousePos)
 
 	scaledX = vp.w * zoomVal;
 	scaledY = vp.h * zoomVal;
+
+	//adjust the vpcenter
+
 }
 
 
@@ -482,7 +489,6 @@ void GUI::pan(SDL_Point mousePos)
 	{
 		moveVPDown();
 	}
-	
 
 	//std::cout << mousePos.x - prevMouse.x << "\n" << mousePos.y - prevMouse.y << "\n";
 	//std::cout << vp.x << ", " << vp.y << std::endl;
