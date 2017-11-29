@@ -75,5 +75,13 @@ private:
 
 	//opengl context
 	SDL_GLContext glcontext;
+
+	//time handling
+	int frames = 0;
+	float fps = 0;
+	int fpsLimit = 60;
+
+	//pause sim
+	bool pauseSim;
 };
 

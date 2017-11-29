@@ -311,6 +311,17 @@ void Main::close()
 
 void Main::mainLoop()
 {
+	//handling frames per second
+	float frameTime = 0,
+		prevTime = 0,
+		curTime = 0,
+		deltaTime = 0;
+
+	Uint32 startTime, elapsedTime;
+	startTime = SDL_GetTicks();
+
+	frames = 0, fps = 0;
+	
 	appRun = true;
 
 	//keyboard input
@@ -322,6 +333,17 @@ void Main::mainLoop()
 	//loop
 	while (appRun)
 	{
+		//calculating frame time
+		frames++;
+
+		//the overall elapsed time
+		elapsedTime = SDL_GetTicks() - startTime;
+
+		//setting previous time to current time
+		prevTime = curTime;
+		//update current time
+		curTime = SDL_GetTicks();
+
 		//update mouse position
 		SDL_GetMouseState(&mousePos.x, &mousePos.y);
 			
@@ -410,14 +432,46 @@ void Main::mainLoop()
 			
 		}
 
-		//update frame for imgui
-		ImGui_ImplSdlGL2_NewFrame(window);
+		//only done if the simulation is not paused
+		if (!pauseSim)
 		{
-			gui.menuBar(appRun);
+			//update frame for imgui
+			ImGui_ImplSdlGL2_NewFrame(window);
+			{
+				gui.menuBar(appRun);
+			}
+		
+			//draw
+			updateMain();
+		}
+
+		//skips first frame to prevent crash
+		if (elapsedTime)
+		{
+			//calculate time between frames
+			deltaTime = (curTime - prevTime) / 1000.0f;
+
+			//update frame time
+			frameTime += deltaTime;
+
+			//convert elapsed time to seconds
+			double elapsedSec = elapsedTime / 1000;
+			fps = frames / elapsedSec;
+
+			//debug fps
+			std::cout << fps << std::endl;
+
+			//controlling frame rate
+			if (deltaTime < 1000 / fpsLimit)
+			{
+				if (fpsLimit != 0)
+				{
+					//sleep the remaining frame time
+					SDL_Delay((1000 / fpsLimit) - deltaTime);
+				}
+			}
 		}
 		
-		//draw
-		updateMain();
 	}
 
 	//close components
@@ -427,5 +481,5 @@ void Main::mainLoop()
 void Main::updateMain()
 {
 	//render gui	
-	gui.render(renderer);
+	gui.render(window, renderer);
 }

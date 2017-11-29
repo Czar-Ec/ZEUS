@@ -5,6 +5,9 @@ c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(92): warning C4091: 'static ': i
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(296): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(300): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(301): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(457): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(458): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(421): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(422): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.cpp(345): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.cpp(459): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.cpp(470): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
   ZEUS.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Debug\ZEUS.exe

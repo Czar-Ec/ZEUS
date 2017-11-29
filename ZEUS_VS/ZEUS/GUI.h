@@ -38,7 +38,7 @@ static class GUI
 		void newSim();
 		void openSim();
 
-		void render(SDL_Renderer *renderer);
+		void render(SDL_Window *window, SDL_Renderer *renderer);
 
 		//move the viewport
 		void moveVPUp();
@@ -286,7 +286,7 @@ void GUI::openSim()
 	}
 }
 
-void GUI::render(SDL_Renderer *renderer)
+void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 {
 	//clear the screen
 	SDL_SetRenderDrawColor(renderer,
@@ -302,7 +302,7 @@ void GUI::render(SDL_Renderer *renderer)
 
 
 
-	std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
+	//std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
 
 	//move the viewport to the correct place
 	vp.x = vpCenter.x;
@@ -325,47 +325,11 @@ void GUI::render(SDL_Renderer *renderer)
 	glUseProgram(0);
 	ImGui::Render();
 
-	//update the screen
 	SDL_RenderPresent(renderer);
 
+	//update the screen
+	SDL_GL_SwapWindow(window);
 }
-
-//void GUI::moveVPUp()
-//{
-//	
-//	if (vpCenter.y < scaledX / 4)
-//	{
-//		vpCenter.y += 10;
-//	}
-//	//std::cout << "up\n";
-//}
-//
-//void GUI::moveVPDown()
-//{
-//	if (vpCenter.y > -scaledX/4)
-//	{
-//		vpCenter.y -= 10;
-//	}
-//	//std::cout << "down\n";
-//}
-//
-//void GUI::moveVPLeft()
-//{
-//	if (vpCenter.x < scaledY / 4)
-//	{
-//		vpCenter.x += 10;
-//	}
-//	//std::cout << "left\n";
-//}
-//
-//void GUI::moveVPRight()
-//{
-//	if(vpCenter.x > -scaledY)
-//	{
-//		vpCenter.x -= 10;
-//	}
-//	//std::cout << "right\n";
-//}
 
 void GUI::moveVPUp()
 {
