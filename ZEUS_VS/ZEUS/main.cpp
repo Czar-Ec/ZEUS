@@ -219,6 +219,8 @@ void Main::init()
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GetCurrentDisplayMode(0, &currentDisplay);
+
+		//std::cout << currentDisplay.w << ", " << currentDisplay.h << std::endl;
 				
 		//create the window
 		window = SDL_CreateWindow(
@@ -235,6 +237,7 @@ void Main::init()
 			| SDL_WINDOW_RESIZABLE
 			//maximised window
 			| SDL_WINDOW_MAXIMIZED
+			| SDL_WINDOW_MINIMIZED
 			//opengl window
 			| SDL_WINDOW_OPENGL
 		);
@@ -294,7 +297,7 @@ void Main::init()
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 			//initiate GUI
-			gui = GUI(renderer);
+			gui = GUI(renderer, currentDisplay.w, currentDisplay.h);
 		}
 	}
 	
@@ -459,7 +462,7 @@ void Main::mainLoop()
 			fps = frames / elapsedSec;
 
 			//debug fps
-			std::cout << fps << std::endl;
+			//std::cout << fps << std::endl;
 
 			//controlling frame rate
 			if (deltaTime < 1000 / fpsLimit)

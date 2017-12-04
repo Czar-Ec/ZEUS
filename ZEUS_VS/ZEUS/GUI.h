@@ -28,7 +28,7 @@ static class GUI
 {
 	public:
 		GUI();
-		GUI(SDL_Renderer *renderer);
+		GUI(SDL_Renderer *renderer, int winX, int winY);
 		~GUI();
 
 		//draw menu bar
@@ -49,6 +49,7 @@ static class GUI
 		//zooming the viewport
 		void zoom(int zoomType, SDL_Point mousePos);
 		void pan(SDL_Point mousePos);
+		void panLimiting();
 
 		//shortcuts
 		void ctrlN();
@@ -56,20 +57,21 @@ static class GUI
 
 
 	private:
+		//world size
+		int worldX, worldY;
 		//viewport rect
 		SDL_Rect vp;
-		//center of the screen
-		SDL_Point vpCenter;
-		//scaled original vp
-		int scaledX, scaledY;
+		//focus point of camera
+		SDL_Point center;
 
 		//previous mouse position
 		SDL_Point prevMouse;
 
 		//viewport zoom
-		float zoomVal;
-		float zoomAmount = 0.05;
-		float maxZoomIn = 2.5, maxZoomOut = 0.9;
+		float zoomVal; //current zoom
+		float zoomAmount = 0.1; //increment zoom by this amount
+		float panSpeed = 20;
+		float maxZoomIn = 4, maxZoomOut = 0.9;
 
 		//bool for menubar windows
 		bool aPrefWin, newSimWindow, openSimWindow;
@@ -96,18 +98,17 @@ GUI::GUI()
 	//temporarily empty but will then have values later on
 }
 
-GUI::GUI(SDL_Renderer *renderer)
+GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 {
 	//viewport location
 	vp.x = vp.y = 0;
-	scaledX = vp.w = (int)ImGui::GetIO().DisplaySize.x;
-	scaledY = vp.h = (int)ImGui::GetIO().DisplaySize.y;
 
-	vpCenter.x = vp.x + vp.w/2;
-	vpCenter.y = vp.y + vp.h/2;
+	worldX = (int)ImGui::GetIO().DisplaySize.x;
+	worldY = (int)ImGui::GetIO().DisplaySize.y;
 
-	//setup prevmouse
-	prevMouse.x = prevMouse.y = 0;
+	//center is at center of the screen
+	center.x = 0;
+	center.y = 0;
 
 	//set zoom to 1
 	zoomVal = 1;
@@ -122,13 +123,14 @@ GUI::GUI(SDL_Renderer *renderer)
 	bkgColour = ImColor(0, 0, 44);
 
 	//load the worldmap texture
-	SDL_Surface *worldSurf = IMG_Load("res\\img\\world1.png");
+	SDL_Surface *worldSurf = IMG_Load("res\\img\\worldHigh.png");
 	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
 	//remove the surface, no longer needed
 	SDL_FreeSurface(worldSurf);
 	if (worldMap == NULL)
 	{
 		std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
+		worldX = worldY = 0;
 	}
 }
 
@@ -300,13 +302,14 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	vp.w = (int)ImGui::GetIO().DisplaySize.x * zoomVal;
 	vp.h = (int)ImGui::GetIO().DisplaySize.y * zoomVal;
 
+	//gets the world size
+	SDL_GetWindowSize(window, &worldX, &worldY);
+	//std::cout << worldX << ", " << worldY << std::endl;
+	//std::cout << vp.x << ", " << vp.y << std::endl;
 
-
-	//std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
-
-	//move the viewport to the correct place
-	vp.x = vpCenter.x;
-	vp.y = vpCenter.y;
+	//update viewport location to be set to the center
+	vp.x = center.x;
+	vp.y = center.y;
 
 	//link viewport to the renderer
 	SDL_RenderSetViewport(renderer, &vp);
@@ -333,48 +336,65 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 
 void GUI::moveVPUp()
 {
-	//get the top of the viewport and make sure at least a quarter of the window remains within the map
-	if (vpCenter.y - (vp.h / 2) < -vp.h / 4)
-	{
-		vpCenter.y += 10;
-	}
-	//std::cout << "up\n";
-	//std::cout << "UP: " << vpCenter.y - (vp.h / 2) << ", " << -vp.h/4 << std::endl;
+	//move up
+	center.y += panSpeed;
+
+	//checks if the viewport stays within the bounds
+	panLimiting();
+
+	//debug
+	//std::cout << "UP Test\n";
+	//std::cout << "Center Y: " << center.y << std::endl;
 }
 
 void GUI::moveVPDown()
 {
-	//get the bottom of the viewport and make sure it stays within the map
-	if (vpCenter.y + (vp.h / 2) > -vp.h / 4)
-	{
-		vpCenter.y -= 10;
-	}
-	//std::cout << "down\n";
-	//std::cout << "DOWN: " << vpCenter.y + (vp.h / 2) << ", " << scaledY << std::endl;
+	//move down
+	center.y -= panSpeed;
+
+	//checks if the viewport stays within the bounds
+	panLimiting();
+
+	//debug
+	//std::cout << "DOWN Test\n";
+	//std::cout << "Center Y: " << center.y << std::endl;
 }
 
 void GUI::moveVPLeft()
 {
-	if (vpCenter.x - (vp.w / 2) < -vp.w / 4)
-	{
-		vpCenter.x += 10;
-	}
-	//std::cout << "left\n";
-	//std::cout << "LEFT: " << vpCenter.x - (vp.w / 2) << ", " << -vp.w/4 << std::endl;
+	//move left
+	center.x += panSpeed;
+
+	//checks if the viewport stays within the bounds
+	panLimiting();
+
+	//debug
+	//std::cout << "LEFT Test\n";
+	//std::cout << "Center X: " << center.x << std::endl;
 }
 
 void GUI::moveVPRight()
 {
-	if (vpCenter.x + (vp.w / 2) > -vp.w / 4)
-	{
-		vpCenter.x -= 10;
-	}
-	//std::cout << "right\n";
-	//std::cout << "RIGHT: " << vpCenter.x + (vp.w / 2) << ", " << -vp.w/4 << std::endl;
+	//move right
+	center.x -= panSpeed;
+
+	//checks if the viewport stays within the bounds
+	panLimiting();
+
+	//debug
+	//std::cout << "RIGHT Test\n";
+	//std::cout << "Center X: " << center.x << std::endl;
 }
 
 void GUI::zoom(int zoomType, SDL_Point mousePos)
 {
+	//get mouse pos relative to viewport
+	float mX = mousePos.x - center.x;
+	float mY = mousePos.y - center.y;
+
+	//update old zoom
+	float oldzoom = zoomVal;
+	
 	switch (zoomType)
 	{
 		//catches null type zooms
@@ -405,57 +425,101 @@ void GUI::zoom(int zoomType, SDL_Point mousePos)
 		break;
 	}
 
-	//get window size
-	vp.w = (int)ImGui::GetIO().DisplaySize.x;
-	vp.h = (int)ImGui::GetIO().DisplaySize.y;
+	//figure out change in scale
+	float scaleChange = zoomVal - oldzoom;
 
-	////center on the mouse
-	//vpCenter.x = vp.x + vp.w / 2;
-	//vpCenter.y = vp.y + vp.h / 2;
+	//only change things if the scale changed
+	if (scaleChange != 0)
+	{
+		//calculate offsets
+		float offsetX = mX * (zoomVal / oldzoom);
+		float offsetY = mY * (zoomVal / oldzoom);
 
-	//std::cout << vpCenter.x << ", " << vpCenter.y << std::endl;
+		//std::cout << "Offtset X and Y: " << offsetX << ",  " << offsetY << std::endl << std::endl;
 
-	//glOrtho(-vpW * zoomVal, vpW*zoomVal, -vpH*zoomVal, vpH * zoomVal, 1, -1);
-	//glOrtho(0, vp.w * zoomVal, vp.h * zoomVal, 0, 1, -1);
+		//adjust camera
+		center.x += mX - offsetX;
+		center.y += mY - offsetY;
 
-	scaledX = vp.w * zoomVal;
-	scaledY = vp.h * zoomVal;
+		panLimiting();
+	}
 
-	//adjust the vpcenter
-
+	//std::cout << "D Scale: " << scaleChange << std::endl;
+	//std::cout << "Mouse Pos: " << mousePos.x << ", " << mousePos.y << std::endl;
+	//std::cout << "Center X and Y: " << center.x << ", " << center.y << std::endl << std::endl;
 }
 
 
 void GUI::pan(SDL_Point mousePos)
-{	
-	//move by the difference of the mouse's movement
-	/*vpCenter.x += mousePos.x - vpCenter.x;
-	vpCenter.y += mousePos.y - vpCenter.y;*/
-
-	//get screen size
-	int screenX = (int)ImGui::GetIO().DisplaySize.x,
-		screenY = (int)ImGui::GetIO().DisplaySize.y;
-
+{
 	//only pans if mouse is on the 1/8th outer region of the screen
-	if ((screenX / 8) > mousePos.x)
+	if ((worldX / 8) > mousePos.x)
 	{
 		moveVPLeft();
 	}
-	else if((screenX - screenX / 8) < mousePos.x)
+	else if((worldX - worldX / 8) < mousePos.x)
 	{
 		moveVPRight();
 	}
-	if ((screenY / 8) > mousePos.y)
+	if ((worldY / 8) > mousePos.y)
 	{
 		moveVPUp();
 	}
-	else if ((screenY - screenY / 8) < mousePos.y)
+	else if ((worldY - worldY / 8) < mousePos.y)
 	{
 		moveVPDown();
 	}
+}
 
-	//std::cout << mousePos.x - prevMouse.x << "\n" << mousePos.y - prevMouse.y << "\n";
-	//std::cout << vp.x << ", " << vp.y << std::endl;
+void GUI::panLimiting()
+{
+	float upperLimit, lowerLimit, leftLimit, rightLimit;
+	float rescaleWorldX = worldX * zoomVal,
+		rescaleWorldY = worldY * zoomVal;
+	upperLimit = vp.h / 16;
+	lowerLimit = -rescaleWorldY * 13 / 16 + rescaleWorldY / 16;
+	leftLimit = vp.w / 16;
+	rightLimit = - rescaleWorldX * 13 / 16 + rescaleWorldX / 16;
+
+	//print limits
+	/*std::cout << std::endl;
+	std::cout << "limit up: " << upperLimit << std::endl;
+	std::cout << "limit down: " << lowerLimit << std::endl;
+	std::cout << "limit left: " << leftLimit << std::endl;
+	std::cout << "limit right: " << rightLimit << std::endl;
+	std::cout << std::endl;
+	std::cout << "VP size: " << vp.w << ", " << vp.h << std::endl;
+	std::cout << "World size: " << worldX << ", " << worldY << std::endl;
+	std::cout << "Zoom Val: " << zoomVal << std::endl;*/
+
+	//limit panning upwards
+	if (upperLimit < center.y)
+	{
+		center.y = upperLimit;
+	}
+
+	//limit panning downwards
+	else if (lowerLimit > center.y)
+	{
+		center.y = lowerLimit;
+	}
+
+	//limit panning towards left
+	if (leftLimit < center.x)
+	{
+		center.x = leftLimit;
+	}
+
+	//limit panning towards right
+	if (rightLimit > center.x)
+	{
+		center.x = rightLimit;
+	}
+
+	//debug
+	/*std::cout << std::endl;
+	std::cout << "Center X: " << center.x << std::endl;
+	std::cout << "Center Y: " << center.y << std::endl;*/
 }
 
 void GUI::ctrlN()
