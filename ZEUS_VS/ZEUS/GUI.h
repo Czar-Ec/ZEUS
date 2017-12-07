@@ -31,6 +31,9 @@ static class GUI
 		GUI(SDL_Renderer *renderer, int winX, int winY);
 		~GUI();
 
+		//update window size
+		void winSizeUpdate(int winX, int winY);
+
 		//draw menu bar
 		void menuBar(bool &appRun);
 
@@ -57,12 +60,13 @@ static class GUI
 
 
 	private:
+		//renderer
+		SDL_Renderer *guiRenderer;
+
 		//world size
 		int worldX, worldY;
 		//viewport rect
 		SDL_Rect vp;
-		//focus point of camera
-		SDL_Point center;
 
 		//previous mouse position
 		SDL_Point prevMouse;
@@ -74,21 +78,28 @@ static class GUI
 		float maxZoomIn = 4, maxZoomOut = 0.9;
 
 		//bool for menubar windows
-		bool aPrefWin, newSimWindow, openSimWindow;
+		bool newSimWindow, openSimWindow;
 
 		#pragma region APPEARANCE PREFERENCES
 		//Appearance Preferences
 		//bool if window should be open or not
+		bool aPrefWin;
 
+		//bool to show colour map or not
+		bool showColourMap;
 
+		//colour of the background
 		ImVec4 bkgColour;
 
 
 		#pragma endregion
 
+
 		//the texture which will be drawn to the screen
 		SDL_Texture *worldMap;
-
+		SDL_Texture *colourMap;
+		//texture sizes
+		int wMapX, wMapY, cMapX, cMapY;
 		//list of countries
 		std::vector<Country> countryList;
 };
@@ -100,44 +111,73 @@ GUI::GUI()
 
 GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 {
+	guiRenderer = renderer;
+	
 	//viewport location
-	vp.x = vp.y = 0;
+	vp = { 0, 0, winX, winY };
 
-	worldX = (int)ImGui::GetIO().DisplaySize.x;
-	worldY = (int)ImGui::GetIO().DisplaySize.y;
+	worldX = winX;
+	worldY = winY;
 
-	//center is at center of the screen
-	center.x = 0;
-	center.y = 0;
+	//std::cout << center.x << ", " << center.y << std::endl;
 
 	//set zoom to 1
 	zoomVal = 1;
 
 	//not initially open
-	aPrefWin
-		= newSimWindow
-		= openSimWindow
-		= false;
+	newSimWindow = false;
+	openSimWindow= false;
+
+	//pref window not open unless chosen
+	aPrefWin = false;
+
+	//colour map default to not displayed
+	showColourMap = false;
 
 	//background colour
 	bkgColour = ImColor(0, 0, 44);
 
-	//load the worldmap texture
+	//load the worldmap textures
 	SDL_Surface *worldSurf = IMG_Load("res\\img\\worldHigh.png");
 	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
 	//remove the surface, no longer needed
 	SDL_FreeSurface(worldSurf);
+	//check if texture is loaded
 	if (worldMap == NULL)
 	{
 		std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
 		worldX = worldY = 0;
 	}
+
+	//get texture size
+	SDL_QueryTexture(worldMap, NULL, NULL, &wMapX, &wMapY);
+
+	SDL_Surface *colourSurf = IMG_Load("res\\img\\worldHighc.png");
+	colourMap = SDL_CreateTextureFromSurface(renderer, colourSurf);
+	//remove surface
+	SDL_FreeSurface(colourSurf);
+	//check if texture is loaded
+	if (colourMap == NULL)
+	{
+		std::cerr << "Colour Map not found!\n" << IMG_GetError() << std::endl;
+		worldX = worldY = 0;
+	}
+
+	SDL_QueryTexture(worldMap, NULL, NULL, &cMapX, &cMapY);
 }
 
 
 GUI::~GUI()
 {
+	//destroy the textures
+	//SDL_DestroyTexture(worldMap);
+	//SDL_DestroyTexture(colourMap);
+}
 
+inline void GUI::winSizeUpdate(int winX, int winY)
+{
+	worldX = winX,
+	worldY = winY;
 }
 
 void GUI::menuBar(bool &appRun)
@@ -256,6 +296,9 @@ void GUI::menuBar(bool &appRun)
 		//open appearance preferences window
 		ImGui::Begin("Appearance Preferences", &aPrefWin, ImGuiWindowFlags_NoCollapse);
 		ImGui::Separator();
+		ImGui::Text("Colour Map");
+		ImGui::Checkbox("Colour Map: ", &showColourMap);
+		ImGui::Separator();
 		ImGui::Text("Background colour");
 		ImGui::ColorEdit3("background colour", (float*)&bkgColour);
 		ImGui::Separator();
@@ -290,6 +333,8 @@ void GUI::openSim()
 
 void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 {
+	SDL_RenderCopy(renderer, colourMap, NULL, &vp);
+
 	//clear the screen
 	SDL_SetRenderDrawColor(renderer,
 		bkgColour.x * 255.0f,
@@ -307,10 +352,6 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	//std::cout << worldX << ", " << worldY << std::endl;
 	//std::cout << vp.x << ", " << vp.y << std::endl;
 
-	//update viewport location to be set to the center
-	vp.x = center.x;
-	vp.y = center.y;
-
 	//link viewport to the renderer
 	SDL_RenderSetViewport(renderer, &vp);
 
@@ -321,8 +362,17 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &rect);*/
 
-	//render the world map
-	SDL_RenderCopy(renderer, worldMap, NULL, NULL);
+	if (showColourMap)
+	{
+		SDL_RenderCopy(renderer, colourMap, NULL, &vp);
+	}
+
+	//only done if the user chose to show the country colourmap
+	if (!showColourMap)
+	{
+		//render the world map
+		SDL_RenderCopy(renderer, worldMap, NULL, &vp);
+	}
 
 	//render the IMGUI elements
 	glUseProgram(0);
@@ -337,7 +387,7 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 void GUI::moveVPUp()
 {
 	//move up
-	center.y += panSpeed;
+	vp.y -= panSpeed;
 
 	//checks if the viewport stays within the bounds
 	panLimiting();
@@ -350,7 +400,7 @@ void GUI::moveVPUp()
 void GUI::moveVPDown()
 {
 	//move down
-	center.y -= panSpeed;
+	vp.y += panSpeed;
 
 	//checks if the viewport stays within the bounds
 	panLimiting();
@@ -363,7 +413,7 @@ void GUI::moveVPDown()
 void GUI::moveVPLeft()
 {
 	//move left
-	center.x += panSpeed;
+	vp.x -= panSpeed;
 
 	//checks if the viewport stays within the bounds
 	panLimiting();
@@ -376,7 +426,7 @@ void GUI::moveVPLeft()
 void GUI::moveVPRight()
 {
 	//move right
-	center.x -= panSpeed;
+	vp.x += panSpeed;
 
 	//checks if the viewport stays within the bounds
 	panLimiting();
@@ -387,14 +437,7 @@ void GUI::moveVPRight()
 }
 
 void GUI::zoom(int zoomType, SDL_Point mousePos)
-{
-	//get mouse pos relative to viewport
-	float mX = mousePos.x - center.x;
-	float mY = mousePos.y - center.y;
-
-	//update old zoom
-	float oldzoom = zoomVal;
-	
+{	
 	switch (zoomType)
 	{
 		//catches null type zooms
@@ -425,49 +468,34 @@ void GUI::zoom(int zoomType, SDL_Point mousePos)
 		break;
 	}
 
-	//figure out change in scale
-	float scaleChange = zoomVal - oldzoom;
-
-	//only change things if the scale changed
-	if (scaleChange != 0)
-	{
-		//calculate offsets
-		float offsetX = mX * (zoomVal / oldzoom);
-		float offsetY = mY * (zoomVal / oldzoom);
-
-		//std::cout << "Offtset X and Y: " << offsetX << ",  " << offsetY << std::endl << std::endl;
-
-		//adjust camera
-		center.x += mX - offsetX;
-		center.y += mY - offsetY;
-
-		panLimiting();
-	}
+	//panLimiting();
 
 	//std::cout << "D Scale: " << scaleChange << std::endl;
 	//std::cout << "Mouse Pos: " << mousePos.x << ", " << mousePos.y << std::endl;
 	//std::cout << "Center X and Y: " << center.x << ", " << center.y << std::endl << std::endl;
+
+	//panLimiting();
 }
 
 
 void GUI::pan(SDL_Point mousePos)
 {
 	//only pans if mouse is on the 1/8th outer region of the screen
-	if ((worldX / 8) > mousePos.x)
-	{
-		moveVPLeft();
-	}
-	else if((worldX - worldX / 8) < mousePos.x)
+	if ((vp.w / 8) > mousePos.x)
 	{
 		moveVPRight();
 	}
-	if ((worldY / 8) > mousePos.y)
+	else if((vp.w - vp.w / 8) < mousePos.x)
 	{
-		moveVPUp();
+		moveVPLeft();
 	}
-	else if ((worldY - worldY / 8) < mousePos.y)
+	if ((vp.h / 8) > mousePos.y)
 	{
 		moveVPDown();
+	}
+	else if ((vp.h - vp.h / 8) < mousePos.y)
+	{
+		moveVPUp();
 	}
 }
 
@@ -476,50 +504,46 @@ void GUI::panLimiting()
 	float upperLimit, lowerLimit, leftLimit, rightLimit;
 	float rescaleWorldX = worldX * zoomVal,
 		rescaleWorldY = worldY * zoomVal;
-	upperLimit = vp.h / 16;
-	lowerLimit = -rescaleWorldY * 13 / 16 + rescaleWorldY / 16;
-	leftLimit = vp.w / 16;
-	rightLimit = - rescaleWorldX * 13 / 16 + rescaleWorldX / 16;
+	upperLimit = vp.h/16;
+	leftLimit = vp.w/16;
+	lowerLimit = vp.h / 16;
+
+	float offsetCenterX = vp.x - vp.w / 2;
+	float offsetCenterY = vp.y - vp.h / 2;
 
 	//print limits
-	/*std::cout << std::endl;
-	std::cout << "limit up: " << upperLimit << std::endl;
-	std::cout << "limit down: " << lowerLimit << std::endl;
-	std::cout << "limit left: " << leftLimit << std::endl;
-	std::cout << "limit right: " << rightLimit << std::endl;
-	std::cout << std::endl;
-	std::cout << "VP size: " << vp.w << ", " << vp.h << std::endl;
-	std::cout << "World size: " << worldX << ", " << worldY << std::endl;
-	std::cout << "Zoom Val: " << zoomVal << std::endl;*/
-
-	//limit panning upwards
-	if (upperLimit < center.y)
-	{
-		center.y = upperLimit;
-	}
-
-	//limit panning downwards
-	else if (lowerLimit > center.y)
-	{
-		center.y = lowerLimit;
-	}
-
-	//limit panning towards left
-	if (leftLimit < center.x)
-	{
-		center.x = leftLimit;
-	}
-
-	//limit panning towards right
-	if (rightLimit > center.x)
-	{
-		center.x = rightLimit;
-	}
+	//std::cout << std::endl;
+	//std::cout << "limit up: " << upperLimit << std::endl;
+	//std::cout << "limit down: " << lowerLimit << std::endl;
+	//std::cout << "limit left: " << leftLimit << std::endl;
+	//std::cout << "limit right: " << rightLimit << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "VP size: " << vp.w << ", " << vp.h << std::endl;
+	//std::cout << "World size: " << worldX << ", " << worldY << std::endl;
+	//std::cout << "Zoom Val: " << zoomVal << std::endl;
 
 	//debug
-	/*std::cout << std::endl;
-	std::cout << "Center X: " << center.x << std::endl;
-	std::cout << "Center Y: " << center.y << std::endl;*/
+	//std::cout << std::endl;
+	//std::cout << "Center X: " << center.x << std::endl;
+	//std::cout << "VP Y: " << vp.y << std::endl;
+
+	////limit panning upwards
+	//if (upperLimit < offsetCenterY)
+	//{
+	//	vp.y = upperLimit + vp.h / 2;
+	//}
+
+	////limit panning towards left
+	//if (leftLimit < offsetCenterX)
+	//{
+	//	vp.x = leftLimit + vp.w / 2;
+	//}	
+
+	////limit panning towards right
+	//if (rightLimit > center.x)
+	//{
+	//	center.x = rightLimit;
+	//}
 }
 
 void GUI::ctrlN()

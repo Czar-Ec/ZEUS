@@ -1,0 +1,7 @@
+ID,CountryName,red,green,blue
+AD,Andorra,94,204,204
+AE,UnitedArabEmirates,170,0,0
+AF,Afghanistan,204,0,0
+AG,Antigua&Barbuda,0,204,0
+AI,Anguilla,0,198,0
+AL,Albania,20,0,201
