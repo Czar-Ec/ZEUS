@@ -82,7 +82,7 @@ private:
 	int fpsLimit = 60;
 
 	//pause sim
-	bool pauseSim;
+	bool pauseSim = false;
 };
 
 
@@ -252,14 +252,9 @@ void Main::mainLoop()
 		//update mouse position
 		SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
-		//update window size
-		SDL_GetWindowSize(window, &winX, &winY);
-		gui.winSizeUpdate(winX, winY);
-
 		//check for inputs
 		while (SDL_PollEvent(&eventMain) != 0)
 		{
-
 			//process event for IMGUI
 			ImGui_ImplSdlGL2_ProcessEvent(&eventMain);
 
@@ -291,32 +286,32 @@ void Main::mainLoop()
 				if (eventMain.wheel.y == -1)
 				{
 					//zoom in for scroll up
-					gui.zoom(ZOOM_IN, mousePos);
+
 				}
 				else if (eventMain.wheel.y == 1)
 				{
 					//zoom out for scroll down
-					gui.zoom(ZOOM_OUT, mousePos);
+
 				}
 				break;
 
 			case SDL_KEYDOWN:
 				if (eventMain.key.keysym.sym == SDLK_EQUALS)
 				{
-					gui.zoom(ZOOM_OUT, mousePos);
+
 				}
 				else if (eventMain.key.keysym.sym == SDLK_MINUS)
 				{
-					gui.zoom(ZOOM_IN, mousePos);
+
 				}
 				break;
 			}
 
 			//moving the viewport
-			if (key[SDL_SCANCODE_UP]) gui.moveVPDown();
-			if (key[SDL_SCANCODE_DOWN]) gui.moveVPUp();
-			if (key[SDL_SCANCODE_LEFT]) gui.moveVPRight();
-			if (key[SDL_SCANCODE_RIGHT]) gui.moveVPLeft();
+			if (key[SDL_SCANCODE_UP]) ;
+			if (key[SDL_SCANCODE_DOWN]) ;
+			if (key[SDL_SCANCODE_LEFT]) ;
+			if (key[SDL_SCANCODE_RIGHT]) ;
 
 
 			//ctrl + N shortcut
@@ -336,7 +331,7 @@ void Main::mainLoop()
 			//panning
 			if (clickAndDrag)
 			{
-				gui.pan(mousePos);
+
 			}
 
 		}

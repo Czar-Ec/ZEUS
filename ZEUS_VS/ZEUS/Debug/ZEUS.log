@@ -1,21 +1,18 @@
 ﻿  main.cpp
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(76): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(78): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(105): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(343): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(347): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(348): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(390): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(403): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(416): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(429): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(507): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(508): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(509): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(511): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(512): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(504): warning C4101: 'rightLimit': unreferenced local variable
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(70): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(72): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(99): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(316): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(318): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(353): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(354): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(355): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(372): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\main.h(250): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(366): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(377): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(361): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(372): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(311): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(312): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(313): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(314): warning C4390: ';': empty controlled statement found; is this the intent?
   ZEUS.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Debug\ZEUS.exe
