@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <shellapi.h>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <iterator>
+#include <string>
 
 //other items
 #include "Country.h"
@@ -30,6 +34,9 @@ static class GUI
 		GUI();
 		GUI(SDL_Renderer *renderer, int winX, int winY);
 		~GUI();
+
+		//load country data
+		int loadCountryData();
 
 		//draw menu bar
 		void menuBar(bool &appRun);
@@ -162,12 +169,128 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	}
 
 	SDL_QueryTexture(worldMap, NULL, NULL, &cMapX, &cMapY);
+
+	//load the country data
+	if (loadCountryData() < 0)
+	{
+		std::cout << "Country File not loaded\n";
+	}
 }
 
 
 GUI::~GUI()
 {
 	
+}
+
+int GUI::loadCountryData()
+{
+	//if the file was successfully loaded or not
+	int loaded = 0;
+
+	//vectors that store strings for data
+	std::vector<std::string> cID;
+	std::vector<std::string> cName;
+	std::vector<std::string> cRed;
+	std::vector<std::string> cGreen;
+	std::vector<std::string> cBlue;
+	std::vector<std::string> cPopulation;
+	
+	//line buffer
+	std::string lineBuffer;
+
+	//get the country data file
+	std::ifstream cData;
+	cData.open("res\\dat\\countrydata.dat");
+
+	//error checking
+	if (cData.is_open())
+	{
+		//counts the number of loaded countries
+		int countries = 0;
+
+		//loop until end of file
+		while (!cData.eof())
+		{
+			//send the retrieved line to the line buffer
+			cData >> lineBuffer;
+
+			//string stream to process the line
+			std::stringstream ss(lineBuffer);
+
+			//store processed line
+			std::string processedData;
+
+			//actual country data
+			std::string countryData[6];
+
+			//separator for each line
+			char delimiter = '|';
+
+			//counts the number of items in the line
+			int count = 0;
+
+			//loop to read the entire line
+			while (std::getline(ss, processedData, delimiter))
+			{
+				//store the processed data in the appropriate array location
+				countryData[count] = processedData;
+
+				//if count = 5, print data values and reset count
+				if (count == 5)
+				{
+					//for debugging if the data was input correctly
+					/*std::cout <<
+						"ID: " << countryData[0] << std::endl <<
+						"Name: " << countryData[1] << std::endl <<
+						"Red: " << countryData[2] << std::endl <<
+						"Green: " << countryData[3] << std::endl <<
+						"Blue: " << countryData[4] << std::endl <<
+						"Population: " << countryData[5] << std::endl;*/
+
+					//process the data i.e. turn string to int
+					//as well as just making clear which variable is which
+					std::string id = countryData[0];
+					std::string name = countryData[1];
+					int red = atoi(countryData[2].c_str());
+					int green = atoi(countryData[3].c_str());
+					int blue = atoi(countryData[4].c_str());
+					int pop = atoi(countryData[5].c_str());
+
+					Country c = Country(id, name, red, green, blue, pop);
+
+					//add the country to the country list
+					countryList.push_back(c);
+										
+					//reset counter
+					count = 0;
+				}
+				
+				//increment
+				count++;
+			}
+
+			//next line therefore increment
+			countries++;
+		}
+
+		//close file after reading
+		cData.close();
+	}
+	else
+	{
+		loaded = -1;
+	}
+
+	//debugging
+	/*for (int i = 0; i < countryList.size(); i++)
+	{
+		std::cout << "ID: " << countryList[i].getID() << std::endl;
+		std::cout << "Name: " << countryList[i].getCountryName() << std::endl;
+		std::cout << "Population: " << countryList[i].getPopulation() << std::endl << std::endl;
+	}*/
+
+	return loaded;
 }
 
 void GUI::menuBar(bool &appRun)
@@ -317,7 +440,7 @@ void GUI::infoBox()
 	//set the side bar size
 	ImGui::SetWindowSize("", ImVec2(infoBoxRect.w, infoBoxRect.h));
 	
-
+	ImGui::CollapsingHeader("Selected Country", NULL);
 
 	ImGui::End();
 
