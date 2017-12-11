@@ -27,6 +27,11 @@
 //other items
 #include "GUI.h"
 
+/**
+* Main Class
+* the class which handles everything that is relevant to the program.
+* Main is the central point of the program and is what will contain the main loop
+*/
 class Main
 {
 public:
@@ -68,7 +73,6 @@ private:
 
 	//SDL Events
 	SDL_Event eventMain;
-	bool clickAndDrag;
 	
 	//mouse position
 	SDL_Point mousePos;
@@ -85,7 +89,10 @@ private:
 	bool pauseSim = false;
 };
 
-
+/**
+* Main constructor
+* Calls init to initialise the program then runs the main loop
+*/
 Main::Main()
 {
 	//initialise
@@ -95,12 +102,20 @@ Main::Main()
 	mainLoop();
 }
 
-
+/**
+* Main destructor
+* called when the instance of Main is destroyed
+*/
 Main::~Main()
 {
 	close();
 }
 
+/**
+* init
+* Initialises the program and sets up the window which the program will use.
+* The function also sets up the imgui library by calling its initialisation functions
+*/
 void Main::init()
 {
 	//initialise window as a null pointer
@@ -205,6 +220,10 @@ void Main::init()
 
 }
 
+/**
+* close
+* function that calls the functions which closes down the imgui library and the SDL library
+*/
 void Main::close()
 {
 	//close everything
@@ -214,6 +233,10 @@ void Main::close()
 	SDL_Quit();
 }
 
+/**
+* mainLoop
+* function which will be the main loop of the entire program i.e. once the loop is exited, the program stops
+*/
 void Main::mainLoop()
 {
 	//handling frames per second
@@ -267,9 +290,9 @@ void Main::mainLoop()
 
 				//while clicking the left button
 			case SDL_MOUSEBUTTONDOWN:
-				if (eventMain.button.button == SDL_BUTTON_LEFT && key[SDL_SCANCODE_LSHIFT])
+				if (eventMain.button.button == SDL_BUTTON_LEFT)
 				{
-					clickAndDrag = true;
+					gui.leftClick();
 				}
 				break;
 
@@ -277,7 +300,7 @@ void Main::mainLoop()
 			case SDL_MOUSEBUTTONUP:
 				if (eventMain.button.button == SDL_BUTTON_LEFT)
 				{
-					clickAndDrag = false;
+
 				}
 				break;
 
@@ -327,13 +350,6 @@ void Main::mainLoop()
 			{
 				gui.ctrlO();
 			}
-
-			//panning
-			if (clickAndDrag)
-			{
-
-			}
-
 		}
 
 		//only done if the simulation is not paused
@@ -380,6 +396,11 @@ void Main::mainLoop()
 	close();
 }
 
+/**
+* updateMain
+* function which is called at every iteration of the main loop.
+* The function calls te rendering/drawing functons of the gui
+*/
 void Main::updateMain()
 {
 	//render gui	

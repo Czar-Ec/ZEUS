@@ -16,18 +16,30 @@
 #include <SDL\SDL_image.h>
 
 //C/C++ libraries
+//basic IO
 #include <iostream>
 #include <stdio.h>
+
+//opening external programs
 #include <shellapi.h>
+
+//data storing
 #include <vector>
+
+//data handling (loadin and saving)
 #include <fstream>
 #include <sstream>
 #include <iterator>
 #include <string>
+#include <algorithm>
 
 //other items
 #include "Country.h"
 
+/**
+* GUI Class
+* the class which handles the imgui actions and will be drawing and handling the actions on the scren
+*/
 static class GUI
 {
 	public:
@@ -36,7 +48,7 @@ static class GUI
 		~GUI();
 
 		//load country data
-		int loadCountryData();
+		int loadCountryData(std::string filePath);
 
 		//draw menu bar
 		void menuBar(bool &appRun);
@@ -51,14 +63,14 @@ static class GUI
 		//render items
 		void render(SDL_Window *window, SDL_Renderer *renderer);
 
-		//shortcuts
+		//CONTROLS AND SHORTCUTS
 		void ctrlN();
 		void ctrlO();
 
+		void leftClick();
+
 
 	private:
-		//renderer
-		SDL_Renderer *guiRenderer;
 
 		//world size
 		int worldX, worldY;
@@ -68,9 +80,6 @@ static class GUI
 
 		//information box rect
 		SDL_Rect infoBoxRect;
-
-		//previous mouse position
-		SDL_Point prevMouse;
 
 		//viewport zoom
 		//float zoomVal; //current zoom
@@ -82,6 +91,7 @@ static class GUI
 		bool newSimWindow, openSimWindow;
 
 		#pragma region APPEARANCE PREFERENCES
+		////////////////////////////////////////////////////////////////////////////////
 		//Appearance Preferences
 		//bool if window should be open or not
 		bool aPrefWin;
@@ -91,29 +101,43 @@ static class GUI
 
 		//colour of the background
 		ImVec4 bkgColour;
-
-
+		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
-
 
 		//the texture which will be drawn to the screen
 		SDL_Texture *worldMap;
-		SDL_Texture *colourMap;
+		
+		//READING THE PIXEL COLOURS
 		//texture sizes
-		int wMapX, wMapY, cMapX, cMapY;
+		int wMapX, wMapY;
+		
+
 		//list of countries
 		std::vector<Country> countryList;
+
+		//current country being chosen
+		Country curCountry = Country("None", "None", 0, 0, 0, 0);
 };
 
+/**
+* GUI default contructor
+* empty constructor which is temporary i.e. for when GUI is set up in main
+*/
 GUI::GUI()
 {
 	//temporarily empty but will then have values later on
 }
 
+/**
+* GUI constructor
+* the constructor used to give the GUI class parameters and be able to run
+* 
+* @param SDL_Renderer renderer
+* @param int winX
+* @param int winY
+*/
 GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
-{
-	guiRenderer = renderer;
-	
+{	
 	//viewport location
 	vp = { 0, 0, winX, winY };
 
@@ -157,33 +181,30 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//get texture size
 	SDL_QueryTexture(worldMap, NULL, NULL, &wMapX, &wMapY);
 
-	SDL_Surface *colourSurf = IMG_Load("res\\img\\worldHighc.png");
-	colourMap = SDL_CreateTextureFromSurface(renderer, colourSurf);
-	//remove surface
-	SDL_FreeSurface(colourSurf);
-	//check if texture is loaded
-	if (colourMap == NULL)
-	{
-		std::cerr << "Colour Map not found!\n" << IMG_GetError() << std::endl;
-		worldX = worldY = 0;
-	}
-
-	SDL_QueryTexture(worldMap, NULL, NULL, &cMapX, &cMapY);
-
 	//load the country data
-	if (loadCountryData() < 0)
+	if (loadCountryData("res\\dat\\countrydata.dat") < 0)
 	{
 		std::cout << "Country File not loaded\n";
 	}
 }
 
-
+/**
+* GUI destructor
+*/
 GUI::~GUI()
 {
 	
 }
 
-int GUI::loadCountryData()
+/**
+* loadCountryData
+* function which loads the file path given to it.
+* the countries loaded are then instantiated and added to the country list
+*
+* @param string filePath
+* @return loaded (0 = success, -1 = failed)
+*/
+int GUI::loadCountryData(std::string filePath)
 {
 	//if the file was successfully loaded or not
 	int loaded = 0;
@@ -201,7 +222,7 @@ int GUI::loadCountryData()
 
 	//get the country data file
 	std::ifstream cData;
-	cData.open("res\\dat\\countrydata.dat");
+	cData.open(filePath);
 
 	//error checking
 	if (cData.is_open())
@@ -216,7 +237,8 @@ int GUI::loadCountryData()
 			cData >> lineBuffer;
 
 			//string stream to process the line
-			std::stringstream ss(lineBuffer);
+			std::stringstream ss;
+			ss.str(lineBuffer);
 
 			//store processed line
 			std::string processedData;
@@ -225,7 +247,7 @@ int GUI::loadCountryData()
 			std::string countryData[6];
 
 			//separator for each line
-			char delimiter = '|';
+			char delimiter = ',';
 
 			//counts the number of items in the line
 			int count = 0;
@@ -234,36 +256,35 @@ int GUI::loadCountryData()
 			while (std::getline(ss, processedData, delimiter))
 			{
 				//store the processed data in the appropriate array location
+				//std::replace(processedData.begin(), processedData.end(), '_', ' ');
 				countryData[count] = processedData;
 
-				//if count = 5, print data values and reset count
 				if (count == 5)
 				{
 					//for debugging if the data was input correctly
 					/*std::cout <<
-						"ID: " << countryData[0] << std::endl <<
-						"Name: " << countryData[1] << std::endl <<
-						"Red: " << countryData[2] << std::endl <<
-						"Green: " << countryData[3] << std::endl <<
-						"Blue: " << countryData[4] << std::endl <<
-						"Population: " << countryData[5] << std::endl;*/
+					"ID: " << countryData[0] << std::endl <<
+					"Name: " << countryData[1] << std::endl <<
+					"Red: " << countryData[2] << std::endl <<
+					"Green: " << countryData[3] << std::endl <<
+					"Blue: " << countryData[4] << std::endl <<
+					"Population: " << countryData[5] << std::endl;*/
 
 					//process the data i.e. turn string to int
 					//as well as just making clear which variable is which
 					std::string id = countryData[0];
 					std::string name = countryData[1];
+					//std::cout << name << std::endl;
 					int red = atoi(countryData[2].c_str());
 					int green = atoi(countryData[3].c_str());
 					int blue = atoi(countryData[4].c_str());
 					int pop = atoi(countryData[5].c_str());
 
+					//create new instance of a country
 					Country c = Country(id, name, red, green, blue, pop);
 
 					//add the country to the country list
 					countryList.push_back(c);
-										
-					//reset counter
-					count = 0;
 				}
 				
 				//increment
@@ -293,6 +314,13 @@ int GUI::loadCountryData()
 	return loaded;
 }
 
+/**
+* menuBar
+* function which heavily uses imgui to create the program's main menu bar as well as its options.
+* The function also deals with the sub windows that the menu options generate as well as calls the info box function
+*
+* @param bool &appRun (uses the pointer to the bool value so that the quit option of the menu can shut down the program)
+*/
 void GUI::menuBar(bool &appRun)
 {
 	//display the side info box
@@ -412,9 +440,6 @@ void GUI::menuBar(bool &appRun)
 		//open appearance preferences window
 		ImGui::Begin("Appearance Preferences", &aPrefWin, ImGuiWindowFlags_NoCollapse);
 		ImGui::Separator();
-		ImGui::Text("Colour Map");
-		ImGui::Checkbox("Colour Map: ", &showColourMap);
-		ImGui::Separator();
 		ImGui::Text("Background colour");
 		ImGui::ColorEdit3("background colour", (float*)&bkgColour);
 		ImGui::Separator();
@@ -427,6 +452,10 @@ void GUI::menuBar(bool &appRun)
 	openSim();
 }
 
+/**
+* infoBox
+* function which uses imgui to display the options that the user has done i.e. the chosen country's information
+*/
 void GUI::infoBox()
 {
 	//make the side bar
@@ -439,13 +468,26 @@ void GUI::infoBox()
 	ImGui::SetWindowPos("", ImVec2(infoBoxRect.x, infoBoxRect.y));
 	//set the side bar size
 	ImGui::SetWindowSize("", ImVec2(infoBoxRect.w, infoBoxRect.h));
-	
-	ImGui::CollapsingHeader("Selected Country", NULL);
+
+	//display the data of the selected country
+	ImGui::CollapsingHeader("Selected Country");
+	//country ID
+	ImGui::TextWrapped("ID: \n%s", curCountry.getID().c_str());
+	//country Name
+	ImGui::TextWrapped("Name: \n%s", curCountry.getCountryName().c_str());
+	//country Population
+	ImGui::TextWrapped("Population: \n%d", curCountry.getPopulation());
+
+	//std::cout << curCountry.getID() << ", " << curCountry.getCountryName() << ", " << curCountry.getPopulation() << std::endl;
 
 	ImGui::End();
 
 }
 
+/**
+* newSim
+* function that uses an imgui window to allow the user to create a new simulation 
+*/
 void GUI::newSim()
 {
 	//open new simulation window
@@ -457,6 +499,10 @@ void GUI::newSim()
 	}
 }
 
+/**
+* openSim
+* function that uses an imgui window to allow the user to open an existing simulation
+*/
 void GUI::openSim()
 {
 	//open the existing simulation window
@@ -468,10 +514,15 @@ void GUI::openSim()
 	}
 }
 
+/**
+* render
+* function that draws all the items to the screen
+*
+* @param SDL_Window window
+* @param SDL_Renderer renderer
+*/
 void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
-{
-	SDL_RenderCopy(renderer, colourMap, NULL, &vp);
-
+{	
 	//update vp size
 	vp.y = ((int)ImGui::GetIO().DisplaySize.y) * 0.125;
 	vp.w = ((int)ImGui::GetIO().DisplaySize.x) * 0.75;
@@ -498,35 +549,97 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	//link viewports to the renderer
 	SDL_RenderSetViewport(renderer, &vp);
 
-	if (showColourMap)
-	{
-		SDL_RenderCopy(renderer, colourMap, NULL, NULL);
-	}
-
-	//only done if the user chose to show the country colourmap
-	if (!showColourMap)
-	{
-		//render the world map
-		SDL_RenderCopy(renderer, worldMap, NULL, NULL);
-	}
+	//render the world map
+	SDL_RenderCopy(renderer, worldMap, NULL, NULL);
 
 	//render the IMGUI elements
 	glUseProgram(0);
 	ImGui::Render();
 
-	SDL_RenderPresent(renderer);
 
 	//update the screen
+	SDL_RenderPresent(renderer);
 	SDL_GL_SwapWindow(window);
 }
 
+/**
+* ctrlN
+* function called when the control + N shortcut is used.
+* shortcut is to make a new simulation
+*/
 void GUI::ctrlN()
 {
 	newSimWindow = true;
 }
 
+/**
+* ctrlO
+* function called when the control + O shortcut is used.
+* shortcut is used to open an existing simulation
+*/
 void GUI::ctrlO()
 {
 	openSimWindow = true;
+}
+
+/**
+leftClick
+When called, the function reads the screen and uses the pixel under the mouse cursor to determine if the user has selected a country
+*/
+void GUI::leftClick()
+{
+	//source of this function: 
+	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor
+	POINT p;
+	BOOL b;
+
+	// Get the current cursor position
+	b = GetCursorPos(&p);
+	COLORREF colour;
+	HDC hDC;
+
+	// Get the device context for the screen
+	hDC = GetDC(NULL);
+	if (hDC == NULL)
+		std::cout << 3;
+
+	if (!b)
+		std::cout << 2;
+
+	// Retrieve the color at that position
+	colour = GetPixel(hDC, p.x, p.y);
+	if (colour == CLR_INVALID)
+		std::cout << 1;
+
+	// Release the device context again
+	ReleaseDC(GetDesktopWindow(), hDC);
+
+	//printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));
+
+	//find the country which matches the colour
+	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
+
+	//loop through the country list to find a matching colour
+	for (int i = 0; i < countryList.size(); i++)
+	{
+		//get country colour
+		SDL_Color countryColour = countryList[i].getColour();
+		
+		//debugging
+		/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+		printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+		if (comparison.r == countryColour.r		//compare red values
+			&& comparison.g == countryColour.g	//compare green values
+			&& comparison.b == countryColour.b	//compare blue values
+			)
+		{
+			//set the current country to this country (countryList[i])
+			curCountry = countryList[i];
+
+			//break the loop
+			break;
+		}
+	}
 }
 
