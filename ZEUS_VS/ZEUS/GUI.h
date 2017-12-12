@@ -26,7 +26,7 @@
 //data storing
 #include <vector>
 
-//data handling (loadin and saving)
+//data handling (loading and saving)
 #include <fstream>
 #include <sstream>
 #include <iterator>
@@ -67,8 +67,7 @@ static class GUI
 		void ctrlN();
 		void ctrlO();
 
-		void leftClick();
-
+		void leftClick(SDL_Window *window);
 
 	private:
 
@@ -76,7 +75,8 @@ static class GUI
 		int worldX, worldY;
 
 		//viewport rect
-		SDL_Rect vp;
+		SDL_Rect vp; //display area
+		SDL_Rect vpSrc; //allows panning and zooming
 
 		//information box rect
 		SDL_Rect infoBoxRect;
@@ -111,12 +111,37 @@ static class GUI
 		//texture sizes
 		int wMapX, wMapY;
 		
+		#pragma region INFOBOX VARIABLES
+		////////////////////////////////////////////////////////////////////////////////
+		//collapse bools
+		bool worldStatCollapse = true;
+		bool countryStatCollapse = true;
+
+		////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
+
+		#pragma region GLOBAL DATA VARIABLES
+		////////////////////////////////////////////////////////////////////////////////
+		//total number of countries in the world
+		int totalCountries = 0;
+
+		//total number of people in the world
+		unsigned long long int worldPopulation = 0;
 
 		//list of countries
 		std::vector<Country> countryList;
 
+		////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
+
+
+		#pragma region EVENT VARIABLES
+		//////////////////////////////////////////////////////////////////////////////////////
 		//current country being chosen
 		Country curCountry = Country("None", "None", 0, 0, 0, 0);
+
+		//////////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
 };
 
 /**
@@ -167,7 +192,7 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	bkgColour = ImColor(0, 0, 44);
 
 	//load the worldmap textures
-	SDL_Surface *worldSurf = IMG_Load("res\\img\\worldHigh.png");
+	SDL_Surface *worldSurf = IMG_Load("..\\res\\img\\worldHigh.png");
 	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
 	//remove the surface, no longer needed
 	SDL_FreeSurface(worldSurf);
@@ -182,7 +207,7 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	SDL_QueryTexture(worldMap, NULL, NULL, &wMapX, &wMapY);
 
 	//load the country data
-	if (loadCountryData("res\\dat\\countrydata.dat") < 0)
+	if (loadCountryData("..\\res\\dat\\countrydata.dat") < 0)
 	{
 		std::cout << "Country File not loaded\n";
 	}
@@ -208,6 +233,9 @@ int GUI::loadCountryData(std::string filePath)
 {
 	//if the file was successfully loaded or not
 	int loaded = 0;
+
+	//clear country list
+	countryList.empty();
 
 	//vectors that store strings for data
 	std::vector<std::string> cID;
@@ -255,45 +283,61 @@ int GUI::loadCountryData(std::string filePath)
 			//loop to read the entire line
 			while (std::getline(ss, processedData, delimiter))
 			{
-				//store the processed data in the appropriate array location
-				//std::replace(processedData.begin(), processedData.end(), '_', ' ');
-				countryData[count] = processedData;
-
-				if (count == 5)
+				//ignores any empty lines
+				if (processedData != "")
 				{
-					//for debugging if the data was input correctly
-					/*std::cout <<
-					"ID: " << countryData[0] << std::endl <<
-					"Name: " << countryData[1] << std::endl <<
-					"Red: " << countryData[2] << std::endl <<
-					"Green: " << countryData[3] << std::endl <<
-					"Blue: " << countryData[4] << std::endl <<
-					"Population: " << countryData[5] << std::endl;*/
+					//store the processed data in the appropriate array location
+					//std::replace(processedData.begin(), processedData.end(), '_', ' ');
+					countryData[count] = processedData;
 
-					//process the data i.e. turn string to int
-					//as well as just making clear which variable is which
-					std::string id = countryData[0];
-					std::string name = countryData[1];
-					//std::cout << name << std::endl;
-					int red = atoi(countryData[2].c_str());
-					int green = atoi(countryData[3].c_str());
-					int blue = atoi(countryData[4].c_str());
-					int pop = atoi(countryData[5].c_str());
+					if (count == 5)
+					{
+						//for debugging if the data was input correctly
+						/*std::cout <<
+						"ID: " << countryData[0] << std::endl <<
+						"Name: " << countryData[1] << std::endl <<
+						"Red: " << countryData[2] << std::endl <<
+						"Green: " << countryData[3] << std::endl <<
+						"Blue: " << countryData[4] << std::endl <<
+						"Population: " << countryData[5] << std::endl;*/
 
-					//create new instance of a country
-					Country c = Country(id, name, red, green, blue, pop);
+						//process the data i.e. turn string to int
+						//as well as just making clear which variable is which
+						std::string id = countryData[0];
+						//replace dashes with spaces
+						std::replace(countryData[1].begin(), countryData[1].end(), '-', ' ');
+						std::string name = countryData[1];
+						//std::cout << name << std::endl;
+						int red = atoi(countryData[2].c_str());
+						int green = atoi(countryData[3].c_str());
+						int blue = atoi(countryData[4].c_str());
+						unsigned long int pop = atoi(countryData[5].c_str());
 
-					//add the country to the country list
-					countryList.push_back(c);
+						if (pop > 0)
+						{
+							//add the country's population the the total population
+							worldPopulation += pop;
+						}
+						//create new instance of a country
+						Country c = Country(id, name, red, green, blue, pop);
+
+						//add the country to the country list
+						countryList.push_back(c);
+
+						//reset count
+						count = 0;
+					}
+
+					//increment
+					count++;
 				}
-				
-				//increment
-				count++;
 			}
 
 			//next line therefore increment
 			countries++;
 		}
+
+		totalCountries = countries;
 
 		//close file after reading
 		cData.close();
@@ -310,6 +354,9 @@ int GUI::loadCountryData(std::string filePath)
 		std::cout << "Name: " << countryList[i].getCountryName() << std::endl;
 		std::cout << "Population: " << countryList[i].getPopulation() << std::endl << std::endl;
 	}*/
+
+	//std::cout << "Total Countries: " << totalCountries << std::endl;
+	//std::cout << "Total Population: " << worldPopulation << std::endl;
 
 	return loaded;
 }
@@ -457,7 +504,7 @@ void GUI::menuBar(bool &appRun)
 * function which uses imgui to display the options that the user has done i.e. the chosen country's information
 */
 void GUI::infoBox()
-{
+{	
 	//make the side bar
 	ImGui::Begin("", NULL, 
 		ImGuiWindowFlags_NoCollapse
@@ -469,14 +516,36 @@ void GUI::infoBox()
 	//set the side bar size
 	ImGui::SetWindowSize("", ImVec2(infoBoxRect.w, infoBoxRect.h));
 
+	#pragma region WORLD STATISTICS
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	//display the map statistics
+	if (ImGui::CollapsingHeader("World Statistics"))
+	{
+		//total countries
+		ImGui::TextWrapped("Number of Countries: %d", totalCountries);
+		//total world population
+		ImGui::TextWrapped("Total World Population: %llu", worldPopulation);
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
+
+	#pragma region SELECTED COUNTRY
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	//display the data of the selected country
-	ImGui::CollapsingHeader("Selected Country");
-	//country ID
-	ImGui::TextWrapped("ID: \n%s", curCountry.getID().c_str());
-	//country Name
-	ImGui::TextWrapped("Name: \n%s", curCountry.getCountryName().c_str());
-	//country Population
-	ImGui::TextWrapped("Population: \n%d", curCountry.getPopulation());
+	if (ImGui::CollapsingHeader("Selected Country"))
+	{
+		//country ID
+		ImGui::TextWrapped("ID: %s", curCountry.getID().c_str());
+		//country Name
+		ImGui::TextWrapped("Name: %s", curCountry.getCountryName().c_str());
+		//country Population
+		ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
+
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
 
 	//std::cout << curCountry.getID() << ", " << curCountry.getCountryName() << ", " << curCountry.getPopulation() << std::endl;
 
@@ -586,7 +655,7 @@ void GUI::ctrlO()
 leftClick
 When called, the function reads the screen and uses the pixel under the mouse cursor to determine if the user has selected a country
 */
-void GUI::leftClick()
+void GUI::leftClick(SDL_Window *window)
 {
 	//source of this function: 
 	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor

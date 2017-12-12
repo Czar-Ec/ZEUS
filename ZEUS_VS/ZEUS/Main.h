@@ -292,7 +292,7 @@ void Main::mainLoop()
 			case SDL_MOUSEBUTTONDOWN:
 				if (eventMain.button.button == SDL_BUTTON_LEFT)
 				{
-					gui.leftClick();
+					gui.leftClick(window);
 				}
 				break;
 
