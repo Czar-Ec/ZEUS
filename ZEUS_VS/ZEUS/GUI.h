@@ -69,6 +69,10 @@ static class GUI
 
 		void leftClick(SDL_Window *window);
 
+		void zoom(int zoomType);	//function to allow zooming
+		void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
+		void panLimiting();	//ensures the pan is limited within the relevant zone of the texture
+
 	private:
 
 		//world size
@@ -81,12 +85,6 @@ static class GUI
 		//information box rect
 		SDL_Rect infoBoxRect;
 
-		//viewport zoom
-		//float zoomVal; //current zoom
-		float zoomAmount = 0.1; //increment zoom by this amount
-		float panSpeed = 20;
-		float maxZoomIn = 4, maxZoomOut = 0.9;
-
 		//bool for menubar windows
 		bool newSimWindow, openSimWindow;
 
@@ -95,9 +93,6 @@ static class GUI
 		//Appearance Preferences
 		//bool if window should be open or not
 		bool aPrefWin;
-
-		//bool to show colour map or not
-		bool showColourMap;
 
 		//colour of the background
 		ImVec4 bkgColour;
@@ -116,6 +111,19 @@ static class GUI
 		//collapse bools
 		bool worldStatCollapse = true;
 		bool countryStatCollapse = true;
+
+		////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
+
+		#pragma region CONTROL VARIABLES
+		////////////////////////////////////////////////////////////////////////////////
+		//zoom values
+		float zoomVal = 1, 
+			maxZoom = 1, 
+			minZoom = 0.1,
+			zoomInterval = 0.025;
+
+		SDL_Point oldMousePos;
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -139,6 +147,7 @@ static class GUI
 		//////////////////////////////////////////////////////////////////////////////////////
 		//current country being chosen
 		Country curCountry = Country("None", "None", 0, 0, 0, 0);
+
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -185,8 +194,6 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//pref window not open unless chosen
 	aPrefWin = false;
 
-	//colour map default to not displayed
-	showColourMap = false;
 
 	//background colour
 	bkgColour = ImColor(0, 0, 44);
@@ -211,6 +218,8 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	{
 		std::cout << "Country File not loaded\n";
 	}
+
+	vpSrc = { 0, 0, wMapX, wMapY };
 }
 
 /**
@@ -619,7 +628,7 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	SDL_RenderSetViewport(renderer, &vp);
 
 	//render the world map
-	SDL_RenderCopy(renderer, worldMap, NULL, NULL);
+	SDL_RenderCopy(renderer, worldMap, &vpSrc, NULL);
 
 	//render the IMGUI elements
 	glUseProgram(0);
@@ -705,10 +714,104 @@ void GUI::leftClick(SDL_Window *window)
 		{
 			//set the current country to this country (countryList[i])
 			curCountry = countryList[i];
-
+			
 			//break the loop
 			break;
 		}
+	}
+}
+
+/**
+* zoom
+* function that determines the type of zoom that is done and then changes the vpSrc rect to change what is to be shown on the screen.
+*
+* @param int zoomType
+*/
+void GUI::zoom(int zoomType)
+{
+	//store the old zoom
+	float oldZoom = zoomVal;
+	
+	//determine the zoom type and alter the zoom val
+	switch (zoomType)
+	{
+		case -1:
+			//place holder input
+			break;
+
+		//zoom in
+		case 0:
+			if (zoomVal - zoomInterval > minZoom)
+			{
+				zoomVal -= zoomInterval;
+				//std::cout << "zoomed in" << std::endl;
+			}
+			break;
+
+		//zoom out
+		case 1:
+			if (zoomVal + zoomInterval <= maxZoom)
+			{
+				zoomVal += zoomInterval;
+				//std::cout << "zoomed out" << std::endl;
+			}
+			break;
+
+		default:
+			std::cout << "Unknown zoom type" << std::endl;
+			break;
+	}
+
+	//adjust vpSrc
+	if (oldZoom - zoomVal != 0)
+	{
+		vpSrc.w = wMapX * zoomVal;
+		vpSrc.h = wMapY * zoomVal;
+		vpSrc.x = wMapX / 2 - vpSrc.w / 2;
+		vpSrc.y = wMapY / 2 - vpSrc.h / 2;
+	}
+	
+	//std::cout << zoomVal << std::endl;
+
+	//limit the x and y of the source
+	panLimiting();
+}
+
+void GUI::pan(SDL_Point *mPos, int motionX, int motionY)
+{
+	//check if the mouse is within the viewport
+	if (SDL_PointInRect(mPos, &vp))
+	{
+		vpSrc.x += motionX * 2;
+		vpSrc.y += motionY * 2;
+		//std::cout << "X: " << vpSrc.x << std::endl << "Y: " << vpSrc.y << std::endl;
+
+		//limit the panning so there is no texture streching
+		panLimiting();
+	}
+}
+
+void GUI::panLimiting()
+{
+	//limit for the left scrolling
+	if (vpSrc.x < 0)
+	{
+		vpSrc.x = 0;
+	}
+	//limit for up scrolling
+	if (vpSrc.y < 0)
+	{
+		vpSrc.y = 0;
+	}
+	//limit for scrolling to the right
+	if (vpSrc.x > wMapX - vpSrc.w)
+	{
+		vpSrc.x = wMapX - vpSrc.w;
+	}
+	//limit for scrolling to the bottom
+	if (vpSrc.y > wMapY - vpSrc.h)
+	{
+		vpSrc.y = wMapY - vpSrc.h;
 	}
 }
 

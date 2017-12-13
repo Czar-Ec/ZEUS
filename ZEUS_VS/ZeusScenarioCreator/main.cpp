@@ -1,7 +1,7 @@
-#include "Main.h"
+#include "SCMain.h"
 
 int main(int argc, char** argv)
 {
-	Main scenarioCreator;
+	SCMain scenarioCreator;
 	return 0;
 }

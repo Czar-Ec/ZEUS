@@ -59,7 +59,10 @@
     <ClInclude Include="stb_truetype.h">
       <Filter>Header Files\IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="Main.h">
+    <ClInclude Include="SCMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SCGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

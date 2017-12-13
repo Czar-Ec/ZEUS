@@ -53,8 +53,8 @@ public:
 private:
 
 	//constant values
-	const int ZOOM_IN = 1;
-	const int ZOOM_OUT = 0;
+	const int ZOOM_IN = 0;
+	const int ZOOM_OUT = 1;
 
 	//window size
 	int winWidth, winHeight;
@@ -87,6 +87,13 @@ private:
 
 	//pause sim
 	bool pauseSim = false;
+
+	#pragma region CONTROL VARIABLES
+	//////////////////////////////////////////////////////////////////////////////
+	bool isPanning = false;
+
+	/////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
 };
 
 /**
@@ -284,51 +291,81 @@ void Main::mainLoop()
 			//process events via SDL
 			switch (eventMain.type)
 			{
-			case SDL_QUIT:
-				appRun = false;
-				break;
+				case SDL_QUIT:
+					appRun = false;
+					break;
 
-				//while clicking the left button
-			case SDL_MOUSEBUTTONDOWN:
-				if (eventMain.button.button == SDL_BUTTON_LEFT)
-				{
-					gui.leftClick(window);
-				}
-				break;
+				#pragma region CLICK CONTROL
+				///////////////////////////////////////////////////////////////////////////
+					
+				case SDL_MOUSEBUTTONDOWN:
+					//while clicking the left button
+					if (eventMain.button.button == SDL_BUTTON_LEFT)
+					{
+						gui.leftClick(window);
+					}
+					//middle mouse button
+					if (eventMain.button.button == SDL_BUTTON_RIGHT)
+					{
+						isPanning = true;
+					}
+					break;
 
-				//when the button is no longer pressed
-			case SDL_MOUSEBUTTONUP:
-				if (eventMain.button.button == SDL_BUTTON_LEFT)
-				{
+					//when the button is no longer pressed
+				case SDL_MOUSEBUTTONUP:
+					if (eventMain.button.button == SDL_BUTTON_LEFT)
+					{
 
-				}
-				break;
+					}
+					//middle mouse button
+					if (eventMain.button.button == SDL_BUTTON_RIGHT)
+					{
+						isPanning = false;
+					}
+					break;
 
-			case SDL_MOUSEWHEEL:
-				//mouse wheel for zoom control
-				if (eventMain.wheel.y == -1)
-				{
-					//zoom in for scroll up
 
-				}
-				else if (eventMain.wheel.y == 1)
-				{
-					//zoom out for scroll down
+				///////////////////////////////////////////////////////////////////////////
+				#pragma endregion
 
-				}
-				break;
+				#pragma region MOUSEWHEEL CONTROLS
+				///////////////////////////////////////////////////////////////////////////
+				case SDL_MOUSEWHEEL:
+					//mouse wheel for zoom control
+					if (eventMain.wheel.y == 1)
+					{
+						//zoom in for scroll up
+						gui.zoom(ZOOM_IN);
+					}
+					else if (eventMain.wheel.y == -1)
+					{
+						//zoom out for scroll down
+						gui.zoom(ZOOM_OUT);
+					}
+					break;
 
-			case SDL_KEYDOWN:
-				if (eventMain.key.keysym.sym == SDLK_EQUALS)
-				{
+				///////////////////////////////////////////////////////////////////////////
+				#pragma endregion
 
-				}
-				else if (eventMain.key.keysym.sym == SDLK_MINUS)
-				{
+				#pragma region KEY PRESS CONTROLS
+				///////////////////////////////////////////////////////////////////////////
+				case SDL_KEYDOWN:
+					//pressing equals zooms the map in
+					if (eventMain.key.keysym.sym == SDLK_EQUALS)
+					{
+						gui.zoom(ZOOM_IN);
+					}
+					//pressing minus zooms the map out
+					else if (eventMain.key.keysym.sym == SDLK_MINUS)
+					{
+						gui.zoom(ZOOM_OUT);
+					}
+					break;
 
-				}
-				break;
+				///////////////////////////////////////////////////////////////////////////
+				#pragma endregion
 			}
+
 
 			//moving the viewport
 			if (key[SDL_SCANCODE_UP]) ;
@@ -351,16 +388,21 @@ void Main::mainLoop()
 				gui.ctrlO();
 			}
 		}
+		
+		//update frame for imgui
+		ImGui_ImplSdlGL2_NewFrame(window);
+		gui.menuBar(appRun);
+		//draw
+		updateMain();
 
-		//only done if the simulation is not paused
-		if (!pauseSim)
+		//if the user is panning the world map
+		if (isPanning)
 		{
-			//update frame for imgui
-			ImGui_ImplSdlGL2_NewFrame(window);
-			gui.menuBar(appRun);
-
-			//draw
-			updateMain();
+			if (eventMain.type == SDL_MOUSEMOTION)
+			{
+				//pan
+				gui.pan(&mousePos, -eventMain.motion.xrel, -eventMain.motion.yrel);
+			}
 		}
 
 		//skips first frame to prevent crash
