@@ -400,7 +400,6 @@ void Main::mainLoop()
 		{
 			if (eventMain.type == SDL_MOUSEMOTION)
 			{
-				//pan
 				gui.pan(&mousePos, -eventMain.motion.xrel, -eventMain.motion.yrel);
 			}
 		}

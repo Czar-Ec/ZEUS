@@ -356,7 +356,7 @@ void SCMain::mainLoop()
 			ImGui_ImplSdlGL2_NewFrame(window);
 
 			//call the gui menubar
-			gui.menuBar(appRun);
+			gui.menuBar(renderer, appRun);
 
 			//draw
 			updateMain();
