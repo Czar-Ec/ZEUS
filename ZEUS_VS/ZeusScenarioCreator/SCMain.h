@@ -53,8 +53,8 @@ public:
 private:
 
 	//constant values
-	const int ZOOM_IN = 1;
-	const int ZOOM_OUT = 0;
+	const int ZOOM_IN = 0;
+	const int ZOOM_OUT = 1;
 
 	//window size
 	int winWidth, winHeight;
@@ -141,7 +141,7 @@ void SCMain::init()
 
 		//create the window
 		window = SDL_CreateWindow(
-			"ZEUS",
+			"ZEUS Scenario Creator",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
 			//window width
@@ -306,12 +306,12 @@ void SCMain::mainLoop()
 				if (eventMain.wheel.y == -1)
 				{
 					//zoom in for scroll up
-
+					gui.zoom(ZOOM_IN);
 				}
 				else if (eventMain.wheel.y == 1)
 				{
 					//zoom out for scroll down
-
+					gui.zoom(ZOOM_OUT);
 				}
 				break;
 
@@ -356,7 +356,7 @@ void SCMain::mainLoop()
 			ImGui_ImplSdlGL2_NewFrame(window);
 
 			//call the gui menubar
-			gui.menuBar(renderer, appRun);
+			gui.menuBar(appRun);
 
 			//draw
 			updateMain();
