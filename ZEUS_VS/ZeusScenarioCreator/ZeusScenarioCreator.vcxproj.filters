@@ -65,8 +65,5 @@
     <ClInclude Include="SCGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Country.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
