@@ -19,6 +19,7 @@
 //basic IO
 #include <iostream>
 #include <stdio.h>
+<<<<<<< HEAD
 
 //opening external programs
 #include <shellapi.h>
@@ -35,6 +36,8 @@
 
 //other items
 #include "Country.h"
+=======
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 
 /**
 * GUI Class
@@ -47,11 +50,16 @@ public:
 	SCGUI(SDL_Renderer *renderer, int winX, int winY);
 	~SCGUI();
 
+<<<<<<< HEAD
 	//draw menu bar
 	void menuBar(bool &appRun);
 
 	//info box
 	void infoBox();
+=======
+	//main menu bar
+	void menuBar(bool &appRun);
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 
 	//menu bar functions
 	void newSim();
@@ -60,6 +68,7 @@ public:
 	//render items
 	void render(SDL_Window *window, SDL_Renderer *renderer);
 
+<<<<<<< HEAD
 	//CONTROLS AND SHORTCUTS
 	void ctrlN();
 	void ctrlO();
@@ -70,6 +79,8 @@ public:
 	void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
 	void panLimiting();	//ensures the pan is limited within the relevant zone of the texture
 
+=======
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 private:
 
 	//world size
@@ -92,6 +103,7 @@ private:
 	bool aPrefWin;
 
 	//colour of the background
+<<<<<<< HEAD
 	ImVec4 bkgColour;
 	////////////////////////////////////////////////////////////////////////////////
 #pragma endregion
@@ -148,6 +160,11 @@ private:
 
 	//////////////////////////////////////////////////////////////////////////////////////
 #pragma endregion
+=======
+	ImVec4 bkgColour = ImColor(255,255,255);
+
+
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 };
 
 /**
@@ -221,6 +238,7 @@ SCGUI::~SCGUI()
 
 }
 
+<<<<<<< HEAD
 /**
 * menuBar
 * function which heavily uses imgui to create the program's main menu bar as well as its options.
@@ -228,6 +246,9 @@ SCGUI::~SCGUI()
 *
 * @param bool &appRun (uses the pointer to the bool value so that the quit option of the menu can shut down the program)
 */
+=======
+
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 void SCGUI::menuBar(bool &appRun)
 {
 	//display the side info box
@@ -242,13 +263,21 @@ void SCGUI::menuBar(bool &appRun)
 		//Make a new simulation
 		if (ImGui::MenuItem("New Simulation", "CTRL+N"))
 		{
+<<<<<<< HEAD
 			newSimWindow = true;
+=======
+
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 		}
 
 		//Open existing simulation
 		if (ImGui::MenuItem("Open Simulation", "CTRL+O"))
 		{
+<<<<<<< HEAD
 			openSimWindow = true;
+=======
+
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 		}
 
 		//Save current simulation
@@ -341,6 +370,7 @@ void SCGUI::menuBar(bool &appRun)
 	ImGui::EndMainMenuBar();
 
 	//components of main menu bar
+<<<<<<< HEAD
 	//Appearance Preferences window
 	if (aPrefWin)
 	{
@@ -441,6 +471,8 @@ void SCGUI::openSim()
 		ImGui::Text("Open Sim");
 		ImGui::End();
 	}
+=======
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 }
 
 /**
@@ -474,6 +506,7 @@ void SCGUI::render(SDL_Window *window, SDL_Renderer *renderer)
 		bkgColour.z * 255.0f,
 		bkgColour.w * 255.0f);
 	SDL_RenderClear(renderer);
+<<<<<<< HEAD
 
 	//link viewports to the renderer
 	SDL_RenderSetViewport(renderer, &vp);
@@ -481,6 +514,9 @@ void SCGUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	//render the world map
 	SDL_RenderCopy(renderer, worldMap, &vpSrc, NULL);
 
+=======
+	
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
 	//render the IMGUI elements
 	glUseProgram(0);
 	ImGui::Render();
@@ -490,6 +526,7 @@ void SCGUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	SDL_RenderPresent(renderer);
 	SDL_GL_SwapWindow(window);
 }
+<<<<<<< HEAD
 
 /**
 * ctrlN
@@ -666,3 +703,5 @@ void SCGUI::panLimiting()
 	}
 }
 
+=======
+>>>>>>> parent of 82d0947... 6:00am 14/12/17
