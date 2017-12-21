@@ -67,7 +67,7 @@ static class GUI
 		void ctrlN();
 		void ctrlO();
 
-		void leftClick(SDL_Window *window);
+		void leftClick();
 
 		void zoom(int zoomType);	//function to allow zooming
 		void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
@@ -664,7 +664,7 @@ void GUI::ctrlO()
 leftClick
 When called, the function reads the screen and uses the pixel under the mouse cursor to determine if the user has selected a country
 */
-void GUI::leftClick(SDL_Window *window)
+void GUI::leftClick()
 {
 	//source of this function: 
 	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor

@@ -212,6 +212,8 @@ void SCMain::init()
 
 			//allow transparency
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+			gui = SCGUI(renderer, winX, winY);
 		}
 	}
 

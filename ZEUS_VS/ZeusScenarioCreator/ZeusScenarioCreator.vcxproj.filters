@@ -19,6 +19,9 @@
     <Filter Include="Header Files\IMGUI">
       <UniqueIdentifier>{eb8cffa3-2220-4a78-ad19-8694ef0f014a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{a7614342-3571-47f1-934c-4b4975761c2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="SCGUI.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Country.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

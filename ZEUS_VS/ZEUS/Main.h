@@ -302,7 +302,7 @@ void Main::mainLoop()
 					//while clicking the left button
 					if (eventMain.button.button == SDL_BUTTON_LEFT)
 					{
-						gui.leftClick(window);
+						gui.leftClick();
 					}
 					//middle mouse button
 					if (eventMain.button.button == SDL_BUTTON_RIGHT)
