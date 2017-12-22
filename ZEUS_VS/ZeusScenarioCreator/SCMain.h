@@ -291,7 +291,7 @@ void SCMain::mainLoop()
 			case SDL_MOUSEBUTTONDOWN:
 				if (eventMain.button.button == SDL_BUTTON_LEFT)
 				{
-
+					gui.leftClick();
 				}
 				break;
 

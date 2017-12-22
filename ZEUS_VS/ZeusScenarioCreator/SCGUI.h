@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 //Visual C++ library
 #include "Windows.h"
@@ -44,9 +45,15 @@ public:
 	//main menu bar
 	void menuBar(SDL_Renderer *renderer, bool &appRun);
 
+	//menu functions
+	void save();
+
 	//new scenario window
 	void newScenarioWin(SDL_Renderer *renderer);
 	void resetNewScenario();
+
+	//add new country window
+	void newCountryMenu(SDL_Renderer *renderer);
 
 	//gui rendering
 	void render(SDL_Window *window, SDL_Renderer *renderer);
@@ -63,6 +70,7 @@ private:
 	ImVec4 bkgColour = ImColor(0,0,44);
 
 	bool newScenario = false;
+	bool addNewCountry = false;
 
 	//map to be shown on screen
 	SDL_Texture *map = NULL;
@@ -108,6 +116,7 @@ private:
 	Country curCountry = Country("None", "None", 0, 0, 0, 0);
 
 	SDL_Color scrollCol;
+	bool nonExistentCountry = true; //variable to know if the country being scrolled over is unknown therefore can make a new country
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
 };
@@ -203,6 +212,29 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	//View
 	if (ImGui::BeginMenu("View"))
 	{
+		//view scenario details
+		if (ImGui::MenuItem("View Scenario Details"))
+		{
+
+		}
+
+		//view existing countries option
+		if (ImGui::MenuItem("View all countries"))
+		{
+
+		}
+
+		//add new country option
+		if (ImGui::MenuItem("Add new country"))
+		{
+			if (scenarioLoaded)
+			{
+				addNewCountry = true;
+			}
+		}
+
+
+
 
 		ImGui::EndMenu();
 	}
@@ -246,6 +278,16 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	{
 		newScenarioWin(renderer);
 	}
+
+	if (addNewCountry)
+	{
+		newCountryMenu(renderer);
+	}
+}
+
+void SCGUI::save()
+{
+
 }
 
 void SCGUI::newScenarioWin(SDL_Renderer *renderer)
@@ -258,10 +300,15 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 	//Scenario name label
 	ImGui::Text("Scenario Name: ");
 	ImGui::SameLine();
-	helpMarker("The name of the scenario. Maximum 30 characters.");
+	helpMarker("The name of the scenario. Maximum 30 characters and no spaces.");
 	//Scenario name input
 	ImGui::InputText("##name", tempName, sizeof(tempName), NULL);
-	
+
+	//removing spaces
+	std::string tempStr(tempName);
+	tempStr.erase(std::remove(tempStr.begin(), tempStr.end(), ' '), tempStr.end());
+	strcpy(tempName, tempStr.c_str());
+
 	ImGui::Separator();
 
 	//Scenario map label
@@ -463,6 +510,14 @@ void SCGUI::resetNewScenario()
 	newScenario = false;
 }
 
+void SCGUI::newCountryMenu(SDL_Renderer * renderer)
+{
+	//make the window
+	ImGui::Begin("New Country", &addNewCountry, ImGuiWindowFlags_NoCollapse);
+	ImGui::Text("TEST");
+	ImGui::End();
+}
+
 void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 {
 	//clear the screen
@@ -543,27 +598,40 @@ void SCGUI::leftClick()
 		//find the country which matches the colour
 		SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
 
-		//loop through the country list to find a matching colour
-		for (int i = 0; i < countryList.size(); i++)
+		//find the country if the country exists
+		if (!nonExistentCountry)
 		{
-			//get country colour
-			SDL_Color countryColour = countryList[i].getColour();
-
-			//debugging
-			/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
-			printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
-
-			if (comparison.r == countryColour.r		//compare red values
-				&& comparison.g == countryColour.g	//compare green values
-				&& comparison.b == countryColour.b	//compare blue values
-				)
+			//loop through the country list to find a matching colour
+			for (int i = 0; i < countryList.size(); i++)
 			{
-				//set the current country to this country (countryList[i])
-				curCountry = countryList[i];
+				//get country colour
+				SDL_Color countryColour = countryList[i].getColour();
 
-				//break the loop
-				break;
+				//debugging
+				/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+				printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+				if (comparison.r == countryColour.r		//compare red values
+					&& comparison.g == countryColour.g	//compare green values
+					&& comparison.b == countryColour.b	//compare blue values
+					)
+				{
+					//set the current country to this country (countryList[i])
+					curCountry = countryList[i];
+
+					//break the loop
+					break;
+				}
 			}
+		}
+		//make sure that it is not the background
+		else if(
+			comparison.r != bkgColour.x &&
+			comparison.g != bkgColour.y &&
+			comparison.b != bkgColour.z
+			)
+		{
+			addNewCountry = true;
 		}
 	}
 }
@@ -581,15 +649,15 @@ void SCGUI::getScrollCol()
 	// Get the device context for the screen
 	hDC = GetDC(NULL);
 	if (hDC == NULL)
-		std::cout << 3;
+		std::cout << "Unable to get screen context\n";
 
 	if (!b)
-		std::cout << 2;
+		std::cout << "Unable to get cursor position\n";
 
 	// Retrieve the color at that position
 	colour = GetPixel(hDC, p.x, p.y);
 	if (colour == CLR_INVALID)
-		std::cout << 1;
+		std::cout << "Obtained colour invalid\n";
 
 	// Release the device context again
 	ReleaseDC(GetDesktopWindow(), hDC);
@@ -646,23 +714,26 @@ void SCGUI::getScrollCol()
 		}
 	}
 
-	//if current scroll colour is not equal to the backgroung colour
+	//if current scroll colour is not equal to the background colour
 	if (
 		scrollCol.r != bkgColour.x &&
 		scrollCol.g != bkgColour.y &&
 		scrollCol.b != bkgColour.z
 		)
 	{
+		
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(450.0f);
 
 		if (countryFound)
 		{
 			ImGui::TextUnformatted(curCountry.getCountryName().c_str());
+			nonExistentCountry = false;
 		}
 		else
 		{
 			ImGui::TextUnformatted("Add new country?");
+			nonExistentCountry = true;
 		}
 
 		ImGui::PopTextWrapPos();

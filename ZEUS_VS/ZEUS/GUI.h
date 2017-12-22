@@ -64,10 +64,12 @@ static class GUI
 		void render(SDL_Window *window, SDL_Renderer *renderer);
 
 		//CONTROLS AND SHORTCUTS
-		void ctrlN();
-		void ctrlO();
+		void ctrlN();	//new simulation shortcut
+		void ctrlO();	//open simulation shortcut
 
-		void leftClick();
+		void mouseOver();	//mouseover countries, so user can see the country where the mouse is over
+
+		void leftClick();	//left click control
 
 		void zoom(int zoomType);	//function to allow zooming
 		void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
@@ -148,7 +150,8 @@ static class GUI
 		//current country being chosen
 		Country curCountry = Country("None", "None", 0, 0, 0, 0);
 
-
+		SDL_Color curCol = { 0, 0, 0 };
+		Country scrollCountry = Country("None", "None", 0, 0, 0, 0);
 		//////////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
 };
@@ -624,6 +627,9 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 		bkgColour.w * 255.0f);
 	SDL_RenderClear(renderer);
 
+	//get the user mouse over
+	mouseOver();
+
 	//link viewports to the renderer
 	SDL_RenderSetViewport(renderer, &vp);
 
@@ -658,6 +664,102 @@ void GUI::ctrlN()
 void GUI::ctrlO()
 {
 	openSimWindow = true;
+}
+
+void GUI::mouseOver()
+{
+	//variables to get mouse position and screen context
+	POINT p;
+	BOOL b;
+
+	// Get the current cursor position
+	b = GetCursorPos(&p);
+	COLORREF colour;
+	HDC hDC;
+
+	// Get the device context for the screen
+	hDC = GetDC(NULL);
+	if (hDC == NULL)
+		std::cout << "Unable to get screen context\n";
+
+	if (!b)
+		std::cout << "Unable to get cursor position\n";
+
+	// Retrieve the color at that position
+	colour = GetPixel(hDC, p.x, p.y);
+	if (colour == CLR_INVALID)
+		std::cout << "Obtained colour invalid\n";
+
+	// Release the device context again
+	ReleaseDC(GetDesktopWindow(), hDC);
+
+	//find the country which matches the colour
+	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
+
+	bool countryFound = false;
+
+	//check if current mouse over colour is the same, if not find out which country
+	//this prevents having to go through the loop everytime, uses less computing processes
+	//also ensures that the current colour is not the background colour
+	if (
+		comparison.r != bkgColour.x &&
+		comparison.g != bkgColour.y &&
+		comparison.b != bkgColour.z)
+	{
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			//get country colour
+			SDL_Color countryColour = countryList[i].getColour();
+
+			//debugging
+			/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+			printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+			if (comparison.r == countryColour.r		//compare red values
+				&& comparison.g == countryColour.g	//compare green values
+				&& comparison.b == countryColour.b	//compare blue values
+				)
+			{
+				//set this as the scroll country
+				scrollCountry = countryList[i];
+
+				//set scroll colour equal to this
+				curCol.r = countryColour.r;
+				curCol.g = countryColour.g;
+				curCol.b = countryColour.b;
+
+				//country found
+				countryFound = true;
+
+				//break the loop
+				break;
+			}
+		}
+
+		//if country was not found, set scroll colour equal to current colour
+		if (!countryFound)
+		{
+			curCol.r = comparison.r;
+			curCol.g = comparison.g;
+			curCol.b = comparison.b;
+		}
+	}
+
+	//if the country was identified
+	if (countryFound)
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(450.0f);
+
+		if (countryFound)
+		{
+			//get country name
+			ImGui::TextUnformatted(scrollCountry.getCountryName().c_str());
+		}
+
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }
 
 /**
