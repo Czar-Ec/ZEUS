@@ -85,6 +85,9 @@ private:
 	//pause sim
 	bool pauseSim = false;
 
+	//panning
+	bool isPanning = false;
+
 	//the GUI class used with the Main
 	SCGUI gui;
 };
@@ -291,7 +294,12 @@ void SCMain::mainLoop()
 			case SDL_MOUSEBUTTONDOWN:
 				if (eventMain.button.button == SDL_BUTTON_LEFT)
 				{
-					gui.leftClick();
+
+				}
+				//middle mouse button
+				if (eventMain.button.button == SDL_BUTTON_RIGHT)
+				{
+					isPanning = true;
 				}
 				break;
 
@@ -301,6 +309,12 @@ void SCMain::mainLoop()
 				{
 
 				}
+
+				//middle mouse button
+				if (eventMain.button.button == SDL_BUTTON_RIGHT)
+				{
+					isPanning = false;
+				}
 				break;
 
 			case SDL_MOUSEWHEEL:
@@ -308,23 +322,23 @@ void SCMain::mainLoop()
 				if (eventMain.wheel.y == -1)
 				{
 					//zoom in for scroll up
-
+					gui.zoom(ZOOM_IN);
 				}
 				else if (eventMain.wheel.y == 1)
 				{
 					//zoom out for scroll down
-
+					gui.zoom(ZOOM_OUT);
 				}
 				break;
 
 			case SDL_KEYDOWN:
 				if (eventMain.key.keysym.sym == SDLK_EQUALS)
 				{
-
+					gui.zoom(ZOOM_IN);
 				}
 				else if (eventMain.key.keysym.sym == SDLK_MINUS)
 				{
-
+					gui.zoom(ZOOM_OUT);
 				}
 				break;
 			}
@@ -362,6 +376,16 @@ void SCMain::mainLoop()
 
 			//draw
 			updateMain();
+
+			//if the user is panning the world map
+			if (isPanning)
+			{
+				if (eventMain.type == SDL_MOUSEMOTION)
+				{
+					//pan
+					gui.pan(&mousePos, -eventMain.motion.xrel, -eventMain.motion.yrel);
+				}
+			}
 		}
 
 		//skips first frame to prevent crash

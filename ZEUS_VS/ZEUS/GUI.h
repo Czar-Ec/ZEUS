@@ -589,7 +589,7 @@ void GUI::openSim()
 	//open the existing simulation window
 	if (openSimWindow)
 	{
-		ImGui::Begin("Opem Simulation", &openSimWindow, ImGuiWindowFlags_NoCollapse);
+		ImGui::Begin("Open Simulation", &openSimWindow, ImGuiWindowFlags_NoCollapse);
 		ImGui::Text("Open Sim");
 		ImGui::End();
 	}
@@ -639,7 +639,6 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	//render the IMGUI elements
 	glUseProgram(0);
 	ImGui::Render();
-
 
 	//update the screen
 	SDL_RenderPresent(renderer);
@@ -697,7 +696,6 @@ void GUI::mouseOver()
 	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
 
 	bool countryFound = false;
-
 	//check if current mouse over colour is the same, if not find out which country
 	//this prevents having to go through the loop everytime, uses less computing processes
 	//also ensures that the current colour is not the background colour

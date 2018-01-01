@@ -53,17 +53,19 @@ public:
 	void resetNewScenario();
 
 	//add new country window
-	void newCountryMenu(SDL_Renderer *renderer);
+	void newCountryMenu(SDL_Renderer *renderer, int r, int g, int b);
 
 	//gui rendering
 	void render(SDL_Window *window, SDL_Renderer *renderer);
 
 	//ease of access
 	void helpMarker(const char* desc);
+	void eyedropTool();
 
 	//Control functions
-	void leftClick();
-	void getScrollCol();
+	void zoom(int zoomType);	//function to allow zooming
+	void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
+	void panLimiting();	//ensures the pan is limited within the relevant zone of the texture
 
 private:
 	//colour of the background
@@ -75,6 +77,25 @@ private:
 	//map to be shown on screen
 	SDL_Texture *map = NULL;
 
+	//region where the map will be drawn
+	int worldX, worldY;
+	SDL_Rect vp;
+	//rectangle which allows for zooming and panning
+	SDL_Rect vpSrc;
+
+	#pragma region CONTROL VARIABLES
+	//////////////////////////////////////////////////////////////////////////////////
+	int wMapX, wMapY;
+	
+	float zoomVal = 1,
+		maxZoom = 1,
+		minZoom = 0.1,
+		zoomInterval = 0.025;
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
+
 	#pragma region SCENARIO GLOBAL VARIABLES
 	//////////////////////////////////////////////////////////////////////////////////
 	//scenario name
@@ -82,8 +103,6 @@ private:
 	//file path for the scenario map
 	char imgFilePath[MAX_PATH] = "";
 	std::string imgType = "";
-	//whether or not zombies are involved
-	bool simulateZombies = false;
 
 	//loaded scenario
 	bool scenarioLoaded = false;
@@ -96,13 +115,27 @@ private:
 	char tempName[30] = "";
 	char tempMapFilePath[MAX_PATH] = "";
 	std::string tempImgType = "";
-	bool tempZombies = false;
 
 	//booleans for error validation
 	bool acceptName = false;
 	bool acceptImgPath = false;
 	bool existingImgPath = false;
 	bool validType = false;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
+
+	#pragma region NEW COUNTRY VARIABLES
+	//////////////////////////////////////////////////////////////////////////////////
+	//temporary variables which hold country information
+	char tempCName[30] = "";
+	int tempR = 0,
+		tempG = 0,
+		tempB = 0;
+
+
+	//active eye dropper
+	bool eyedropperActive = false;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
@@ -144,14 +177,18 @@ SCGUI::SCGUI(SDL_Renderer *renderer, int winX, int winY)
 	scrollCol.r = 0;
 	scrollCol.g = 0;
 	scrollCol.b = 0;
-}
 
+	worldX = winX;
+	worldY = winY;
+
+	//set draw region
+	vp = { 0, 20, winX, winY - 20 };
+}
 
 void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 {
 	//menu bar
 	ImGui::BeginMainMenuBar();
-
 	//File
 	if (ImGui::BeginMenu("File"))
 	{
@@ -269,11 +306,12 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		ImGui::EndMenu();
 	}
 
-
 	//end of main menu bar
 	ImGui::EndMainMenuBar();
 
 	//components of main menu bar
+	
+
 	if (newScenario)
 	{
 		newScenarioWin(renderer);
@@ -281,7 +319,7 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 	if (addNewCountry)
 	{
-		newCountryMenu(renderer);
+		newCountryMenu(renderer, 0, 0, 0);
 	}
 }
 
@@ -302,12 +340,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 	ImGui::SameLine();
 	helpMarker("The name of the scenario. Maximum 30 characters and no spaces.");
 	//Scenario name input
-	ImGui::InputText("##name", tempName, sizeof(tempName), NULL);
-
-	//removing spaces
-	std::string tempStr(tempName);
-	tempStr.erase(std::remove(tempStr.begin(), tempStr.end(), ' '), tempStr.end());
-	strcpy(tempName, tempStr.c_str());
+	ImGui::InputText("##scenarioname", tempName, sizeof(tempName), ImGuiInputTextFlags_CharsNoBlank);
 
 	ImGui::Separator();
 
@@ -344,16 +377,6 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 			strcpy(tempMapFilePath, filename);
 		}
 	}
-
-	ImGui::Separator();
-	//Scenario zombie settings label
-	ImGui::Text("Zombie Scenario: ");
-	ImGui::SameLine();
-	helpMarker("Tick if the scenario should involve zombies during simulation");
-
-	ImGui::SameLine();
-	//check box for bool or no
-	ImGui::Checkbox("##zombieSimOpt", &tempZombies);
 
 	ImGui::Separator();
 
@@ -428,9 +451,6 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 			//file type of image
 			imgType = tempImgType;
 
-			//setglobal zombie to temp zombie
-			simulateZombies = tempZombies;
-
 			resetNewScenario();
 			scenarioLoaded = true;
 		}
@@ -484,7 +504,9 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 
 		map = SDL_CreateTextureFromSurface(renderer, tempSurf);
 		SDL_FreeSurface(tempSurf);
-		SDL_RenderCopy(renderer, map, NULL, NULL);
+		SDL_RenderCopy(renderer, map, NULL, NULL);//get texture size
+		SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
+		vpSrc = { 0, 0, wMapX, wMapY };
 	}
 	
 }
@@ -500,7 +522,6 @@ void SCGUI::resetNewScenario()
 	strcpy(tempName, "");
 	strcpy(tempMapFilePath, "");
 	tempImgType = "";
-	tempZombies = false;
 	
 	//reset validations
 	acceptName = false;
@@ -510,16 +531,96 @@ void SCGUI::resetNewScenario()
 	newScenario = false;
 }
 
-void SCGUI::newCountryMenu(SDL_Renderer * renderer)
+void SCGUI::newCountryMenu(SDL_Renderer * renderer, int r, int g, int b)
 {
+	tempR = r,
+	tempG = g,
+	tempB = b;
+
 	//make the window
 	ImGui::Begin("New Country", &addNewCountry, ImGuiWindowFlags_NoCollapse);
-	ImGui::Text("TEST");
+
+	ImGui::Separator();
+	//country name label
+	ImGui::Text("Country Name: ");
+	//input box
+	ImGui::SameLine();
+	//help marker
+	helpMarker("Country Name. Maximum 30 characters");
+	//country input
+	ImGui::SameLine();
+	ImGui::InputText("##countryname", tempCName, sizeof(tempCName), NULL);
+	ImGui::Separator();
+
+	//region identifier
+	ImGui::Text("Country Region: ");
+	ImGui::SameLine();
+	helpMarker(
+		"The colour that identifies as the country.\n" 
+		"You can either input the colour manually or use the\n"
+		"eye dropper tool to display the colour values from the image");
+
+	//separate inputs into 3 columns
+	ImGui::BeginColumns("##countrycolourinputs", 4, ImGuiColumnsFlags_NoBorder);
+
+	//red colour input
+	ImGui::TextColored(ImVec4(255, 0, 0, 255), "R: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##redcolourinput", &tempR, NULL, NULL, NULL);
+	ImGui::SameLine();
+
+	//green colour input
+	ImGui::NextColumn();
+	ImGui::TextColored(ImVec4(0, 255, 0, 255), "G: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##redcolourinput", &tempG, NULL, NULL, NULL);
+	ImGui::SameLine();
+
+	//blue colour input
+	ImGui::NextColumn();
+	ImGui::TextColored(ImVec4(0, 0, 255, 255), "B: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##redcolourinput", &tempB, NULL, NULL, NULL);
+
+	//eye dropper tool that will help identify region colours
+	ImGui::NextColumn();
+	ImGui::Text("Eyedrop tool: ");
+	ImGui::SameLine();
+	ImGui::Checkbox("##eyeDropCheckbox", &eyedropperActive);
+
+	ImGui::EndColumns();
+
+	ImGui::Separator();
+
+
+
+	//create new country button
+	if (ImGui::Button("Create Country", ImVec2(ImGui::GetWindowWidth(), 20)))
+	{
+
+	}
+
 	ImGui::End();
+
+	//only work if the mouse is not over any imgui items
+	if (eyedropperActive && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
+	{
+		eyedropTool();
+	}
 }
 
 void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 {
+	//update vp size
+	vp.y = 20;
+	vp.w = ((int)ImGui::GetIO().DisplaySize.x);
+	vp.h = ((int)ImGui::GetIO().DisplaySize.y) - 20;
+
+	//gets the world size
+	SDL_GetWindowSize(window, &worldX, &worldY);
+	//link viewports to the renderer
+	SDL_RenderSetViewport(renderer, &vp);
+
 	//clear the screen
 	SDL_SetRenderDrawColor(renderer,
 		bkgColour.x * 255.0f,
@@ -528,17 +629,12 @@ void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 		bkgColour.w * 255.0f);
 	SDL_RenderClear(renderer);
 
-	if (scenarioLoaded)
-	{
-		getScrollCol();
-	}
-
 	//render the world map
 	if (map != NULL)
 	{
-		SDL_RenderCopy(renderer, map, NULL, NULL);
+		SDL_RenderCopy(renderer, map, &vpSrc, NULL);
 	}
-	
+
 	//render the IMGUI elements
 	glUseProgram(0);
 	ImGui::Render();
@@ -562,82 +658,10 @@ void SCGUI::helpMarker(const char * desc)
 	}
 }
 
-void SCGUI::leftClick()
+void SCGUI::eyedropTool()
 {
-	//should only do things if an image is actually loaded
-	if (scenarioLoaded)
-	{
-		//source of this function: 
-		//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor
-		POINT p;
-		BOOL b;
-
-		// Get the current cursor position
-		b = GetCursorPos(&p);
-		COLORREF colour;
-		HDC hDC;
-
-		// Get the device context for the screen
-		hDC = GetDC(NULL);
-		if (hDC == NULL)
-			std::cout << 3;
-
-		if (!b)
-			std::cout << 2;
-
-		// Retrieve the color at that position
-		colour = GetPixel(hDC, p.x, p.y);
-		if (colour == CLR_INVALID)
-			std::cout << 1;
-
-		// Release the device context again
-		ReleaseDC(GetDesktopWindow(), hDC);
-
-		//printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));
-
-		//find the country which matches the colour
-		SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
-
-		//find the country if the country exists
-		if (!nonExistentCountry)
-		{
-			//loop through the country list to find a matching colour
-			for (int i = 0; i < countryList.size(); i++)
-			{
-				//get country colour
-				SDL_Color countryColour = countryList[i].getColour();
-
-				//debugging
-				/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
-				printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
-
-				if (comparison.r == countryColour.r		//compare red values
-					&& comparison.g == countryColour.g	//compare green values
-					&& comparison.b == countryColour.b	//compare blue values
-					)
-				{
-					//set the current country to this country (countryList[i])
-					curCountry = countryList[i];
-
-					//break the loop
-					break;
-				}
-			}
-		}
-		//make sure that it is not the background
-		else if(
-			comparison.r != bkgColour.x &&
-			comparison.g != bkgColour.y &&
-			comparison.b != bkgColour.z
-			)
-		{
-			addNewCountry = true;
-		}
-	}
-}
-
-void SCGUI::getScrollCol()
-{
+	//source of this function: 
+	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor
 	POINT p;
 	BOOL b;
 
@@ -649,15 +673,15 @@ void SCGUI::getScrollCol()
 	// Get the device context for the screen
 	hDC = GetDC(NULL);
 	if (hDC == NULL)
-		std::cout << "Unable to get screen context\n";
+		std::cout << 3;
 
 	if (!b)
-		std::cout << "Unable to get cursor position\n";
+		std::cout << 2;
 
 	// Retrieve the color at that position
 	colour = GetPixel(hDC, p.x, p.y);
 	if (colour == CLR_INVALID)
-		std::cout << "Obtained colour invalid\n";
+		std::cout << 1;
 
 	// Release the device context again
 	ReleaseDC(GetDesktopWindow(), hDC);
@@ -667,77 +691,134 @@ void SCGUI::getScrollCol()
 	//find the country which matches the colour
 	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
 
-	bool countryFound = false;
-
-	//check if current scrolled colour is the same, if not find the new country
-	//this prevents having to go through the loop everytime, uses less computing processes
-	if (comparison.r != scrollCol.r &&
-		comparison.g != scrollCol.g &&
-		comparison.b != scrollCol.b)
+	//loop through the country list to find a matching colour
+	for (int i = 0; i < countryList.size(); i++)
 	{
-		for (int i = 0; i < countryList.size(); i++)
+		//get country colour
+		SDL_Color countryColour = countryList[i].getColour();
+
+		//debugging
+		/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+		printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+		if (comparison.r == countryColour.r		//compare red values
+			&& comparison.g == countryColour.g	//compare green values
+			&& comparison.b == countryColour.b	//compare blue values
+			)
 		{
-			//get country colour
-			SDL_Color countryColour = countryList[i].getColour();
+			//set the current country to this country (countryList[i])
+			curCountry = countryList[i];
 
-			//debugging
-			/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
-			printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
-
-			if (comparison.r == countryColour.r		//compare red values
-				&& comparison.g == countryColour.g	//compare green values
-				&& comparison.b == countryColour.b	//compare blue values
-				)
-			{
-				//set scroll colour equal to this
-				scrollCol.r = countryColour.r;
-				scrollCol.g = countryColour.g;
-				scrollCol.b = countryColour.b;
-
-
-				std::cout << (int)scrollCol.r << ", " << (int)scrollCol.g << ", " << (int)scrollCol.b << std::endl;
-
-				//country found
-				countryFound = true;
-
-				//break the loop
-				break;
-			}
-		}
-
-		//if country was not found, set scroll colour equal to current colour
-		if (!countryFound)
-		{
-			scrollCol.r = comparison.r;
-			scrollCol.g = comparison.g;
-			scrollCol.b = comparison.b;
+			//break the loop
+			break;
 		}
 	}
 
-	//if current scroll colour is not equal to the background colour
-	if (
-		scrollCol.r != bkgColour.x &&
-		scrollCol.g != bkgColour.y &&
-		scrollCol.b != bkgColour.z
-		)
+	//if the country was identified
+	if ((int)comparison.r != (int)bkgColour.w &&
+		(int)comparison.g != (int)bkgColour.x &&
+		(int)comparison.b != (int)bkgColour.y)
 	{
-		
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(450.0f);
 
-		if (countryFound)
-		{
-			ImGui::TextUnformatted(curCountry.getCountryName().c_str());
-			nonExistentCountry = false;
-		}
-		else
-		{
-			ImGui::TextUnformatted("Add new country?");
-			nonExistentCountry = true;
-		}
+		//text to show
+		std::string rTxt = std::to_string((int)comparison.r);
+		std::string gTxt = std::to_string((int)comparison.g);
+		std::string bTxt = std::to_string((int)comparison.b);
+		std::string col = "R: " + rTxt + ", G: " + gTxt + ", B: " + bTxt;
+
+		ImGui::TextUnformatted(col.c_str());
 
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
-	
+}
+
+inline void SCGUI::zoom(int zoomType)
+{
+	//store the old zoom
+	float oldZoom = zoomVal;
+
+	//determine the zoom type and alter the zoom val
+	switch (zoomType)
+	{
+	case -1:
+		//place holder input
+		break;
+
+		//zoom in
+	case 0:
+		if (zoomVal - zoomInterval > minZoom)
+		{
+			zoomVal -= zoomInterval;
+			//std::cout << "zoomed in" << std::endl;
+		}
+		break;
+
+		//zoom out
+	case 1:
+		if (zoomVal + zoomInterval <= maxZoom)
+		{
+			zoomVal += zoomInterval;
+			//std::cout << "zoomed out" << std::endl;
+		}
+		break;
+
+	default:
+		std::cout << "Unknown zoom type" << std::endl;
+		break;
+	}
+
+	//adjust vpSrc
+	if (oldZoom - zoomVal != 0)
+	{
+		vpSrc.w = wMapX * zoomVal;
+		vpSrc.h = wMapY * zoomVal;
+		vpSrc.x = wMapX / 2 - vpSrc.w / 2;
+		vpSrc.y = wMapY / 2 - vpSrc.h / 2;
+	}
+
+	//std::cout << zoomVal << std::endl;
+
+	//limit the x and y of the source
+	panLimiting();
+}
+
+void SCGUI::pan(SDL_Point * mPos, int motionX, int motionY)
+{
+	//check if the mouse is within the viewport
+	if (SDL_PointInRect(mPos, &vp))
+	{
+		vpSrc.x += motionX * 2;
+		vpSrc.y += motionY * 2;
+		//std::cout << "X: " << vpSrc.x << std::endl << "Y: " << vpSrc.y << std::endl;
+
+		//limit the panning so there is no texture streching
+		panLimiting();
+	}
+}
+
+void SCGUI::panLimiting()
+{
+	//limit for the left scrolling
+	if (vpSrc.x < 0)
+	{
+		vpSrc.x = 0;
+	}
+	//limit for up scrolling
+	if (vpSrc.y < 0)
+	{
+		vpSrc.y = 0;
+	}
+	//limit for scrolling to the right
+	if (vpSrc.x > wMapX - vpSrc.w)
+	{
+		vpSrc.x = wMapX - vpSrc.w;
+	}
+	//limit for scrolling to the bottom
+	if (vpSrc.y > wMapY - vpSrc.h)
+	{
+		vpSrc.y = wMapY - vpSrc.h;
+	}
 }
