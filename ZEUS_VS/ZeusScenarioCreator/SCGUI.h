@@ -47,16 +47,26 @@ public:
 
 	//menu functions
 	void save();
+	
+	//view country window
+	void viewCountries();
 
 	//new scenario window
 	void newScenarioWin(SDL_Renderer *renderer);
 	void resetNewScenario();
 
 	//add new country window
-	void newCountryMenu(SDL_Renderer *renderer, int r, int g, int b);
+	void newCountryMenu(int r, int g, int b);
+	void resetNewCountry();
+
+	//edit country window
+	void editCountryMenu(int count);
 
 	//gui rendering
 	void render(SDL_Window *window, SDL_Renderer *renderer);
+
+	//tools
+	bool doesCountryExist(std::string id);
 
 	//ease of access
 	void helpMarker(const char* desc);
@@ -73,6 +83,8 @@ private:
 
 	bool newScenario = false;
 	bool addNewCountry = false;
+	bool editCountry = false;
+	bool viewCountriesWin = false;
 
 	//map to be shown on screen
 	SDL_Texture *map = NULL;
@@ -117,7 +129,7 @@ private:
 	std::string tempImgType = "";
 
 	//booleans for error validation
-	bool acceptName = false;
+	bool acceptScenarioName = false;
 	bool acceptImgPath = false;
 	bool existingImgPath = false;
 	bool validType = false;
@@ -125,9 +137,63 @@ private:
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
 
+	#pragma region VIEW COUNTRIES
+	//////////////////////////////////////////////////////////////////////////////////
+	int currentCountry;
+
+	char editID[5] = "";
+	char editCName[30] = "";
+	int editR = 0,
+		editG = 0,
+		editB = 0;
+
+
+	//active eye dropper
+	bool editEyeDropperActive = false;
+
+	//country's population
+	char editPop[13] = "0";
+	long int editPopInt;
+
+	//country GDP
+	char editGDP[13] = "0";
+	long int editGDPInt;
+
+	//country military budget
+	char editMilitaryBudget[13] = "0";
+	long int editMBInt;
+
+	//country research spending
+	char editResearchSpending[13] = "0";
+	long int editRSInt;
+
+	//climate booleans
+	bool
+		//temperatures
+		ehotTemp = false,
+		ecoldTemp = false,
+		eneutralTemp = true,
+
+		//humidity
+		ewetHum = false,
+		edryHum = false,
+		eneutralHum = true;
+
+	//country borders
+	std::vector<std::string> elandBorders;
+
+	//air and ocean links
+	std::vector<std::string> eairLinks;
+	std::vector<std::string> eseaLinks;
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
+
 	#pragma region NEW COUNTRY VARIABLES
 	//////////////////////////////////////////////////////////////////////////////////
 	//temporary variables which hold country information
+	char tempID[5] = "";
 	char tempCName[30] = "";
 	int tempR = 0,
 		tempG = 0,
@@ -136,6 +202,45 @@ private:
 
 	//active eye dropper
 	bool eyedropperActive = false;
+
+	//country's population
+	char tempPop[13] = "0";
+	long int tempPopInt;
+
+	//country GDP
+	char tempGDP[13] = "0";
+	long int tempGDPInt;
+
+	//country military budget
+	char tempMilitaryBudget[13] = "0";
+	long int tempMBInt;
+
+	//country research spending
+	char tempResearchSpending[13] = "0";
+	long int tempRSInt;
+
+	//climate booleans
+	bool
+		//temperatures
+		hotTemp = false,
+		coldTemp = false,
+		neutralTemp = true,
+
+		//humidity
+		wetHum = false,
+		dryHum = false,
+		neutralHum = true;
+
+	//country borders
+	std::vector<std::string> landBorders;
+
+	//air and ocean links
+	std::vector<std::string> airLinks;
+	std::vector<std::string> seaLinks;
+
+	//error checking
+	std::string errID, errName;
+	bool acceptNewCID, isNewCIDunique, acceptNewCName;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
@@ -146,7 +251,7 @@ private:
 	std::vector<Country> countryList;
 
 	//current chosen country
-	Country curCountry = Country("None", "None", 0, 0, 0, 0);
+	Country curCountry = Country();
 
 	SDL_Color scrollCol;
 	bool nonExistentCountry = true; //variable to know if the country being scrolled over is unknown therefore can make a new country
@@ -249,16 +354,17 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	//View
 	if (ImGui::BeginMenu("View"))
 	{
-		//view scenario details
-		if (ImGui::MenuItem("View Scenario Details"))
-		{
-
-		}
 
 		//view existing countries option
 		if (ImGui::MenuItem("View all countries"))
 		{
+			if (scenarioLoaded)
+			{
+				viewCountriesWin = true;
 
+				//sort the country list alphabetically
+				//std::sort(countryList.begin(), countryList.end());
+			}
 		}
 
 		//add new country option
@@ -317,9 +423,14 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		newScenarioWin(renderer);
 	}
 
+	if (viewCountriesWin)
+	{
+		viewCountries();
+	}
+
 	if (addNewCountry)
 	{
-		newCountryMenu(renderer, 0, 0, 0);
+		newCountryMenu(0, 0, 0);
 	}
 }
 
@@ -328,10 +439,139 @@ void SCGUI::save()
 
 }
 
+void SCGUI::viewCountries()
+{
+	//make the window
+	ImGui::Begin("View Country", &viewCountriesWin, ImGuiWindowFlags_NoCollapse);
+	ImGui::SetWindowSize(ImVec2(500, 250));
+	ImGui::BeginColumns("View Countries", 4, NULL);
+
+	//column titles
+	ImGui::Text("Country ID");
+	ImGui::NextColumn();
+
+	ImGui::Text("Country Name");
+	ImGui::NextColumn();
+
+	helpMarker("Press View to edit/view the country data");
+	ImGui::NextColumn();
+
+	helpMarker("Press Remove to delete the country from the list. Action cannot be undone");
+	ImGui::NextColumn();
+
+	//add all information from the country list
+	for (int count = 0; count < countryList.size(); count++)
+	{
+		//show the ID in the first column
+		ImGui::Text(countryList[count].getID().c_str());
+		ImGui::NextColumn();
+
+		//show country name
+		ImGui::Text(countryList[count].getCountryName().c_str());
+		ImGui::NextColumn();
+
+		std::string viewButtonText = "View " + countryList[count].getID();
+		//view button
+		if (ImGui::Button(viewButtonText.c_str()))
+		{
+			currentCountry = count;
+
+			//set edit ID
+			strcpy(editID, countryList[count].getID().c_str());
+
+			//set edit name
+			strcpy(editCName, countryList[count].getCountryName().c_str());
+
+			//set region colours
+			SDL_Color colour = countryList[count].getColour();
+			editR = colour.r;
+			editG = colour.g;
+			editB = colour.b;
+
+			//set population
+			strcpy(editPop, std::to_string(countryList[count].getPopulation()).c_str());
+
+			//set gdp
+			strcpy(editGDP, std::to_string(countryList[count].getGDP()).c_str());
+
+			//set military budget
+			strcpy(editMilitaryBudget, std::to_string(countryList[count].getMilitaryBudget()).c_str());
+
+			//set research budget
+			strcpy(editResearchSpending, std::to_string(countryList[count].getResearchBudget()).c_str());
+
+			int temp = countryList[count].getTemperature();
+			eneutralTemp = ehotTemp = ecoldTemp = false;
+			int hum = countryList[count].getHumidity();
+			eneutralHum = ewetHum = edryHum = false;
+
+			//setting correct settings for temperature
+			switch (temp)
+			{
+				case 0:
+					eneutralTemp = true;
+					break;
+
+				case 1:
+					ehotTemp = true;
+					break;
+
+				case 2:
+					ecoldTemp = true;
+					break;
+
+				default:
+					break;
+			}
+
+			//setting correct settings for humidity
+			switch (hum)
+			{
+			case 0:
+				eneutralHum = true;
+				break;
+
+			case 1:
+				edryHum = true;
+				break;
+
+			case 2:
+				ewetHum = true;
+				break;
+
+			default:
+				break;
+			}
+
+			editCountry = true;
+		}
+		ImGui::NextColumn();
+
+		std::string removeButtonText = "Remove " + countryList[count].getID();
+		//remove button
+		if (ImGui::Button(removeButtonText.c_str()))
+		{
+			countryList.erase(countryList.begin() + count);
+		}
+		ImGui::NextColumn();
+
+	}
+
+	ImGui::EndColumns();
+	ImGui::End();
+
+	if (editCountry)
+	{
+		editCountryMenu(currentCountry);
+	}
+}
+
 void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 {
 	//make the window
-	ImGui::Begin("New Scenario", &newScenario, ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("New Scenario", &newScenario, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+	ImGui::SetWindowSize(ImVec2(400, 250));
 
 	ImGui::Separator();
 
@@ -388,7 +628,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		//validation checks
 		if (strcmp(tempName, "") != 0)
 		{
-			acceptName = true;
+			acceptScenarioName = true;
 		}
 		if (strcmp(tempMapFilePath, "") != 0)
 		{
@@ -440,7 +680,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		}
 
 		//if valid, commit to global
-		if (acceptName && acceptImgPath && existingImgPath)
+		if (acceptScenarioName && acceptImgPath && existingImgPath)
 		{
 			//copy temp name to global name
 			strcpy(name, tempName);
@@ -450,6 +690,21 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 
 			//file type of image
 			imgType = tempImgType;
+
+			//load the texture
+			if (tempMapFilePath != "")
+			{
+				SDL_Surface* tempSurf = IMG_Load(imgFilePath);
+
+				map = SDL_CreateTextureFromSurface(renderer, tempSurf);
+				SDL_FreeSurface(tempSurf);
+				SDL_RenderCopy(renderer, map, NULL, NULL);//get texture size
+				SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
+				vpSrc = { 0, 0, wMapX, wMapY };
+
+				//resets map file path
+				strcpy(tempMapFilePath, "");
+			}
 
 			resetNewScenario();
 			scenarioLoaded = true;
@@ -463,10 +718,12 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 	ImGui::Separator();
 	ImGui::Separator();
 
-	bool open = true;
-	if (ImGui::BeginPopupModal("Cannot Create Scenario", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+	bool error = true;
+	if (ImGui::BeginPopupModal("Cannot Create Scenario", &error, ImGuiWindowFlags_NoResize))
 	{
-		if (!acceptName)
+		ImGui::SetWindowSize(ImVec2(400, 150));
+
+		if (!acceptScenarioName)
 		{
 			ImGui::Text("Name of the scenario cannot be empty.\n");
 		}
@@ -488,7 +745,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 
 		//close popup
 		ImGui::Separator();
-		if (ImGui::Button("Close"))
+		if (ImGui::Button("Close", ImVec2(ImGui::GetWindowWidth(), 20)))
 		{
 			ImGui::CloseCurrentPopup();
 		}
@@ -496,18 +753,6 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		ImGui::EndPopup();
 	}
 	ImGui::End();
-
-	//load the texture
-	if (tempMapFilePath != "")
-	{
-		SDL_Surface* tempSurf = IMG_Load(imgFilePath);
-
-		map = SDL_CreateTextureFromSurface(renderer, tempSurf);
-		SDL_FreeSurface(tempSurf);
-		SDL_RenderCopy(renderer, map, NULL, NULL);//get texture size
-		SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
-		vpSrc = { 0, 0, wMapX, wMapY };
-	}
 	
 }
 
@@ -524,23 +769,44 @@ void SCGUI::resetNewScenario()
 	tempImgType = "";
 	
 	//reset validations
-	acceptName = false;
+	acceptScenarioName = false;
 	acceptImgPath = false;
 	existingImgPath = false;
 
 	newScenario = false;
 }
 
-void SCGUI::newCountryMenu(SDL_Renderer * renderer, int r, int g, int b)
+void SCGUI::newCountryMenu(int r, int g, int b) 
 {
-	tempR = r,
-	tempG = g,
-	tempB = b;
+	if (r != 0 &&
+		g != 0 &&
+		b != 0)
+	{
+		tempR = r,
+		tempB = b,
+		tempG = g;
+	}
 
 	//make the window
-	ImGui::Begin("New Country", &addNewCountry, ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("New Country", &addNewCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowSize(ImVec2(700, 500), NULL);
 
 	ImGui::Separator();
+	#pragma region INPUT: CID AND CNAME
+
+	//unique country ID
+	ImGui::Text("Country ID: ");
+	ImGui::SameLine();
+	helpMarker(
+		"A unique identifier for each country\n"
+		"Maximum 4 characters"
+	);
+	ImGui::SameLine();
+	ImGui::InputText("##uniquecountryID", tempID, sizeof(tempID), ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_CharsNoBlank);
+
+	ImGui::Separator();
+
+
 	//country name label
 	ImGui::Text("Country Name: ");
 	//input box
@@ -549,8 +815,14 @@ void SCGUI::newCountryMenu(SDL_Renderer * renderer, int r, int g, int b)
 	helpMarker("Country Name. Maximum 30 characters");
 	//country input
 	ImGui::SameLine();
-	ImGui::InputText("##countryname", tempCName, sizeof(tempCName), NULL);
+	ImGui::InputText("##countryname", tempCName, sizeof(tempCName), ImGuiInputTextFlags_CharsNoBlank);
+	
+	#pragma endregion INPUT: CID AND CNAME
+
 	ImGui::Separator();
+	#pragma region INPUT: REGION COLOUR
+	//separate inputs into 3 columns
+	ImGui::BeginColumns("##countrycolourinputs", 3, ImGuiColumnsFlags_NoBorder);
 
 	//region identifier
 	ImGui::Text("Country Region: ");
@@ -559,45 +831,910 @@ void SCGUI::newCountryMenu(SDL_Renderer * renderer, int r, int g, int b)
 		"The colour that identifies as the country.\n" 
 		"You can either input the colour manually or use the\n"
 		"eye dropper tool to display the colour values from the image");
+	ImGui::NextColumn();
 
-	//separate inputs into 3 columns
-	ImGui::BeginColumns("##countrycolourinputs", 4, ImGuiColumnsFlags_NoBorder);
+	//eye dropper tool that will help identify region colours
+	ImGui::Text("Eyedrop tool: ");
+	ImGui::SameLine();
+	ImGui::Checkbox("##eyeDropCheckbox", &eyedropperActive);
+	ImGui::NextColumn();
+	ImGui::NextColumn();
 
 	//red colour input
 	ImGui::TextColored(ImVec4(255, 0, 0, 255), "R: ");
 	ImGui::SameLine();
 	ImGui::InputInt("##redcolourinput", &tempR, NULL, NULL, NULL);
+	//limiting input
+	if (tempR > 255) tempR = 255;
+	if (tempR < 0) tempR = 0;
 	ImGui::SameLine();
 
 	//green colour input
 	ImGui::NextColumn();
 	ImGui::TextColored(ImVec4(0, 255, 0, 255), "G: ");
 	ImGui::SameLine();
-	ImGui::InputInt("##redcolourinput", &tempG, NULL, NULL, NULL);
+	ImGui::InputInt("##greencolourinput", &tempG, NULL, NULL, NULL);
+	//limiting input
+	if (tempG > 255) tempG = 255;
+	if (tempG < 0) tempG = 0;
 	ImGui::SameLine();
 
 	//blue colour input
 	ImGui::NextColumn();
 	ImGui::TextColored(ImVec4(0, 0, 255, 255), "B: ");
 	ImGui::SameLine();
-	ImGui::InputInt("##redcolourinput", &tempB, NULL, NULL, NULL);
+	ImGui::InputInt("##bluecolourinput", &tempB, NULL, NULL, NULL);
+	//limiting input
+	if (tempB > 255) tempB = 255;
+	if (tempB < 0) tempB = 0;
+
+	ImGui::EndColumns();
+
+	#pragma endregion INPUT: REGION COLOUR
+
+	ImGui::Separator();
+	#pragma region INPUT: C ATTRIBUTES
+	ImGui::BeginColumns("##newcountryattributescolumn", 2, ImGuiColumnsFlags_NoBorder);
+
+	//country population
+	ImGui::Text("Country Population: "); 
+	ImGui::SameLine();
+	helpMarker(
+		"Maximum characters are set at 12 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 12. Value cannot be negative."
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##countrypopinput", tempPop, sizeof(tempPop), ImGuiInputTextFlags_CharsDecimal);
+	tempPopInt = atol(tempPop);
+	if (tempPopInt < 0) strcpy(tempPop, "0");
+	if (tempPopInt > 999999999999) strcpy(tempPop, "999999999999");
+
+	ImGui::Separator();
+
+	//country GDP
+	ImGui::NextColumn();
+	ImGui::Text("Country GDP (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"Maximum characters are set at 12 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 12. Value cannot be negative.\n"
+		"Note that the value is in millions of USD"
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##countryGDPinput", tempGDP, sizeof(tempGDP), ImGuiInputTextFlags_CharsDecimal);
+	//limiting GDP	
+	tempGDPInt = atol(tempGDP);
+	if (tempGDPInt < 0) strcpy(tempGDP, "0");
+	if (tempGDPInt > 999999999999) strcpy(tempGDP, "999999999999");
+
+	ImGui::Separator();
+
+	ImGui::NextColumn();
+	ImGui::Text("Military Budget (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"The military budget will be used to determine how\n"
+		"well the country will fare in a zombie scenario.\n"
+		"Maximum 12 characters (9.99x10^18 million USD)"
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##countryMBinput", tempMilitaryBudget, sizeof(tempMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
+	//limiting Military budget
+	tempMBInt = atol(tempMilitaryBudget);
+	if (tempMBInt > 999999999999) strcpy(tempMilitaryBudget, "99999999999");
+	//cannot be negative
+	if (tempMBInt < 0) strcpy(tempMilitaryBudget, "0");
+
+	ImGui::Separator();
+
+	ImGui::NextColumn();
+	ImGui::Text("Research Budget (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"This is the country's contribution to the global research pool.\n"
+		"The more money the world puts into the research pool, the \n"
+		"faster a cure can be researched. Zombies cannot be cured, but\n"
+		"once a cure is found, no more zombies can be made."
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##countryRBinput", tempResearchSpending, sizeof(tempResearchSpending), ImGuiInputTextFlags_CharsDecimal);
+	//limiting Military budget
+	tempRSInt = atol(tempResearchSpending);
+	if (tempRSInt > 999999999999) strcpy(tempResearchSpending, "99999999999");
+	//cannot be negative
+	if (tempRSInt < 0) strcpy(tempResearchSpending, "0");
+		
+	ImGui::EndColumns();
+
+	#pragma endregion INPUT: C ATTRIBUTES
+
+	ImGui::Separator();
+	#pragma region INPUT: C CLIMATE
+	//country climates
+	ImGui::Text("Country Climates: ");
+
+	//temperature
+	ImGui::Text("Temperature");
+
+	ImGui::BeginColumns("##countrytempcolumn", 4, ImGuiColumnsFlags_NoBorder);
+	
+	//hot temperature
+	ImGui::Text("Hot");
+	ImGui::SameLine();
+	ImGui::Checkbox("##hottempcheckbox", &hotTemp);
+	ImGui::NextColumn();
+
+	//cold temperature
+	ImGui::Text("Cold");
+	ImGui::SameLine();
+	ImGui::Checkbox("##coldtempcheckbox", &coldTemp);
+	ImGui::NextColumn();
+
+	//neutral temperature
+	ImGui::Text("Neutral");
+	ImGui::SameLine();
+	ImGui::Checkbox("##neutraltempcheckbox", &neutralTemp);
+
+	//error checking
+	//can EITHER be hot or cold but can't be in at the same time.
+	//default to neutral if both hot and cold (and other combinations) are used at the same time
+	if (hotTemp && coldTemp ||
+		hotTemp && neutralTemp ||
+		coldTemp && neutralTemp
+		) neutralTemp = true, hotTemp = false, coldTemp = false;
+	
+	ImGui::NextColumn();
+
+	//tooltip for user friendliness
+	helpMarker(
+		"The country's (average) temperature.\n"
+		"Assume that any average temperature below 10 degrees Celsius is \n"
+		"cold; Any temperature between 10 and 20 degrees Celsius is \n"
+		"neutral and any temperature above 20 degrees Celsius is a hot \n"
+		"climate\n\nThe menu will automatcally set to neutral if invalid \n"
+		"options are made."
+	);
+	
+	ImGui::EndColumns();
+
+	//humidity
+	ImGui::Text("Humidity");
+
+	ImGui::BeginColumns("##countryhumiditycolumn", 4, ImGuiColumnsFlags_NoBorder);
+
+	ImGui::Text("Wet");
+	ImGui::SameLine();
+	ImGui::Checkbox("##wethumcheckbox", &wetHum);
+	ImGui::NextColumn();
+
+	ImGui::Text("Dry ");
+	ImGui::SameLine();
+	ImGui::Checkbox("##dryhumcheckbox", &dryHum);
+	ImGui::NextColumn();
+
+	ImGui::Text("Neutral");
+	ImGui::SameLine();
+	ImGui::Checkbox("##neutralhumcheckbox", &neutralHum);
+	ImGui::NextColumn();
+
+	//tooltip
+	helpMarker(
+		"The country's (average) humidity.\n"
+		"Wet refers to countries with high humidity such as\n"
+		"rainforests / tropical monsoon areas.\n"
+		"Dry refers to countries with low humidity such as\n"
+		"deserts / arid areas\n\n"
+		"The option will be set to neutral if invalid options\n"
+		"are made."
+	);
+
+	//error checking
+	//can EITHER be dry OR wet but cannot be both at the same time
+	//default to neutral if invalid combinations are made
+	if (dryHum && wetHum ||
+		dryHum && neutralHum ||
+		wetHum && neutralHum
+		) neutralHum = true, wetHum = false, dryHum = false;
+
+	ImGui::EndColumns();
+
+	#pragma endregion INPUT: C CLIMATE
+
+	ImGui::Separator();
+	#pragma region INPUT: C CONNECTIONS
+	ImGui::Text("Country Connections");
+
+	//countries this country shares borders with
+	if (ImGui::TreeNode("Border Countries"))
+	{
+		if (ImGui::ListBoxHeader("##bordercountries", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+	
+	//countries this country has ocean routes to
+	if (ImGui::TreeNode("Ocean Links"))
+	{
+		if (ImGui::ListBoxHeader("##oceanlinks", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedSea);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+
+	//countries this country has air routes to
+	if (ImGui::TreeNode("Air Links"))
+	{
+		if (ImGui::ListBoxHeader("##airlinks", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedAir);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+	#pragma endregion INPUT: C CONNECTIONS
+	ImGui::Separator();
+
+	//input validation
+	
+
+	//create new country button
+	if (ImGui::Button("Create Country", ImVec2(ImGui::GetWindowWidth(), 20)))
+	{
+		#pragma region NEW COUNTRY VALIDATION CHECK
+		
+		acceptNewCID = false;
+		isNewCIDunique = false;
+		acceptNewCName = false;
+
+		//check if the id is not empty
+		if (!strlen(tempID) == 0)
+		{
+			acceptNewCID = true;
+
+			//check if the id is unique
+			//the ID is a unique identifier, since some countries may have similar names
+			if (doesCountryExist(tempID))
+			{
+				//find the offending country
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					if (tempID == countryList[i].getID())
+					{
+						errID = tempID;
+						errName = countryList[i].getCountryName();
+					}
+				}
+			}
+			else
+			{
+				isNewCIDunique = true;
+			}
+		}
+
+		//check if the country name is empty
+		if (!strlen(tempCName) == 0)
+		{
+			acceptNewCName = true;
+		}
+
+		#pragma endregion NEW COUNTRY VALIDATION CHECK
+
+		if (acceptNewCID && acceptNewCName && isNewCIDunique)
+		{
+			//find the correct value for climates
+			int climTemp, climHum;
+
+			if (neutralTemp) climTemp = 0;
+			if (hotTemp) climTemp = 1;
+			if (coldTemp) climTemp = 2;
+
+			if (neutralHum) climHum = 0;
+			if (wetHum) climHum = 1;
+			if (dryHum) climHum = 2;
+
+			//find the country(ies) selected as this country's land neighbours
+			std::vector<std::string> landBorders;
+			for (int borderScan = 0; borderScan < countryList.size(); borderScan++)
+			{
+				//if selected
+				if (countryList[borderScan].selectedBorder)
+				{
+					landBorders.push_back(countryList[borderScan].getID());
+				}
+			}
+
+			//find the sea links
+			std::vector<std::string> seaLinks;
+			for (int seaScan = 0; seaScan < countryList.size(); seaScan++)
+			{
+				//if selected
+				if (countryList[seaScan].selectedSea)
+				{
+					seaLinks.push_back(countryList[seaScan].getID());
+				}
+			}
+
+			//find air links
+			std::vector<std::string> airLinks;
+			for (int airScan = 0; airScan < countryList.size(); airScan++)
+			{
+				//if selected
+				if (countryList[airScan].selectedAir)
+				{
+					airLinks.push_back(countryList[airScan].getID());
+				}
+			}
+
+			//create the country
+			Country newCountry = Country(
+				tempID,
+				tempCName,
+				tempR, tempG, tempB,
+				tempPopInt,
+				tempGDPInt,
+				tempMBInt,
+				tempRSInt,
+				climTemp,
+				climHum,
+				landBorders,
+				seaLinks,
+				airLinks
+			);
+
+			//add to country list
+			countryList.push_back(newCountry);
+
+			resetNewCountry();
+		}
+		else
+		{
+			ImGui::OpenPopup("Cannot Create Country");
+		}
+		
+	}
+
+	if (ImGui::Button("Reset", ImVec2(ImGui::GetWindowWidth(), 20)))
+	{
+		resetNewCountry();
+	}
+	
+	//Error popup if country cannot be created
+	bool error = true;
+	if (ImGui::BeginPopupModal("Cannot Create Country", &error, ImGuiWindowFlags_NoResize))
+	{
+		ImGui::SetWindowSize(ImVec2(400, 200));
+
+		//printing the error messages
+		if (!acceptNewCID)
+		{
+			ImGui::Text("The Unique ID must not be empty\n");
+			ImGui::NewLine();
+		}
+		if (!isNewCIDunique && acceptNewCID)
+		{
+			std::string errText =
+				"The ID must be unique\nCountry: " + errID + "-" + errName + " already exists with ID\n";
+			
+			ImGui::Text(errText.c_str());
+			ImGui::NewLine();
+		}
+		if (!acceptNewCName)
+		{
+			ImGui::Text("The country must have a name");
+		}
+
+		ImGui::Separator();
+		//close the popup
+		if (ImGui::Button("Close", ImVec2(ImGui::GetWindowWidth(), 20)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::Separator();
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::End();
+
+	
+
+	//only work if the mouse is not over any imgui items
+	if (eyedropperActive && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
+	{
+		eyedropTool();
+	}
+}
+
+void SCGUI::resetNewCountry()
+{
+	//reset all variables
+	strcpy(tempID, "");
+
+	strcpy(tempCName, "");
+
+	tempR = 0,
+		tempG = 0,
+		tempB = 0;
+
+
+	//active eye dropper
+	eyedropperActive = false;
+
+	//country's population
+	strcpy(tempPop, "0");
+
+	//country GDP
+	strcpy(tempGDP, "0");
+
+	//country military budget
+	strcpy(tempMilitaryBudget, "0");
+
+	//country research spending
+	strcpy(tempResearchSpending, "0");
+
+	//climate booleans
+	//temperatures
+	hotTemp = false,
+		coldTemp = false,
+		neutralTemp = true,
+
+		//humidity
+		wetHum = false,
+		dryHum = false,
+		neutralHum = true;
+
+	//country borders
+	landBorders.clear();
+
+	//air and ocean links
+	airLinks.clear();
+	seaLinks.clear();
+
+	//remove the selected option from countries
+	for (int i = 0; i < countryList.size(); i++)
+	{
+		countryList[i].selectedBorder = false;
+		countryList[i].selectedSea = false;
+		countryList[i].selectedAir = false;
+	}
+
+	acceptNewCID = acceptNewCName = isNewCIDunique = false;
+}
+
+void SCGUI::editCountryMenu(int curCountry)
+{
+	//make the window
+	ImGui::Begin("Edit Country", &editCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowSize(ImVec2(700, 500), NULL);
+
+	ImGui::Separator();
+
+	//unique country ID
+	ImGui::Text("Country ID: ");
+	ImGui::SameLine();
+	helpMarker(
+		"A unique identifier for each country\n"
+		"Maximum 4 characters"
+	);
+	ImGui::SameLine();
+	ImGui::InputText("##euniquecountryID", editID, sizeof(editID), ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_CharsNoBlank);
+
+	ImGui::Separator();
+
+
+	//country name label
+	ImGui::Text("Country Name: ");
+	//input box
+	ImGui::SameLine();
+	//help marker
+	helpMarker("Country Name. Maximum 30 characters");
+	//country input
+	ImGui::SameLine();
+	ImGui::InputText("##ecountryname", editCName, sizeof(editCName), ImGuiInputTextFlags_CharsNoBlank);
+	ImGui::Separator();
+
+
+
+	//separate inputs into 3 columns
+	ImGui::BeginColumns("##ecountrycolourinputs", 3, ImGuiColumnsFlags_NoBorder);
+
+	//region identifier
+	ImGui::Text("Country Region: ");
+	ImGui::SameLine();
+	helpMarker(
+		"The colour that identifies as the country.\n"
+		"You can either input the colour manually or use the\n"
+		"eye dropper tool to display the colour values from the image");
+	ImGui::NextColumn();
 
 	//eye dropper tool that will help identify region colours
-	ImGui::NextColumn();
 	ImGui::Text("Eyedrop tool: ");
 	ImGui::SameLine();
-	ImGui::Checkbox("##eyeDropCheckbox", &eyedropperActive);
+	ImGui::Checkbox("##editeyeDropCheckbox", &editEyeDropperActive);
+	ImGui::NextColumn();
+	ImGui::NextColumn();
+
+	//red colour input
+	ImGui::TextColored(ImVec4(255, 0, 0, 255), "R: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##eredcolourinput", &editR, NULL, NULL, NULL);
+	//limiting input
+	if (editR > 255) editR = 255;
+	if (editR < 0) editR = 0;
+	ImGui::SameLine();
+
+	//green colour input
+	ImGui::NextColumn();
+	ImGui::TextColored(ImVec4(0, 255, 0, 255), "G: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##egreencolourinput", &editG, NULL, NULL, NULL);
+	//limiting input
+	if (editG > 255) editG = 255;
+	if (editG < 0) editG = 0;
+	ImGui::SameLine();
+
+	//blue colour input
+	ImGui::NextColumn();
+	ImGui::TextColored(ImVec4(0, 0, 255, 255), "B: ");
+	ImGui::SameLine();
+	ImGui::InputInt("##ebluecolourinput", &editB, NULL, NULL, NULL);
+	//limiting input
+	if (editB > 255) editB = 255;
+	if (editB < 0) editB = 0;
+
+	ImGui::EndColumns();
+
+	ImGui::Separator();
+	ImGui::BeginColumns("##enewcountryattributescolumn", 2, ImGuiColumnsFlags_NoBorder);
+
+	//country population
+	ImGui::Text("Country Population: ");
+	ImGui::SameLine();
+	helpMarker(
+		"Maximum characters are set at 12 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 12. Value cannot be negative."
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##ecountrypopinput", editPop, sizeof(editPop), ImGuiInputTextFlags_CharsDecimal);
+	editPopInt = atol(editPop);
+	if (editPopInt < 0) strcpy(editPop, "0");
+	if (editPopInt > 999999999999) strcpy(editPop, "99999999999");
+
+	ImGui::Separator();
+
+	//country GDP
+	ImGui::NextColumn();
+	ImGui::Text("Country GDP (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"Maximum characters are set at 12 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 12. Value cannot be negative.\n"
+		"Note that the value is in millions of USD"
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##ecountryGDPinput", editGDP, sizeof(editGDP), ImGuiInputTextFlags_CharsDecimal);
+	//limiting GDP	
+	editGDPInt = atol(editGDP);
+	if (editGDPInt > 999999999999) strcpy(editGDP, "99999999999");
+	//<insert joke about removing government debt here>
+	if (editGDPInt < 0) strcpy(editGDP, "0");
+
+	ImGui::Separator();
+
+	ImGui::NextColumn();
+	ImGui::Text("Military Budget (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"The military budget will be used to determine how\n"
+		"well the country will fare in a zombie scenario.\n"
+		"Maximum 12 characters (9.99x10^18 million USD)"
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##ecountryMBinput", editMilitaryBudget, sizeof(editMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
+	//limiting Military budget
+	editMBInt = atol(editMilitaryBudget);
+	if (editMBInt > 999999999999) strcpy(editMilitaryBudget, "99999999999");
+	//cannot be negative
+	if (editMBInt < 0) strcpy(editMilitaryBudget, "0");
+
+	ImGui::Separator();
+
+	ImGui::NextColumn();
+	ImGui::Text("Research Budget (Million US Dollars): ");
+	ImGui::SameLine();
+	helpMarker(
+		"This is the country's contribution to the global research pool.\n"
+		"The more money the world puts into the research pool, the \n"
+		"faster a cure can be researched. Zombies cannot be cured, but\n"
+		"once a cure is found, no more zombies can be made."
+	);
+	ImGui::SameLine();
+	ImGui::NextColumn();
+	ImGui::InputText("##ecountryRBinput", editResearchSpending, sizeof(editResearchSpending), ImGuiInputTextFlags_CharsDecimal);
+	//limiting Military budget
+	editRSInt = atol(editResearchSpending);
+	if (editRSInt > 999999999999) strcpy(editResearchSpending, "99999999999");
+	//cannot be negative
+	if (editRSInt < 0) strcpy(editResearchSpending, "0");
+
+	ImGui::Separator();
+
+	ImGui::EndColumns();
+
+	//country climates
+	ImGui::Text("Country Climates: ");
+
+	//temperature
+	ImGui::Text("Temperature");
+
+	ImGui::BeginColumns("##ecountrytempcolumn", 4, ImGuiColumnsFlags_NoBorder);
+
+	//hot temperature
+	ImGui::Text("Hot");
+	ImGui::SameLine();
+	ImGui::Checkbox("##ehottempcheckbox", &ehotTemp);
+	ImGui::NextColumn();
+
+	//cold temperature
+	ImGui::Text("Cold");
+	ImGui::SameLine();
+	ImGui::Checkbox("##ecoldtempcheckbox", &ecoldTemp);
+	ImGui::NextColumn();
+
+	//neutral temperature
+	ImGui::Text("Neutral");
+	ImGui::SameLine();
+	ImGui::Checkbox("##eneutraltempcheckbox", &eneutralTemp);
+
+	//error checking
+	//can EITHER be hot or cold but can't be in at the same time.
+	//default to neutral if both hot and cold (and other combinations) are used at the same time
+	if (ehotTemp && ecoldTemp ||
+		ehotTemp && eneutralTemp ||
+		ecoldTemp && eneutralTemp
+		) eneutralTemp = true, ehotTemp = false, ecoldTemp = false;
+
+	ImGui::NextColumn();
+
+	//tooltip for user friendliness
+	helpMarker(
+		"The country's (average) temperature.\n"
+		"Assume that any average temperature below 10 degrees Celsius is \n"
+		"cold; Any temperature between 10 and 20 degrees Celsius is \n"
+		"neutral and any temperature above 20 degrees Celsius is a hot \n"
+		"climate\n\nThe menu will automatcally set to neutral if invalid \n"
+		"options are made."
+	);
+
+	ImGui::EndColumns();
+
+	//humidity
+	ImGui::Text("Humidity");
+
+	ImGui::BeginColumns("##ecountryhumiditycolumn", 4, ImGuiColumnsFlags_NoBorder);
+
+	ImGui::Text("Wet");
+	ImGui::SameLine();
+	ImGui::Checkbox("##ewethumcheckbox", &ewetHum);
+	ImGui::NextColumn();
+
+	ImGui::Text("Dry ");
+	ImGui::SameLine();
+	ImGui::Checkbox("##edryhumcheckbox", &edryHum);
+	ImGui::NextColumn();
+
+	ImGui::Text("Neutral");
+	ImGui::SameLine();
+	ImGui::Checkbox("##eneutralhumcheckbox", &eneutralHum);
+	ImGui::NextColumn();
+
+	//tooltip
+	helpMarker(
+		"The country's (average) humidity.\n"
+		"Wet refers to countries with high humidity such as\n"
+		"rainforests / tropical monsoon areas.\n"
+		"Dry refers to countries with low humidity such as\n"
+		"deserts / arid areas\n\n"
+		"The option will be set to neutral if invalid options\n"
+		"are made."
+	);
+
+	//error checking
+	//can EITHER be dry OR wet but cannot be both at the same time
+	//default to neutral if invalid combinations are made
+	if (edryHum && ewetHum ||
+		edryHum && eneutralHum ||
+		ewetHum && eneutralHum
+		) eneutralHum = true, ewetHum = false, edryHum = false;
 
 	ImGui::EndColumns();
 
 	ImGui::Separator();
 
+	ImGui::Text("Country Connections");
 
+	//countries this country shares borders with
+	if (ImGui::TreeNode("Border Countries"))
+	{
+		if (ImGui::ListBoxHeader("##ebordercountries", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+
+	//countries this country has ocean routes to
+	if (ImGui::TreeNode("Ocean Links"))
+	{
+		if (ImGui::ListBoxHeader("##oceanlinks", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedSea);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+
+	//countries this country has air routes to
+	if (ImGui::TreeNode("Air Links"))
+	{
+		if (ImGui::ListBoxHeader("##airlinks", ImVec2(400, 150)))
+		{
+			//make a selectable item for each country
+			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
+			{
+				//add the country's unique ID to ensure no countries have similar selectable names
+				//prevents imgui from having a hard time distinguishing selectables
+				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+				//this is where the user can select which country is connected to another by land
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedAir);
+			}
+
+			ImGui::ListBoxFooter();
+		}
+
+		ImGui::TreePop();
+	}
+
+
+
+	ImGui::Separator();
 
 	//create new country button
-	if (ImGui::Button("Create Country", ImVec2(ImGui::GetWindowWidth(), 20)))
+	if (ImGui::Button("Edit Country", ImVec2(ImGui::GetWindowWidth(), 20)))
 	{
+		//prevents crashing
+		if (countryList.size() > curCountry)
+		{
+			countryList.erase(countryList.begin() + curCountry);
+		}
+		
+		//find the correct value for climates
+		int climTemp, climHum;
 
+		if (eneutralTemp) climTemp = 0;
+		if (ehotTemp) climTemp = 1;
+		if (ecoldTemp) climTemp = 2;
+
+		if (eneutralHum) climHum = 0;
+		if (ewetHum) climHum = 1;
+		if (edryHum) climHum = 2;
+		
+		//find the country(ies) selected as this country's land neighbours
+		std::vector<std::string> landBorders;
+		for (int borderScan = 0; borderScan < countryList.size(); borderScan++)
+		{
+			//if selected
+			if (countryList[borderScan].selectedBorder)
+			{
+				landBorders.push_back(countryList[borderScan].getID());
+			}
+		}
+
+		//find the sea links
+		std::vector<std::string> seaLinks;
+		for (int seaScan = 0; seaScan < countryList.size(); seaScan++)
+		{
+			//if selected
+			if (countryList[seaScan].selectedSea)
+			{
+				seaLinks.push_back(countryList[seaScan].getID());
+			}
+		}
+
+		//find air links
+		std::vector<std::string> airLinks;
+		for (int airScan = 0; airScan < countryList.size(); airScan++)
+		{
+			//if selected
+			if (countryList[airScan].selectedAir)
+			{
+				airLinks.push_back(countryList[airScan].getID());
+			}
+		}
+
+		//create the country
+		Country newCountry = Country(
+			editID,
+			editCName,
+			editR, editG, editB,
+			editPopInt,
+			editGDPInt,
+			editMBInt,
+			editRSInt,
+			climTemp,
+			climHum,
+			landBorders,
+			seaLinks,
+			airLinks
+		);
+
+		//add to country list
+		countryList.insert(countryList.begin() + curCountry, newCountry);
+
+		resetNewCountry();
 	}
 
 	ImGui::End();
@@ -643,6 +1780,28 @@ void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 	//update the screen
 	SDL_RenderPresent(renderer);
 	SDL_GL_SwapWindow(window);
+}
+
+/**
+* doesCountryExist
+* function used to check if a country exists by checking if unique ID's match
+*
+* @param string id
+*/
+bool SCGUI::doesCountryExist(std::string id)
+{
+	bool exist = false;
+
+	for (int scan = 0; scan < countryList.size(); scan++)
+	{
+		//check if ID's match
+		if (id == countryList[scan].getID())
+		{
+			exist = true;
+		}
+	}
+
+	return exist;
 }
 
 void SCGUI::helpMarker(const char * desc)
@@ -735,68 +1894,77 @@ void SCGUI::eyedropTool()
 	}
 }
 
-inline void SCGUI::zoom(int zoomType)
+void SCGUI::zoom(int zoomType)
 {
-	//store the old zoom
-	float oldZoom = zoomVal;
-
-	//determine the zoom type and alter the zoom val
-	switch (zoomType)
+	//prevents the control if the user is over any ImGui components
+	if (!ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
 	{
-	case -1:
-		//place holder input
-		break;
+		//store the old zoom
+		float oldZoom = zoomVal;
 
-		//zoom in
-	case 0:
-		if (zoomVal - zoomInterval > minZoom)
+		//determine the zoom type and alter the zoom val
+		switch (zoomType)
 		{
-			zoomVal -= zoomInterval;
-			//std::cout << "zoomed in" << std::endl;
-		}
-		break;
+		case -1:
+			//place holder input
+			break;
 
-		//zoom out
-	case 1:
-		if (zoomVal + zoomInterval <= maxZoom)
+			//zoom in
+		case 0:
+			if (zoomVal - zoomInterval > minZoom)
+			{
+				zoomVal -= zoomInterval;
+				//std::cout << "zoomed in" << std::endl;
+			}
+			break;
+
+			//zoom out
+		case 1:
+			if (zoomVal + zoomInterval <= maxZoom)
+			{
+				zoomVal += zoomInterval;
+				//std::cout << "zoomed out" << std::endl;
+			}
+			break;
+
+		default:
+			std::cout << "Unknown zoom type" << std::endl;
+			break;
+		}
+
+		//adjust vpSrc
+		if (oldZoom - zoomVal != 0)
 		{
-			zoomVal += zoomInterval;
-			//std::cout << "zoomed out" << std::endl;
+			vpSrc.w = wMapX * zoomVal;
+			vpSrc.h = wMapY * zoomVal;
+			vpSrc.x = wMapX / 2 - vpSrc.w / 2;
+			vpSrc.y = wMapY / 2 - vpSrc.h / 2;
 		}
-		break;
 
-	default:
-		std::cout << "Unknown zoom type" << std::endl;
-		break;
+		//std::cout << zoomVal << std::endl;
+
+		//limit the x and y of the source
+		panLimiting();
 	}
-
-	//adjust vpSrc
-	if (oldZoom - zoomVal != 0)
-	{
-		vpSrc.w = wMapX * zoomVal;
-		vpSrc.h = wMapY * zoomVal;
-		vpSrc.x = wMapX / 2 - vpSrc.w / 2;
-		vpSrc.y = wMapY / 2 - vpSrc.h / 2;
-	}
-
-	//std::cout << zoomVal << std::endl;
-
-	//limit the x and y of the source
-	panLimiting();
 }
 
 void SCGUI::pan(SDL_Point * mPos, int motionX, int motionY)
 {
-	//check if the mouse is within the viewport
-	if (SDL_PointInRect(mPos, &vp))
+	//prevents control if the user is over any ImGui components
+	if (!ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
 	{
-		vpSrc.x += motionX * 2;
-		vpSrc.y += motionY * 2;
-		//std::cout << "X: " << vpSrc.x << std::endl << "Y: " << vpSrc.y << std::endl;
+		//check if the mouse is within the viewport
+		if (SDL_PointInRect(mPos, &vp))
+		{
+			vpSrc.x += motionX * 2;
+			vpSrc.y += motionY * 2;
+			//std::cout << "X: " << vpSrc.x << std::endl << "Y: " << vpSrc.y << std::endl;
 
-		//limit the panning so there is no texture streching
-		panLimiting();
+			//limit the panning so there is no texture streching
+			panLimiting();
+		}
 	}
+	
 }
 
 void SCGUI::panLimiting()
