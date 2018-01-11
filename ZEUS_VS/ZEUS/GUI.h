@@ -665,6 +665,10 @@ void GUI::ctrlO()
 	openSimWindow = true;
 }
 
+/**
+* mouseOver
+* function that shows to the user the current country that is being moused over
+*/
 void GUI::mouseOver()
 {
 	//variables to get mouse position and screen context

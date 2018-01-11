@@ -82,6 +82,9 @@ public:
 	void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
 	void panLimiting();	//ensures the pan is limited within the relevant zone of the texture
 
+	void mouseOver();	//mouse over helps identify a country of where there could be one
+	void leftClick();
+
 private:
 	//colour of the background
 	ImVec4 bkgColour = ImColor(0,0,44);
@@ -90,6 +93,9 @@ private:
 	bool addNewCountry = false;
 	bool editCountry = false;
 	bool viewCountriesWin = false;
+	int curCountryNum = -1;
+
+	int clickR = -1, clickG = -1, clickB = -1;
 
 	//map to be shown on screen
 	SDL_Texture *map = NULL;
@@ -109,6 +115,11 @@ private:
 		minZoom = 0.1,
 		zoomInterval = 0.025;
 
+	//mouse over variables
+	std::vector<std::string> emptyVec;
+	SDL_Color curCol = { 0, 0, 0 };
+	Country scrollCountry = Country("None", "None", 0, 0, 0, 0, 0, 0, 0, -1, -1, emptyVec, emptyVec, emptyVec);
+	bool newCountryOnClick = false;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
@@ -282,6 +293,14 @@ SCGUI::~SCGUI()
 
 }
 
+/**
+* GUI constructor
+* constructor which properly sets up the simulator GUI
+*
+* @param SDL_Renderer *renderer
+* @param int winX
+* @param int winY
+*/
 SCGUI::SCGUI(SDL_Renderer *renderer, int winX, int winY)
 {
 	scrollCol.r = 0;
@@ -295,6 +314,13 @@ SCGUI::SCGUI(SDL_Renderer *renderer, int winX, int winY)
 	vp = { 0, 20, winX, winY - 20 };
 }
 
+/**
+* menuBar
+* function that displays and makes the menu bar work
+*
+* @param SDL_Renderer *renderer
+* @param bool &appRun (the boolean that tells the main loop when to end the program)
+*/
 void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 {
 	//menu bar
@@ -378,6 +404,7 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 			if (scenarioLoaded)
 			{
 				addNewCountry = true;
+				clickR = clickG = clickB = -1;
 			}
 		}
 
@@ -435,7 +462,12 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 	if (addNewCountry)
 	{
-		newCountryMenu(0, 0, 0);
+		newCountryMenu(clickR, clickG, clickB);
+	}
+
+	if (editCountry)
+	{
+		editCountryMenu(curCountryNum);
 	}
 }
 
@@ -444,11 +476,16 @@ void SCGUI::save()
 	
 }
 
+/**
+* viewCountries
+* function that displays a list of all the countries the scenario contains.
+* The function is also a way to access the edit menu by editing a specific country
+*/
 void SCGUI::viewCountries()
 {
 	//make the window
 	ImGui::Begin("View Country", &viewCountriesWin, ImGuiWindowFlags_NoCollapse);
-	ImGui::SetWindowSize(ImVec2(500, 250));
+	ImGui::SetWindowSize(ImVec2(750, 250));
 	ImGui::BeginColumns("View Countries", 4, NULL);
 
 	//column titles
@@ -588,7 +625,7 @@ void SCGUI::viewCountries()
 			}
 
 			//opens the edit menu
-			editCountry = true;
+			editCountry ^= 1;
 		}
 		ImGui::NextColumn();
 
@@ -599,18 +636,19 @@ void SCGUI::viewCountries()
 			countryList.erase(countryList.begin() + count);
 		}
 		ImGui::NextColumn();
-
 	}
 
 	ImGui::EndColumns();
 	ImGui::End();
-
-	if (editCountry)
-	{
-		editCountryMenu(currentCountry);
-	}
 }
 
+/**
+* newScenarioWin
+* function that displays the new scenario menu when called.
+* The function also sets the map texture which will be used for the scenario
+*
+* @param SDL_Renderer *renderer
+*/
 void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 {
 	//make the window
@@ -803,6 +841,10 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 	
 }
 
+/**
+* resetNewScenario
+* function that resets all the variables used for the new scenario menu
+*/
 void SCGUI::resetNewScenario()
 {
 	/*std::cout << "Name: " << name << std::endl
@@ -823,11 +865,20 @@ void SCGUI::resetNewScenario()
 	newScenario = false;
 }
 
+/**
+* newCountryMenu
+* function that displays the new country menu when called. The function
+* is also able to instantiate and add a country to the country list
+*
+* @param int r
+* @param int g
+* @param int b
+*/
 void SCGUI::newCountryMenu(int r, int g, int b) 
 {
-	if (r != 0 &&
-		g != 0 &&
-		b != 0)
+	if (r != -1 &&
+		g != -1 &&
+		b != -1)
 	{
 		tempR = r,
 		tempB = b,
@@ -1339,6 +1390,10 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	}
 }
 
+/**
+* resetNewCountry
+* function that resets all the variables used for the new country menu
+*/
 void SCGUI::resetNewCountry()
 {
 	//reset all variables
@@ -1350,6 +1405,9 @@ void SCGUI::resetNewCountry()
 		tempG = 0,
 		tempB = 0;
 
+	clickR = -1,
+		clickG = -1,
+		clickB = -1;
 
 	//active eye dropper
 	eyedropperActive = false;
@@ -1395,6 +1453,13 @@ void SCGUI::resetNewCountry()
 	acceptNewCID = acceptNewCName = isNewCIDunique = false;
 }
 
+/**
+* editCountryMenu
+* function that when called to be displayed will show the menu for editing countries.
+* function is very similar to new country menu but acts differently and contains extra things
+*
+* @param int curCountry
+*/
 void SCGUI::editCountryMenu(int curCountry)
 {
 	//make the window
@@ -1814,6 +1879,13 @@ void SCGUI::editCountryMenu(int curCountry)
 	}
 }
 
+/**
+* render
+* function that renders everything; the ImGui elements as well as the map
+*
+* @param SDL_Window *window
+* @param SDL_Renderer *renderer
+*/
 void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 {
 	//update vp size
@@ -1838,6 +1910,13 @@ void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 	if (map != NULL)
 	{
 		SDL_RenderCopy(renderer, map, &vpSrc, NULL);
+	}
+
+	//not to show tooltip if either eyedroppers are active 
+	//and the mouse is not over any ImGui components
+	if (!ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
+	{
+		mouseOver();
 	}
 
 	//render the IMGUI elements
@@ -1871,6 +1950,13 @@ bool SCGUI::doesCountryExist(std::string id)
 	return exist;
 }
 
+/**
+* helpMarker
+* function that makes a little popup that contains the text passed to it when 
+* the user scrolls over the question mark that activates the function
+*
+* @param const char *desc
+*/
 void SCGUI::helpMarker(const char * desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -1884,6 +1970,10 @@ void SCGUI::helpMarker(const char * desc)
 	}
 }
 
+/**
+* eyedropTool
+* function that shows to the user the red, green and blue colour values underneath the user pointer
+*/
 void SCGUI::eyedropTool()
 {
 	//source of this function: 
@@ -1961,6 +2051,12 @@ void SCGUI::eyedropTool()
 	}
 }
 
+/**
+* zoom
+* function that manipulates the zoom of the map to be displayed
+*
+* @param int zoomType (0 = zoom in, 1 = zoom out)
+*/
 void SCGUI::zoom(int zoomType)
 {
 	//prevents the control if the user is over any ImGui components
@@ -2015,6 +2111,15 @@ void SCGUI::zoom(int zoomType)
 	}
 }
 
+/**
+* pan
+* function that allows the user to pan the map around, so they are able to
+* see around the map, especially when zoomed in
+*
+* @param SDL_Point *mPos
+* @param int motionX
+* @param int motionY
+*/
 void SCGUI::pan(SDL_Point * mPos, int motionX, int motionY)
 {
 	//prevents control if the user is over any ImGui components
@@ -2034,6 +2139,11 @@ void SCGUI::pan(SDL_Point * mPos, int motionX, int motionY)
 	
 }
 
+/**
+* panLimiting
+* function that ensures that the user remains within the bounds of the image i.e.
+* prevents user from being lost while panning
+*/
 void SCGUI::panLimiting()
 {
 	//limit for the left scrolling
@@ -2055,5 +2165,300 @@ void SCGUI::panLimiting()
 	if (vpSrc.y > wMapY - vpSrc.h)
 	{
 		vpSrc.y = wMapY - vpSrc.h;
+	}
+}
+
+/**
+* mouseOver
+* function that displays what country the user is moused over
+*/
+void SCGUI::mouseOver()
+{
+	//variables to get mouse position and screen context
+	POINT p;
+	BOOL b;
+
+	// Get the current cursor position
+	b = GetCursorPos(&p);
+	COLORREF colour;
+	HDC hDC;
+
+	// Get the device context for the screen
+	hDC = GetDC(NULL);
+	if (hDC == NULL)
+		std::cout << "Unable to get screen context\n";
+
+	if (!b)
+		std::cout << "Unable to get cursor position\n";
+
+	// Retrieve the color at that position
+	colour = GetPixel(hDC, p.x, p.y);
+	if (colour == CLR_INVALID)
+		std::cout << "Obtained colour invalid\n";
+
+	// Release the device context again
+	ReleaseDC(GetDesktopWindow(), hDC);
+
+	//find the country which matches the colour
+	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
+
+	bool countryFound = false;
+	//check if current mouse over colour is the same, if not find out which country
+	//this prevents having to go through the loop everytime, uses less computing processes
+	//also ensures that the current colour is not the background colour
+	if (
+		comparison.r != bkgColour.x &&
+		comparison.g != bkgColour.y &&
+		comparison.b != bkgColour.z)
+	{
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			//get country colour
+			SDL_Color countryColour = countryList[i].getColour();
+
+			//debugging
+			/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+			printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+			if (comparison.r == countryColour.r		//compare red values
+				&& comparison.g == countryColour.g	//compare green values
+				&& comparison.b == countryColour.b	//compare blue values
+				)
+			{
+				//set this as the scroll country
+				scrollCountry = countryList[i];
+
+				//set scroll colour equal to this
+				curCol.r = countryColour.r;
+				curCol.g = countryColour.g;
+				curCol.b = countryColour.b;
+
+				//country found
+				countryFound = true;
+
+				//break the loop
+				break;
+			}
+		}
+
+		//if country was not found, set scroll colour equal to current colour
+		if (!countryFound)
+		{
+			curCol.r = comparison.r;
+			curCol.g = comparison.g;
+			curCol.b = comparison.b;
+		}
+	}
+	
+	//if the country was identified
+	if (countryFound)
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(450.0f);
+		//get country name
+		ImGui::TextUnformatted(scrollCountry.getCountryName().c_str());
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+		newCountryOnClick = false;
+	}
+	//if not the background colour
+	else if(
+		comparison.r != bkgColour.x &&
+		comparison.g != bkgColour.y &&
+		comparison.b != bkgColour.z
+		)
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(450.0f);
+		ImGui::TextUnformatted("Add New Country?");
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+		newCountryOnClick = true;
+	}
+	else
+	{
+		newCountryOnClick = false;
+	}
+}
+
+void SCGUI::leftClick()
+{
+	//source of this function: 
+	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor
+	POINT p;
+	BOOL b;
+
+	// Get the current cursor position
+	b = GetCursorPos(&p);
+	COLORREF colour;
+	HDC hDC;
+
+	// Get the device context for the screen
+	hDC = GetDC(NULL);
+	if (hDC == NULL)
+		std::cout << 3;
+
+	if (!b)
+		std::cout << 2;
+
+	// Retrieve the color at that position
+	colour = GetPixel(hDC, p.x, p.y);
+	if (colour == CLR_INVALID)
+		std::cout << 1;
+
+	// Release the device context again
+	ReleaseDC(GetDesktopWindow(), hDC);
+
+	//printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));
+
+	//find the country which matches the colour
+	SDL_Color comparison = { GetRValue(colour), GetGValue(colour), GetBValue(colour) };
+
+	bool countryFound = false;
+
+	//loop through the country list to find a matching colour
+	for (int count = 0; count < countryList.size(); count++)
+	{
+		//get country colour
+		SDL_Color countryColour = countryList[count].getColour();
+
+		//debugging
+		/*std::cout << countryList[i].getCountryName() << ": " << (int)countryColour.r << "|" << (int)countryColour.g << "|" << (int)countryColour.b << std::endl;
+		printf("%i %i %i\n", GetRValue(colour), GetGValue(colour), GetBValue(colour));*/
+
+		if (comparison.r == countryColour.r		//compare red values
+			&& comparison.g == countryColour.g	//compare green values
+			&& comparison.b == countryColour.b	//compare blue values
+			)
+		{
+			//country is found
+			countryFound = true;
+
+			//set the current country to this country (countryList[i])
+			curCountry = countryList[count];
+			curCountryNum = count;
+
+			//set edit ID
+			strcpy(editID, countryList[count].getID().c_str());
+
+			//set edit name
+			strcpy(editCName, countryList[count].getCountryName().c_str());
+
+			//set region colours
+			SDL_Color colour = countryList[count].getColour();
+			editR = colour.r;
+			editG = colour.g;
+			editB = colour.b;
+
+			//set population
+			strcpy(editPop, std::to_string(countryList[count].getPopulation()).c_str());
+
+			//set gdp
+			strcpy(editGDP, std::to_string(countryList[count].getGDP()).c_str());
+
+			//set military budget
+			strcpy(editMilitaryBudget, std::to_string(countryList[count].getMilitaryBudget()).c_str());
+
+			//set research budget
+			strcpy(editResearchSpending, std::to_string(countryList[count].getResearchBudget()).c_str());
+
+			int temp = countryList[count].getTemperature();
+			eneutralTemp = ehotTemp = ecoldTemp = false;
+			int hum = countryList[count].getHumidity();
+			eneutralHum = ewetHum = edryHum = false;
+
+			//setting correct settings for temperature
+			switch (temp)
+			{
+			case 0:
+				eneutralTemp = true;
+				break;
+
+			case 1:
+				ehotTemp = true;
+				break;
+
+			case 2:
+				ecoldTemp = true;
+				break;
+
+			default:
+				break;
+			}
+
+			//setting correct settings for humidity
+			switch (hum)
+			{
+			case 0:
+				eneutralHum = true;
+				break;
+
+			case 1:
+				ewetHum = true;
+				break;
+
+			case 2:
+				edryHum = true;
+				break;
+
+			default:
+				break;
+			}
+
+			//set land air and sea borders equal to the temps
+			tempLandBorders = countryList[count].getLandBorders();
+			tempSeaLinks = countryList[count].getSeaLinks();
+			tempAirLinks = countryList[count].getAirLinks();
+
+			//load land, air and sea borders
+			for (int scan = 0; scan < countryList.size(); scan++)
+			{
+				//check for land borders
+				for (int landScan = 0; landScan < tempLandBorders.size(); landScan++)
+				{
+					//if ID's match then set selected for land and then break loop
+					if (tempLandBorders[landScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedBorder = true;
+						break;
+					}
+				}
+
+				//doing the same for air and sea
+				for (int seaScan = 0; seaScan < tempSeaLinks.size(); seaScan++)
+				{
+					if (tempSeaLinks[seaScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedSea = true;
+						break;
+					}
+				}
+
+				for (int airScan = 0; airScan < tempAirLinks.size(); airScan++)
+				{
+					if (tempAirLinks[airScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedAir = true;
+						break;
+					}
+				}
+			}
+
+			//opens the edit menu
+			editCountry ^= 1;
+
+			//break the loop
+			break;
+		}
+
+
+	}
+
+	if (!countryFound && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
+	{
+		addNewCountry = true;
+		clickR = comparison.r;
+		clickG = comparison.g;
+		clickB = comparison.b;
 	}
 }
