@@ -148,10 +148,11 @@ static class GUI
 		#pragma region EVENT VARIABLES
 		//////////////////////////////////////////////////////////////////////////////////////
 		//current country being chosen
-		Country curCountry = Country("None", "None", 0, 0, 0, 0);
+		std::vector<std::string> emptyVec;
+		Country curCountry = Country("None", "None", 0, 0, 0, 0, 0, 0, 0, -1, -1, emptyVec, emptyVec, emptyVec);
 
 		SDL_Color curCol = { 0, 0, 0 };
-		Country scrollCountry = Country("None", "None", 0, 0, 0, 0);
+		Country scrollCountry = Country("None", "None", 0, 0, 0, 0, 0, 0, 0, -1, -1, emptyVec, emptyVec, emptyVec);
 		//////////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
 };
@@ -331,7 +332,7 @@ int GUI::loadCountryData(std::string filePath)
 							worldPopulation += pop;
 						}
 						//create new instance of a country
-						Country c = Country(id, name, red, green, blue, pop);
+						Country c = Country(id, name, red, green, blue, pop, 0, 0, 0, 0, 0, emptyVec, emptyVec, emptyVec);
 
 						//add the country to the country list
 						countryList.push_back(c);

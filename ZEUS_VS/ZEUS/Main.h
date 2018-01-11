@@ -168,9 +168,6 @@ void Main::init()
 		//get display size
 		SDL_GetWindowSize(window, &winX, &winY);
 
-		//opengl context
-		glcontext = SDL_GL_CreateContext(window);
-
 		//check if window was created
 		if (window == NULL)
 		{
@@ -181,6 +178,9 @@ void Main::init()
 		//continue setup
 		else
 		{
+			//opengl context
+			glcontext = SDL_GL_CreateContext(window);
+
 			//initialise IMGUI
 			ImGui_ImplSdlGL2_CreateDeviceObjects();
 			ImGui_ImplSdlGL2_InvalidateDeviceObjects();
