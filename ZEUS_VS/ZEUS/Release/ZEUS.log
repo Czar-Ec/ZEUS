@@ -10,10 +10,10 @@ c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(609): warning C4244: '=': conver
 c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(610): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(611): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(628): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(708): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(802): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(707): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(801): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(868): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(869): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\GUI.h(870): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(280): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(419): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(430): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
@@ -22,8 +22,6 @@ c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(372): warning C4390: ';': empty
 c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(373): warning C4390: ';': empty controlled statement found; is this the intent?
 c:\users\user\documents\zeus\zeus_vs\zeus\Main.h(374): warning C4390: ';': empty controlled statement found; is this the intent?
   Generating code
-  3 of 1508 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  All 1508 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   ZEUS.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Release\ZEUS.exe

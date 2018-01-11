@@ -1847,7 +1847,6 @@ void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 
 	//update the screen
 	SDL_RenderPresent(renderer);
-	SDL_GL_SwapWindow(window);
 }
 
 /**
