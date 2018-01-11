@@ -80,7 +80,7 @@ private:
 	//time handling
 	int frames = 0;
 	float fps = 0;
-	int fpsLimit = 60;
+	int fpsLimit = 120;
 
 	//pause sim
 	bool pauseSim = false;

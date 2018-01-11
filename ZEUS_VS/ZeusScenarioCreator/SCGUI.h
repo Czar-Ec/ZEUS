@@ -1,4 +1,9 @@
 #pragma once
+
+//need to sort out dependency on windows sdk
+//C:\Program Files (x86)\Windows Kits\10\Lib\10.0.15063.0\um\x86 for opengl32.lib
+//C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\um for include files glu.h and gl.h
+
 //IMGUI
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -27,7 +32,7 @@
 #include "Windows.h"
 
 //other classes
-#include "Country.h"
+#include "../sharedobjects/Country.h"
 
 /**
 * GUI Class
@@ -111,14 +116,14 @@ private:
 	#pragma region SCENARIO GLOBAL VARIABLES
 	//////////////////////////////////////////////////////////////////////////////////
 	//scenario name
-	char name[30] = "";
+	char scenarioName[30] = "";
 	//file path for the scenario map
 	char imgFilePath[MAX_PATH] = "";
 	std::string imgType = "";
 
 	//loaded scenario
 	bool scenarioLoaded = false;
-
+	char curScenario[30];
 
 	/////////////////////
 	//TEMPORARY VARIABLES
@@ -142,7 +147,7 @@ private:
 	int currentCountry;
 
 	char editID[5] = "";
-	char editCName[30] = "";
+	char editCName[31] = "";
 	int editR = 0,
 		editG = 0,
 		editB = 0;
@@ -152,20 +157,20 @@ private:
 	bool editEyeDropperActive = false;
 
 	//country's population
-	char editPop[13] = "0";
-	long int editPopInt;
+	char editPop[15] = "";
+	unsigned long long int editPopInt;
 
 	//country GDP
-	char editGDP[13] = "0";
-	long int editGDPInt;
+	char editGDP[15] = "";
+	unsigned long long int editGDPInt;
 
 	//country military budget
-	char editMilitaryBudget[13] = "0";
-	long int editMBInt;
+	char editMilitaryBudget[15] = "";
+	unsigned long long int editMBInt;
 
 	//country research spending
-	char editResearchSpending[13] = "0";
-	long int editRSInt;
+	char editResearchSpending[15] = "";
+	unsigned long long int editRSInt;
 
 	//climate booleans
 	bool
@@ -194,7 +199,7 @@ private:
 	//////////////////////////////////////////////////////////////////////////////////
 	//temporary variables which hold country information
 	char tempID[5] = "";
-	char tempCName[30] = "";
+	char tempCName[31] = "";
 	int tempR = 0,
 		tempG = 0,
 		tempB = 0;
@@ -204,20 +209,20 @@ private:
 	bool eyedropperActive = false;
 
 	//country's population
-	char tempPop[13] = "0";
-	long int tempPopInt;
+	char tempPop[15] = "";
+	unsigned long long int tempPopInt;
 
 	//country GDP
-	char tempGDP[13] = "0";
-	long int tempGDPInt;
+	char tempGDP[15] = "";
+	unsigned long long int tempGDPInt;
 
 	//country military budget
-	char tempMilitaryBudget[13] = "0";
-	long int tempMBInt;
+	char tempMilitaryBudget[15] = "";
+	unsigned long long int tempMBInt;
 
 	//country research spending
-	char tempResearchSpending[13] = "0";
-	long int tempRSInt;
+	char tempResearchSpending[15] = "";
+	unsigned long long int tempRSInt;
 
 	//climate booleans
 	bool
@@ -232,11 +237,11 @@ private:
 		neutralHum = true;
 
 	//country borders
-	std::vector<std::string> landBorders;
+	std::vector<std::string> tempLandBorders;
 
 	//air and ocean links
-	std::vector<std::string> airLinks;
-	std::vector<std::string> seaLinks;
+	std::vector<std::string> tempAirLinks;
+	std::vector<std::string> tempSeaLinks;
 
 	//error checking
 	std::string errID, errName;
@@ -436,7 +441,7 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 void SCGUI::save()
 {
-
+	
 }
 
 void SCGUI::viewCountries()
@@ -532,17 +537,57 @@ void SCGUI::viewCountries()
 				break;
 
 			case 1:
-				edryHum = true;
+				ewetHum = true;
 				break;
 
 			case 2:
-				ewetHum = true;
+				edryHum = true;
 				break;
 
 			default:
 				break;
 			}
 
+			//set land air and sea borders equal to the temps
+			tempLandBorders = countryList[count].getLandBorders();
+			tempSeaLinks = countryList[count].getSeaLinks();
+			tempAirLinks = countryList[count].getAirLinks();
+
+			//load land, air and sea borders
+			for (int scan = 0; scan < countryList.size(); scan++)
+			{
+				//check for land borders
+				for (int landScan = 0; landScan < tempLandBorders.size(); landScan++)
+				{
+					//if ID's match then set selected for land and then break loop
+					if (tempLandBorders[landScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedBorder = true;
+						break;
+					}
+				}
+
+				//doing the same for air and sea
+				for (int seaScan = 0; seaScan < tempSeaLinks.size(); seaScan++)
+				{
+					if (tempSeaLinks[seaScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedSea = true;
+						break;
+					}
+				}
+
+				for (int airScan = 0; airScan < tempAirLinks.size(); airScan++)
+				{
+					if (tempAirLinks[airScan] == countryList[scan].getID())
+					{
+						countryList[scan].selectedAir = true;
+						break;
+					}
+				}
+			}
+
+			//opens the edit menu
 			editCountry = true;
 		}
 		ImGui::NextColumn();
@@ -683,7 +728,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		if (acceptScenarioName && acceptImgPath && existingImgPath)
 		{
 			//copy temp name to global name
-			strcpy(name, tempName);
+			strcpy(scenarioName, tempName);
 
 			//copy img path to global img path
 			strcpy(imgFilePath, tempMapFilePath);
@@ -705,6 +750,8 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 				//resets map file path
 				strcpy(tempMapFilePath, "");
 			}
+
+			strcpy(curScenario, tempName);
 
 			resetNewScenario();
 			scenarioLoaded = true;
@@ -880,15 +927,15 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	ImGui::Text("Country Population: "); 
 	ImGui::SameLine();
 	helpMarker(
-		"Maximum characters are set at 12 i.e. maximum value\n"
-		"is set at 9.99 x 10 ^ 12. Value cannot be negative."
+		"Maximum characters are set at 14 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 14. Value cannot be negative."
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##countrypopinput", tempPop, sizeof(tempPop), ImGuiInputTextFlags_CharsDecimal);
-	tempPopInt = atol(tempPop);
+	tempPopInt = strtoull(tempPop, (char **) NULL, 10);	//this converts to unsigned long long
 	if (tempPopInt < 0) strcpy(tempPop, "0");
-	if (tempPopInt > 999999999999) strcpy(tempPop, "999999999999");
+	if (tempPopInt > 99999999999999) strcpy(tempPop, "99999999999999");
 
 	ImGui::Separator();
 
@@ -897,17 +944,17 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	ImGui::Text("Country GDP (Million US Dollars): ");
 	ImGui::SameLine();
 	helpMarker(
-		"Maximum characters are set at 12 i.e. maximum value\n"
-		"is set at 9.99 x 10 ^ 12. Value cannot be negative.\n"
+		"Maximum characters are set at 14 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 14. Value cannot be negative.\n"
 		"Note that the value is in millions of USD"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##countryGDPinput", tempGDP, sizeof(tempGDP), ImGuiInputTextFlags_CharsDecimal);
-	//limiting GDP	
-	tempGDPInt = atol(tempGDP);
+	//limiting GDP
+	tempGDPInt = strtoull(tempGDP, (char**)NULL, 10);
 	if (tempGDPInt < 0) strcpy(tempGDP, "0");
-	if (tempGDPInt > 999999999999) strcpy(tempGDP, "999999999999");
+	if (tempGDPInt > 99999999999999) strcpy(tempGDP, "99999999999999");
 
 	ImGui::Separator();
 
@@ -917,14 +964,14 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	helpMarker(
 		"The military budget will be used to determine how\n"
 		"well the country will fare in a zombie scenario.\n"
-		"Maximum 12 characters (9.99x10^18 million USD)"
+		"Maximum 14 characters (9.99x10^20 million USD)"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##countryMBinput", tempMilitaryBudget, sizeof(tempMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	tempMBInt = atol(tempMilitaryBudget);
-	if (tempMBInt > 999999999999) strcpy(tempMilitaryBudget, "99999999999");
+	tempMBInt = strtoull(tempMilitaryBudget, (char**)NULL, 10);
+	if (tempMBInt > 99999999999999) strcpy(tempMilitaryBudget, "99999999999999");
 	//cannot be negative
 	if (tempMBInt < 0) strcpy(tempMilitaryBudget, "0");
 
@@ -943,8 +990,8 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	ImGui::NextColumn();
 	ImGui::InputText("##countryRBinput", tempResearchSpending, sizeof(tempResearchSpending), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	tempRSInt = atol(tempResearchSpending);
-	if (tempRSInt > 999999999999) strcpy(tempResearchSpending, "99999999999");
+	tempRSInt = strtoull(tempResearchSpending, (char**)NULL, 10);
+	if (tempRSInt > 99999999999999) strcpy(tempResearchSpending, "99999999999999");
 	//cannot be negative
 	if (tempRSInt < 0) strcpy(tempResearchSpending, "0");
 		
@@ -1060,7 +1107,7 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 				//prevents imgui from having a hard time distinguishing selectables
 				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
 				//this is where the user can select which country is connected to another by land
-				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);
+				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);				
 			}
 
 			ImGui::ListBoxFooter();
@@ -1220,9 +1267,17 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 				airLinks
 			);
 
+			//debug country stats
+			/*std::cout <<
+				"ID: " << newCountry.getID() << std::endl <<
+				"Name: " << newCountry.getCountryName() << std::endl <<
+				"Pop: "  << newCountry.getPopulation() << std::endl <<
+				"GDP: " << newCountry.getGDP() << std::endl <<
+				"MB: " << newCountry.getMilitaryBudget() << std::endl <<
+				"RB: " << newCountry.getResearchBudget() << std::endl;*/
+
 			//add to country list
 			countryList.push_back(newCountry);
-
 			resetNewCountry();
 		}
 		else
@@ -1300,16 +1355,16 @@ void SCGUI::resetNewCountry()
 	eyedropperActive = false;
 
 	//country's population
-	strcpy(tempPop, "0");
+	strcpy(tempPop, "");
 
 	//country GDP
-	strcpy(tempGDP, "0");
+	strcpy(tempGDP, "");
 
 	//country military budget
-	strcpy(tempMilitaryBudget, "0");
+	strcpy(tempMilitaryBudget, "");
 
 	//country research spending
-	strcpy(tempResearchSpending, "0");
+	strcpy(tempResearchSpending, "");
 
 	//climate booleans
 	//temperatures
@@ -1323,11 +1378,11 @@ void SCGUI::resetNewCountry()
 		neutralHum = true;
 
 	//country borders
-	landBorders.clear();
+	tempLandBorders.clear();
 
 	//air and ocean links
-	airLinks.clear();
-	seaLinks.clear();
+	tempAirLinks.clear();
+	tempSeaLinks.clear();
 
 	//remove the selected option from countries
 	for (int i = 0; i < countryList.size(); i++)
@@ -1430,15 +1485,15 @@ void SCGUI::editCountryMenu(int curCountry)
 	ImGui::Text("Country Population: ");
 	ImGui::SameLine();
 	helpMarker(
-		"Maximum characters are set at 12 i.e. maximum value\n"
-		"is set at 9.99 x 10 ^ 12. Value cannot be negative."
+		"Maximum characters are set at 14 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 14. Value cannot be negative."
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountrypopinput", editPop, sizeof(editPop), ImGuiInputTextFlags_CharsDecimal);
-	editPopInt = atol(editPop);
+	editPopInt = strtoull(editPop, (char**)NULL, 10);
 	if (editPopInt < 0) strcpy(editPop, "0");
-	if (editPopInt > 999999999999) strcpy(editPop, "99999999999");
+	if (editPopInt > 99999999999999) strcpy(editPop, "99999999999999");
 
 	ImGui::Separator();
 
@@ -1447,16 +1502,16 @@ void SCGUI::editCountryMenu(int curCountry)
 	ImGui::Text("Country GDP (Million US Dollars): ");
 	ImGui::SameLine();
 	helpMarker(
-		"Maximum characters are set at 12 i.e. maximum value\n"
-		"is set at 9.99 x 10 ^ 12. Value cannot be negative.\n"
+		"Maximum characters are set at 14 i.e. maximum value\n"
+		"is set at 9.99 x 10 ^ 14. Value cannot be negative.\n"
 		"Note that the value is in millions of USD"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryGDPinput", editGDP, sizeof(editGDP), ImGuiInputTextFlags_CharsDecimal);
 	//limiting GDP	
-	editGDPInt = atol(editGDP);
-	if (editGDPInt > 999999999999) strcpy(editGDP, "99999999999");
+	editGDPInt = strtoull(tempGDP, (char**)NULL, 10);
+	if (editGDPInt > 99999999999999) strcpy(editGDP, "99999999999999");
 	//<insert joke about removing government debt here>
 	if (editGDPInt < 0) strcpy(editGDP, "0");
 
@@ -1468,14 +1523,14 @@ void SCGUI::editCountryMenu(int curCountry)
 	helpMarker(
 		"The military budget will be used to determine how\n"
 		"well the country will fare in a zombie scenario.\n"
-		"Maximum 12 characters (9.99x10^18 million USD)"
+		"Maximum 12 characters (9.99x10^20 million USD)"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryMBinput", editMilitaryBudget, sizeof(editMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	editMBInt = atol(editMilitaryBudget);
-	if (editMBInt > 999999999999) strcpy(editMilitaryBudget, "99999999999");
+	editMBInt = strtoull(tempMilitaryBudget, (char**)NULL, 10);
+	if (editMBInt > 99999999999999) strcpy(editMilitaryBudget, "99999999999999");
 	//cannot be negative
 	if (editMBInt < 0) strcpy(editMilitaryBudget, "0");
 
@@ -1494,8 +1549,8 @@ void SCGUI::editCountryMenu(int curCountry)
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryRBinput", editResearchSpending, sizeof(editResearchSpending), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	editRSInt = atol(editResearchSpending);
-	if (editRSInt > 999999999999) strcpy(editResearchSpending, "99999999999");
+	editRSInt = strtoull(tempResearchSpending, (char**)NULL, 10);
+	if (editRSInt > 99999999999999) strcpy(editResearchSpending, "99999999999999");
 	//cannot be negative
 	if (editRSInt < 0) strcpy(editResearchSpending, "0");
 
@@ -1603,11 +1658,15 @@ void SCGUI::editCountryMenu(int curCountry)
 			//make a selectable item for each country
 			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
 			{
-				//add the country's unique ID to ensure no countries have similar selectable names
-				//prevents imgui from having a hard time distinguishing selectables
-				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
-				//this is where the user can select which country is connected to another by land
-				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);
+				//country cannot border itself
+				if (countryList[countryNum].getID() != editID)
+				{
+					//add the country's unique ID to ensure no countries have similar selectable names
+					//prevents imgui from having a hard time distinguishing selectables
+					std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+					//this is where the user can select which country is connected to another by land
+					ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedBorder);
+				}
 			}
 
 			ImGui::ListBoxFooter();
@@ -1624,11 +1683,15 @@ void SCGUI::editCountryMenu(int curCountry)
 			//make a selectable item for each country
 			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
 			{
-				//add the country's unique ID to ensure no countries have similar selectable names
-				//prevents imgui from having a hard time distinguishing selectables
-				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
-				//this is where the user can select which country is connected to another by land
-				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedSea);
+				//country should not have seal links to itself
+				if (countryList[countryNum].getID() != editID)
+				{
+					//add the country's unique ID to ensure no countries have similar selectable names
+					//prevents imgui from having a hard time distinguishing selectables
+					std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+					//this is where the user can select which country is connected to another by land
+					ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedSea);
+				}
 			}
 
 			ImGui::ListBoxFooter();
@@ -1642,16 +1705,21 @@ void SCGUI::editCountryMenu(int curCountry)
 	{
 		if (ImGui::ListBoxHeader("##airlinks", ImVec2(400, 150)))
 		{
+			
+
 			//make a selectable item for each country
 			for (int countryNum = 0; countryNum < countryList.size(); countryNum++)
 			{
-				//add the country's unique ID to ensure no countries have similar selectable names
-				//prevents imgui from having a hard time distinguishing selectables
-				std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
-				//this is where the user can select which country is connected to another by land
-				ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedAir);
+				//country should not have air links to itself
+				if (countryList[countryNum].getID() != editID)
+				{
+					//add the country's unique ID to ensure no countries have similar selectable names
+					//prevents imgui from having a hard time distinguishing selectables
+					std::string countryString = countryList[countryNum].getID() + " - " + countryList[countryNum].getCountryName();
+					//this is where the user can select which country is connected to another by land
+					ImGui::Selectable(countryString.c_str(), &countryList[countryNum].selectedAir);
+				}
 			}
-
 			ImGui::ListBoxFooter();
 		}
 

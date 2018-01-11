@@ -68,7 +68,7 @@
     <ClInclude Include="SCGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Country.h">
+    <ClInclude Include="..\sharedobjects\Country.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>

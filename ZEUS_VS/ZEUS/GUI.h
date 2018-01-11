@@ -34,7 +34,7 @@
 #include <algorithm>
 
 //other items
-#include "Country.h"
+#include "../sharedobjects/Country.h"
 
 /**
 * GUI Class
