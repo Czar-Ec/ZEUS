@@ -52,6 +52,7 @@ public:
 
 	//menu functions
 	void save();
+	void saveAs();
 	
 	//view country window
 	void viewCountries();
@@ -99,12 +100,21 @@ private:
 
 	//map to be shown on screen
 	SDL_Texture *map = NULL;
+	char textureLoc[MAX_PATH];
 
 	//region where the map will be drawn
 	int worldX, worldY;
 	SDL_Rect vp;
 	//rectangle which allows for zooming and panning
 	SDL_Rect vpSrc;
+
+	#pragma region SAVING AND LOADING
+	//////////////////////////////////////////////////////////////////////////////////
+	std::string curFileName = "";
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	#pragma endregion
 
 	#pragma region CONTROL VARIABLES
 	//////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +370,11 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		//Save current simulation
 		if (ImGui::MenuItem("Save", "CTRL+S"))
 		{
-
+			//only save is a scenario was loaded
+			if (scenarioLoaded)
+			{
+				save();
+			}
 		}
 
 		//Save current simulation with a different name
@@ -473,7 +487,37 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 void SCGUI::save()
 {
-	
+	//check if this file was opened or was newly created
+	if (curFileName == "")
+	{
+		//call the save as function
+		saveAs();
+	}
+	//else save it as the cur file name
+	else
+	{
+
+	}
+}
+
+void SCGUI::saveAs()
+{
+	char filename[MAX_PATH];
+	OPENFILENAME ofn;
+	ZeroMemory(&filename, sizeof(filename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.lpstrFilter = "ZEUS Simulation Files (*.sim)\0*.sim\0";
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Save Simulation";
+	ofn.Flags = OFN_DONTADDTORECENT;
+
+	if (GetSaveFileNameA(&ofn))
+	{
+		std::cout << "You chose the file \"" << filename << "\"\n";
+	}
 }
 
 /**
@@ -695,7 +739,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		ofn.lpstrTitle = "Select map image";
 		ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
 
-		if (GetOpenFileNameA(&ofn))
+		if (GetOpenFileName(&ofn))
 		{
 			strcpy(tempMapFilePath, filename);
 		}
@@ -786,6 +830,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 				vpSrc = { 0, 0, wMapX, wMapY };
 
 				//resets map file path
+				strcpy(textureLoc, tempMapFilePath);
 				strcpy(tempMapFilePath, "");
 			}
 
@@ -793,6 +838,9 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 
 			resetNewScenario();
 			scenarioLoaded = true;
+
+			//tells the program that this is a new scenario, not a loaded scenario
+			curFileName = "";
 		}
 		else
 		{
@@ -2454,7 +2502,10 @@ void SCGUI::leftClick()
 
 	}
 
-	if (!countryFound && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
+	if (!countryFound && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered() &&
+		comparison.r != bkgColour.x &&
+		comparison.g != bkgColour.y &&
+		comparison.b != bkgColour.z)
 	{
 		addNewCountry = true;
 		clickR = comparison.r;
