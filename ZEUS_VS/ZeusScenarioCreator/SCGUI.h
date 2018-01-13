@@ -24,6 +24,7 @@
 //basic IO
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -51,7 +52,8 @@ public:
 	//main menu bar
 	void menuBar(SDL_Renderer *renderer, bool &appRun);
 
-	//menu functions
+	//file handling
+	void open(SDL_Renderer *renderer);
 	void save();
 	void saveAs();
 	void saveFile(std::string filepath);
@@ -87,6 +89,9 @@ public:
 
 	void mouseOver();	//mouse over helps identify a country of where there could be one
 	void leftClick();
+
+	//shortcut controls
+	void ctrlS() { save(); };
 
 private:
 	//colour of the background
@@ -348,44 +353,20 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		//Open existing simulation
 		if (ImGui::MenuItem("Open Scenario", "CTRL+O"))
 		{
-			newScenario = false;
-
-			char filename[MAX_PATH];
-			OPENFILENAME ofn;
-			ZeroMemory(&filename, sizeof(filename));
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = sizeof(ofn);
-			ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-			ofn.lpstrFilter = "ZEUS Simulation Files (*.sim)\0*.sim\0";
-			ofn.lpstrFile = filename;
-			ofn.nMaxFile = MAX_PATH;
-			ofn.lpstrTitle = "Open Simulation";
-			ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
-
-			if (GetOpenFileNameA(&ofn))
-			{
-				std::cout << "You chose the file \"" << filename << "\"\n";
-			}
+			open(renderer);
 		}
 
 		//Save current simulation
 		if (ImGui::MenuItem("Save", "CTRL+S"))
 		{
-			//only save is a scenario was loaded
-			if (scenarioLoaded)
-			{
-				save();
-			}
+			save();
 		}
 
 		//Save current simulation with a different name
 
 		if (ImGui::MenuItem("Save As"))
 		{
-			if (scenarioLoaded)
-			{
-				saveAs();
-			}
+			saveAs();
 		}
 
 
@@ -489,6 +470,159 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	}
 }
 
+void SCGUI::open(SDL_Renderer *renderer)
+{
+	newScenario = false;
+
+	char filename[MAX_PATH];
+	OPENFILENAME ofn;
+	ZeroMemory(&filename, sizeof(filename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.lpstrFilter = "ZEUS Scenario Files (*.dat)\0*.dat\0";
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Open Scenario";
+	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+	{
+		//open the file
+		std::ifstream file(filename);
+
+		//check if file is valid
+		if (!file.is_open())
+		{
+			std::cout << "Error while loading, file could not be opened\n";
+		}
+		else
+		{
+			//copy temp name to global name
+			strcpy(scenarioName, "world");
+
+			//copy img path to global img path
+			strcpy(tempMapFilePath, "..\\res\\img\\worldHigh.png");
+			strcpy(imgFilePath, tempMapFilePath);
+
+			//load the texture
+			//load the worldmap textures
+			SDL_Surface *worldSurf = IMG_Load("C:/Users/User/Documents/ZEUS/ZEUS_VS/res/img/worldHigh.png");
+			map = SDL_CreateTextureFromSurface(renderer, worldSurf);
+			//check if texture is loaded
+			if (map == NULL)
+			{
+				std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
+				worldX = worldY = 0;
+			}
+
+			//get texture size
+			SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
+
+			//resets map file path
+			strcpy(textureLoc, tempMapFilePath);
+			strcpy(tempMapFilePath, "");
+
+			strcpy(curScenario, "world");
+
+			//tells the program that this is a new scenario, not a loaded scenario
+			curFileName = "";
+
+			//also clear all the countries
+			countryList.clear();
+
+			//load the countries
+			//counts the number of loaded countries
+			int countries = 0;
+
+			//line buffer
+			std::string lineBuffer;
+
+			//get the country data file
+			std::ifstream cData;
+			cData.open(filename);
+
+			//loop until end of file
+			while (!cData.eof())
+			{			
+				//send the retrieved line to the line buffer
+				cData >> lineBuffer;
+
+				//string stream to process the line
+				std::stringstream ss;
+				ss.str(lineBuffer);
+
+				//store processed line
+				std::string processedData;
+
+				//actual country data
+				std::string countryData[6];
+
+				//separator for each line
+				char delimiter = ',';
+
+				//counts the number of items in the line
+				int count = 0;
+
+				//loop to read the entire line
+				while (std::getline(ss, processedData, delimiter))
+				{
+					//ignores any empty lines
+					if (processedData != "")
+					{
+						//store the processed data in the appropriate array location
+						//std::replace(processedData.begin(), processedData.end(), '_', ' ');
+						countryData[count] = processedData;
+
+						if (count == 5)
+						{
+							//for debugging if the data was input correctly
+							/*std::cout <<
+							"ID: " << countryData[0] << std::endl <<
+							"Name: " << countryData[1] << std::endl <<
+							"Red: " << countryData[2] << std::endl <<
+							"Green: " << countryData[3] << std::endl <<
+							"Blue: " << countryData[4] << std::endl <<
+							"Population: " << countryData[5] << std::endl;*/
+
+							//process the data i.e. turn string to int
+							//as well as just making clear which variable is which
+							std::string id = countryData[0];
+							std::string name = countryData[1];
+							//std::cout << name << std::endl;
+							int red = atoi(countryData[2].c_str());
+							int green = atoi(countryData[3].c_str());
+							int blue = atoi(countryData[4].c_str());
+							unsigned long int pop = atoi(countryData[5].c_str());
+
+							//create new instance of a country
+							Country c = Country(id, name, red, green, blue, pop, 0, 0, 0, 0, 0, emptyVec, emptyVec, emptyVec);
+
+							//add the country to the country list
+							countryList.push_back(c);
+
+							//reset count
+							count = 0;
+						}
+
+						//increment
+						count++;
+					}
+				}
+
+				//next line therefore increment
+				countries++;
+			}
+
+			//close file after reading
+			cData.close();
+
+			resetNewScenario();
+			scenarioLoaded = true;
+		}
+	}
+}
+
 /**
 * save
 * function called when the save option is used. The function checks
@@ -497,17 +631,21 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 */
 void SCGUI::save()
 {
-	//check if this file was opened or was newly created
-	if (curFileName == "")
+	if (scenarioLoaded)
 	{
-		//call the save as function
-		saveAs();
+		//check if this file was opened or was newly created
+		if (curFileName == "")
+		{
+			//call the save as function
+			saveAs();
+		}
+		//else save it as the cur file name
+		else
+		{
+			saveFile(curFileName);
+		}
 	}
-	//else save it as the cur file name
-	else
-	{
-		saveFile(curFileName);
-	}
+	
 }
 
 /**
@@ -517,22 +655,26 @@ void SCGUI::save()
 */
 void SCGUI::saveAs()
 {
-	char filename[MAX_PATH];
-	OPENFILENAME ofn;
-	ZeroMemory(&filename, sizeof(filename));
-	ZeroMemory(&ofn, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-	ofn.lpstrFilter = "ZEUS Simulation Files (*.sim)\0*.sim\0";
-	ofn.lpstrFile = filename;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrTitle = "Save Simulation";
-	ofn.Flags = OFN_DONTADDTORECENT;
-
-	if (GetSaveFileNameA(&ofn))
+	if (scenarioLoaded)
 	{
-		saveFile(filename);
+		char filename[MAX_PATH];
+		OPENFILENAME ofn;
+		ZeroMemory(&filename, sizeof(filename));
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+		ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0*.sce\0";
+		ofn.lpstrFile = filename;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.lpstrTitle = "Save Scenario";
+		ofn.Flags = OFN_DONTADDTORECENT;
+
+		if (GetSaveFileNameA(&ofn))
+		{
+			saveFile(filename);
+		}
 	}
+	
 }
 
 /**
@@ -544,16 +686,17 @@ void SCGUI::saveAs()
 void SCGUI::saveFile(std::string filepath)
 {
 	//check if the .sim extension is already added, if not add it
-	if (!(filepath.substr(filepath.find_last_of(".") + 1) == "sim"))
+	if (!(filepath.substr(filepath.find_last_of(".") + 1) == "sce"))
 	{
-		filepath = filepath + ".sim";
+		filepath = filepath + ".sce";
 	}
 
 	std::ofstream file(filepath);
 
+	//check if file is valid
 	if (!file.is_open())
 	{
-		std::cout << "Error while saving, file could not be open\n";
+		std::cout << "Error while saving, file could not be opened\n";
 	}
 	else
 	{
@@ -631,6 +774,9 @@ void SCGUI::saveFile(std::string filepath)
 	}
 
 	file.close();
+
+	//this file is now this filepath
+	curFileName = filepath;
 }
 
 /**
@@ -642,7 +788,7 @@ void SCGUI::viewCountries()
 {
 	//make the window
 	ImGui::Begin("View Country", &viewCountriesWin, ImGuiWindowFlags_NoCollapse);
-	ImGui::SetWindowSize(ImVec2(750, 250));
+	ImGui::SetWindowSize(ImVec2(750, 500));
 	ImGui::BeginColumns("View Countries", 4, NULL);
 
 	//column titles
@@ -954,6 +1100,9 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 
 			//tells the program that this is a new scenario, not a loaded scenario
 			curFileName = "";
+
+			//also clear all the countries
+			countryList.clear();
 		}
 		else
 		{
@@ -1071,7 +1220,7 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	//input box
 	ImGui::SameLine();
 	//help marker
-	helpMarker("Country Name. Maximum 30 characters");
+	helpMarker("Country Name. Maximum 30 characters and use '-' as spaces");
 	//country input
 	ImGui::SameLine();
 	ImGui::InputText("##countryname", tempCName, sizeof(tempCName), ImGuiInputTextFlags_CharsNoBlank);
@@ -1654,7 +1803,7 @@ void SCGUI::editCountryMenu()
 	//input box
 	ImGui::SameLine();
 	//help marker
-	helpMarker("Country Name. Maximum 30 characters");
+	helpMarker("Country Name. Maximum 30 characters and use '-' as spaces");
 	//country input
 	ImGui::SameLine();
 	ImGui::InputText("##ecountryname", editCName, sizeof(editCName), ImGuiInputTextFlags_CharsNoBlank);
@@ -2441,7 +2590,7 @@ void SCGUI::mouseOver()
 	}
 	
 	//if the country was identified
-	if (countryFound)
+	if (countryFound && scenarioLoaded)
 	{
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(450.0f);
@@ -2455,7 +2604,8 @@ void SCGUI::mouseOver()
 	else if(
 		comparison.r != bkgColour.x &&
 		comparison.g != bkgColour.y &&
-		comparison.b != bkgColour.z
+		comparison.b != bkgColour.z &&
+		scenarioLoaded
 		)
 	{
 		ImGui::BeginTooltip();
@@ -2471,6 +2621,11 @@ void SCGUI::mouseOver()
 	}
 }
 
+/**
+* leftClick
+* function called when a left click is detected by the Main class's inputs.
+* The function determines how to respond when a left click is detected
+*/
 void SCGUI::leftClick()
 {
 	//source of this function: 
@@ -2647,7 +2802,8 @@ void SCGUI::leftClick()
 	if (!countryFound && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered() &&
 		comparison.r != bkgColour.x &&
 		comparison.g != bkgColour.y &&
-		comparison.b != bkgColour.z)
+		comparison.b != bkgColour.z &&
+		scenarioLoaded)
 	{
 		addNewCountry = true;
 		clickR = comparison.r;

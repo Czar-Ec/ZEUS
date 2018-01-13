@@ -881,6 +881,15 @@ void GUI::zoom(int zoomType)
 	panLimiting();
 }
 
+/**
+* pan
+* function that allows the user to pan the map around, so they are able to
+* see around the map, especially when zoomed in
+*
+* @param SDL_Point *mPos
+* @param int motionX
+* @param int motionY
+*/
 void GUI::pan(SDL_Point *mPos, int motionX, int motionY)
 {
 	//check if the mouse is within the viewport
@@ -895,6 +904,11 @@ void GUI::pan(SDL_Point *mPos, int motionX, int motionY)
 	}
 }
 
+/**
+* panLimiting
+* function that ensures that the user remains within the bounds of the image i.e.
+* prevents user from being lost while panning
+*/
 void GUI::panLimiting()
 {
 	//limit for the left scrolling

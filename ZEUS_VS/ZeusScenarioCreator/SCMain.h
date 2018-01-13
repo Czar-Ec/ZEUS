@@ -350,18 +350,11 @@ void SCMain::mainLoop()
 			if (key[SDL_SCANCODE_RIGHT]);
 
 
-			//ctrl + N shortcut
-			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_N] ||
-				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_N])
+			//ctrl + S shortcut
+			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_S] ||
+				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_S])
 			{
-
-			}
-
-			//ctrl + O shortcut
-			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_O] ||
-				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_O])
-			{
-
+				gui.ctrlS();
 			}
 		}
 
