@@ -71,10 +71,10 @@
     <ClInclude Include="GUI.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Country.h">
+    <ClInclude Include="Point.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Point.h">
+    <ClInclude Include="..\sharedobjects\Country.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>

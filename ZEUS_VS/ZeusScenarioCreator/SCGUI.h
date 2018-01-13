@@ -23,6 +23,7 @@
 //C/C++ libraries
 //basic IO
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -53,6 +54,7 @@ public:
 	//menu functions
 	void save();
 	void saveAs();
+	void saveFile(std::string filepath);
 	
 	//view country window
 	void viewCountries();
@@ -66,7 +68,7 @@ public:
 	void resetNewCountry();
 
 	//edit country window
-	void editCountryMenu(int count);
+	void editCountryMenu();
 
 	//gui rendering
 	void render(SDL_Window *window, SDL_Renderer *renderer);
@@ -94,7 +96,6 @@ private:
 	bool addNewCountry = false;
 	bool editCountry = false;
 	bool viewCountriesWin = false;
-	int curCountryNum = -1;
 
 	int clickR = -1, clickG = -1, clickB = -1;
 
@@ -165,7 +166,7 @@ private:
 
 	#pragma region VIEW COUNTRIES
 	//////////////////////////////////////////////////////////////////////////////////
-	int currentCountry;
+	int currentCountry = -1;
 
 	char editID[5] = "";
 	char editCName[31] = "";
@@ -381,7 +382,10 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 		if (ImGui::MenuItem("Save As"))
 		{
-
+			if (scenarioLoaded)
+			{
+				saveAs();
+			}
 		}
 
 
@@ -481,10 +485,16 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 
 	if (editCountry)
 	{
-		editCountryMenu(curCountryNum);
+		editCountryMenu();
 	}
 }
 
+/**
+* save
+* function called when the save option is used. The function checks
+* if the scenario was loaded or newly created and either calls save as or
+* writes over the existing scenario
+*/
 void SCGUI::save()
 {
 	//check if this file was opened or was newly created
@@ -496,10 +506,15 @@ void SCGUI::save()
 	//else save it as the cur file name
 	else
 	{
-
+		saveFile(curFileName);
 	}
 }
 
+/**
+* saveAs
+* function called when the saveAs option is used. The function is also called when
+* save function determines that the scenario is new and requires a filepath for the scenario
+*/
 void SCGUI::saveAs()
 {
 	char filename[MAX_PATH];
@@ -516,8 +531,106 @@ void SCGUI::saveAs()
 
 	if (GetSaveFileNameA(&ofn))
 	{
-		std::cout << "You chose the file \"" << filename << "\"\n";
+		saveFile(filename);
 	}
+}
+
+/**
+* saveFile
+* function that actually writes the file
+*
+* @param string filepath
+*/
+void SCGUI::saveFile(std::string filepath)
+{
+	//check if the .sim extension is already added, if not add it
+	if (!(filepath.substr(filepath.find_last_of(".") + 1) == "sim"))
+	{
+		filepath = filepath + ".sim";
+	}
+
+	std::ofstream file(filepath);
+
+	if (!file.is_open())
+	{
+		std::cout << "Error while saving, file could not be open\n";
+	}
+	else
+	{
+		//first line is always the scenario name
+		file << "Scenario Name: " << scenarioName << "\n";
+
+		//second line will be the map's image/texture
+		file << textureLoc << "\n";
+
+		//the following lines will be the country data
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			//everything is on the same line
+			file << countryList[i].getID() << "|" <<
+				countryList[i].getCountryName() << "|" <<
+				(int)countryList[i].getColour().r << "|" <<
+				(int)countryList[i].getColour().g << "|" <<
+				(int)countryList[i].getColour().b << "|" <<
+				countryList[i].getPopulation() << "|" <<
+				countryList[i].getGDP() << "|" <<
+				countryList[i].getMilitaryBudget() << "|" <<
+				countryList[i].getResearchBudget() << "|" <<
+				countryList[i].getTemperature() << "|" <<
+				countryList[i].getHumidity() << "|";
+
+			//borders will need to have its own loops as well, each border is separated by commas
+			std::vector<std::string> lBorder = countryList[i].getLandBorders();
+			std::vector<std::string> sLink = countryList[i].getSeaLinks();
+			std::vector<std::string> aLink = countryList[i].getAirLinks();
+
+			//land border
+			for (int borderScan = 0; borderScan < lBorder.size(); borderScan++)
+			{
+				file << lBorder[borderScan];
+
+				//add a comma after each one except for the last one
+				if (!borderScan == lBorder.size()-1)
+				{
+					file << ",";
+				}
+			}
+
+			//add a separator to indicate the next border
+			file << "|";
+
+			//sea links
+			for (int seaScan = 0; seaScan < sLink.size(); seaScan++)
+			{
+				file << sLink[seaScan];
+
+				//add a comma after each one except for the last one
+				if (!seaScan == sLink.size()-1)
+				{
+					file << ",";
+				}
+			}
+
+			//add a separator to indicate the next border
+			file << "|";
+
+			for (int airScan = 0; airScan < aLink.size(); airScan++)
+			{
+				file << aLink[airScan];
+
+				//add a comma after each one except for the last one
+				if (!airScan == aLink.size()-1)
+				{
+					file << ",";
+				}
+			}
+
+			//finish the country by adding a new line
+			file << "\n";
+		}
+	}
+
+	file.close();
 }
 
 /**
@@ -1325,6 +1438,9 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 				if (countryList[borderScan].selectedBorder)
 				{
 					landBorders.push_back(countryList[borderScan].getID());
+
+					//adds this country to the other country's border list too
+					countryList[borderScan].linkLand(tempID);
 				}
 			}
 
@@ -1336,6 +1452,9 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 				if (countryList[seaScan].selectedSea)
 				{
 					seaLinks.push_back(countryList[seaScan].getID());
+
+					//add this country to the other country's border list too
+					countryList[seaScan].linkSea(tempID);
 				}
 			}
 
@@ -1347,6 +1466,9 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 				if (countryList[airScan].selectedAir)
 				{
 					airLinks.push_back(countryList[airScan].getID());
+
+					//add this country to thr other country's border list too
+					countryList[airScan].linkAir(tempID);
 				}
 			}
 
@@ -1505,10 +1627,8 @@ void SCGUI::resetNewCountry()
 * editCountryMenu
 * function that when called to be displayed will show the menu for editing countries.
 * function is very similar to new country menu but acts differently and contains extra things
-*
-* @param int curCountry
 */
-void SCGUI::editCountryMenu(int curCountry)
+void SCGUI::editCountryMenu()
 {
 	//make the window
 	ImGui::Begin("Edit Country", &editCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
@@ -1847,9 +1967,9 @@ void SCGUI::editCountryMenu(int curCountry)
 	if (ImGui::Button("Edit Country", ImVec2(ImGui::GetWindowWidth(), 20)))
 	{
 		//prevents crashing
-		if (countryList.size() > curCountry)
+		if (countryList.size() > currentCountry)
 		{
-			countryList.erase(countryList.begin() + curCountry);
+			countryList.erase(countryList.begin() + currentCountry);
 		}
 		
 		//find the correct value for climates
@@ -1871,6 +1991,14 @@ void SCGUI::editCountryMenu(int curCountry)
 			if (countryList[borderScan].selectedBorder)
 			{
 				landBorders.push_back(countryList[borderScan].getID());
+
+				//add this country to the other country's border list too
+				countryList[borderScan].linkLand(editID);
+			}
+			else
+			{
+				//if not selected, remove from the country's list, just in case
+				countryList[borderScan].removeLinkLand(editID);
 			}
 		}
 
@@ -1882,6 +2010,14 @@ void SCGUI::editCountryMenu(int curCountry)
 			if (countryList[seaScan].selectedSea)
 			{
 				seaLinks.push_back(countryList[seaScan].getID());
+
+				//add this country to the other country's border list too
+				countryList[seaScan].linkSea(editID);
+			}
+			else
+			{
+				//if not selected, remove from the country's list, just in case
+				countryList[seaScan].removeLinkSea(editID);
 			}
 		}
 
@@ -1893,6 +2029,14 @@ void SCGUI::editCountryMenu(int curCountry)
 			if (countryList[airScan].selectedAir)
 			{
 				airLinks.push_back(countryList[airScan].getID());
+
+				//add this country to the other country's border list too
+				countryList[airScan].linkAir(editID);
+			}
+			else
+			{
+				//if not selected, remove from the country's list, just in case
+				countryList[airScan].removeLinkAir(editID);
 			}
 		}
 
@@ -1913,9 +2057,7 @@ void SCGUI::editCountryMenu(int curCountry)
 		);
 
 		//add to country list
-		countryList.insert(countryList.begin() + curCountry, newCountry);
-
-		resetNewCountry();
+		countryList.insert(countryList.begin() + currentCountry, newCountry);
 	}
 
 	ImGui::End();
@@ -2384,7 +2526,7 @@ void SCGUI::leftClick()
 
 			//set the current country to this country (countryList[i])
 			curCountry = countryList[count];
-			curCountryNum = count;
+			currentCountry = count;
 
 			//set edit ID
 			strcpy(editID, countryList[count].getID().c_str());

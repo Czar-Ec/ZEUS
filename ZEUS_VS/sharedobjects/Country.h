@@ -146,6 +146,34 @@ public:
 	int getHumidity() { return humidity; };
 
 	/**
+	* linkLand
+	* function that adds a country to this country's land border list
+	*
+	* @param string id
+	*/
+	void linkLand(std::string id) { landBorders.push_back(id); };
+
+	/**
+	* removeLinkLand
+	* function that removes a country from this country's land border list
+	*
+	* @param string id
+	*/
+	void removeLinkLand(std::string id) 
+	{
+		//loop through the land border list
+		for (int i = 0; i < landBorders.size(); i++)
+		{
+			//remove from list if id is found
+			if (id == landBorders[i])
+			{
+				landBorders.erase(landBorders.begin() + i);
+				break;
+			}
+		}
+	}
+
+	/**
 	* getLandBorders
 	* returns a vector containing the ID's of the country's neighbours
 	*
@@ -154,12 +182,68 @@ public:
 	std::vector<std::string> getLandBorders() { return landBorders; };
 
 	/**
+	* linkSea
+	* function that adds a country to this country's sea link list
+	*
+	* @param string id
+	*/
+	void linkSea(std::string id) { seaLinks.push_back(id); };
+
+	/**
+	* removeLinkSea
+	* function that removes a country from this country's sea link list
+	*
+	* @param string id
+	*/
+	void removeLinkSea(std::string id)
+	{
+		//loop through the land border list
+		for (int i = 0; i < seaLinks.size(); i++)
+		{
+			//remove from list if id is found
+			if (id == seaLinks[i])
+			{
+				seaLinks.erase(seaLinks.begin() + i);
+				break;
+			}
+		}
+	}
+
+	/**
 	* getSeaLinks
 	* returns a vector containing the ID's of the country's sea links
 	*
 	* @return sealLinks
 	*/
 	std::vector<std::string> getSeaLinks() { return seaLinks; };
+
+	/**
+	* linkAir
+	* function that adds a country to this country's air links
+	*
+	* @param string id
+	*/
+	void linkAir(std::string id) { airLinks.push_back(id); };
+
+	/**
+	* removeLinkAir
+	* function that removes a country from this country's air link list
+	*
+	* @param string id
+	*/
+	void removeLinkAir(std::string id)
+	{
+		//loop through the land border list
+		for (int i = 0; i < airLinks.size(); i++)
+		{
+			//remove from list if id is found
+			if (id == airLinks[i])
+			{
+				airLinks.erase(airLinks.begin() + i);
+				break;
+			}
+		}
+	}
 
 	/**
 	* getAirLinks

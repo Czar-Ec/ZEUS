@@ -146,7 +146,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Country.h" />
+    <ClInclude Include="..\sharedobjects\Country.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
