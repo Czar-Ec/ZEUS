@@ -480,7 +480,7 @@ void SCGUI::open(SDL_Renderer *renderer)
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-	ofn.lpstrFilter = "ZEUS Scenario Files (*.dat)\0*.dat\0";
+	ofn.lpstrFilter = "ZEUS Scenario Files (*.sim; *.dat)\0*.sim;*.dat\0";
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = "Open Scenario";
@@ -489,16 +489,26 @@ void SCGUI::open(SDL_Renderer *renderer)
 	if (GetOpenFileNameA(&ofn))
 	{
 		//open the file
-		std::ifstream file(filename);
+		std::ifstream file;
 
+		//open file
+		file.open(filename);
+
+		//line buffer
+		std::string lineBuf;
+		
 		//check if file is valid
-		if (!file.is_open())
+		if (file.is_open())
 		{
-			std::cout << "Error while loading, file could not be opened\n";
+			//read the entire file
+			while (!file.eof())
+			{
+				std::cout << lineBuf << std::endl;
+			}
 		}
 		else
 		{
-			
+			std::cout << "Error while loading, file could not be opened\n";
 		}
 	}
 }
