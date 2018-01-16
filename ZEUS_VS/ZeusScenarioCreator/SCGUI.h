@@ -536,117 +536,130 @@ void SCGUI::open(SDL_Renderer *renderer)
 				//everything else is a country
 				else
 				{
-					//ignore empty lines
-					if (processed != "")
-					{
-						//helps keep track of which part of the line is being scanned
-						int scanPos = 0;
+					
+					//helps keep track of which part of the line is being scanned
+					int scanPos = 0;
 
-						std::string cData[14];
+					std::string cData[14];
 						
-						//loop through the line
-						while (std::getline(ss, processed, '|'))
+					//loop through the line
+					while (std::getline(ss, processed, '|'))
+					{
+						//try catch to prevent crashes
+						try
 						{
-							//try catch to prevent crashes
-							try
+							//add data to the relevant position
+							cData[scanPos] = processed;
+
+							//handling the land borders
+							if (scanPos == 11)
 							{
-								//add data to the relevant position
-								cData[scanPos] = processed;
+								//loaded country ID
+								std::string cID;
 
-								//handling the land borders
-								if (scanPos == 11)
+								//loop through this section
+								while (std::getline(ss, cData[11], ','))
 								{
-									//loaded country ID
-									std::string cID;
-
-									//loop through this section
-									while (std::getline(ss, cData[11], ','))
-									{
-										//add the country ID to the landborder list
-										cLandLinks.push_back(cID);
-									}
+									//add the country ID to the landborder list
+									cLandLinks.push_back(cID);
 								}
-
-								//handling sea links
-								if (scanPos == 12)
-								{
-									//loaded country id
-									std::string cID;
-
-									//loop through ths section
-									while (std::getline(ss, cData[12], ','))
-									{
-										//add the country ID to the sea link
-										cSeaLinks.push_back(cID);
-									}
-								}
-
-								//handling air links
-								if (scanPos == 13)
-								{
-									//loaded country ID
-									std::string cID;
-
-									//loop through this section
-									while (std::getline(ss, cData[13], ','))
-									{
-										//add the country ID to the air link
-										cAirLinks.push_back(cID);
-									}
-								}
-
-								//once end is reached
-								if (scanPos == 14)
-								{
-									//country colours
-									int rCol = atoi(cData[2].c_str());
-									int gCol = atoi(cData[3].c_str());
-									int bCol = atoi(cData[4].c_str());
-
-									//convert population to unsigned long long
-									unsigned long long int cPop = strtoull(cData[5].c_str(), (char**) NULL, 10);
-									//country gdp
-									unsigned long long int gdp = strtoull(cData[6].c_str(), (char**)NULL, 10);
-									//military budget
-									unsigned long long int mb = strtoull(cData[7].c_str(), (char**) NULL, 10);
-									//research budget
-									unsigned long long int rb = strtoull(cData[8].c_str(), (char**) NULL, 10);
-
-									//climate types
-									int climTemp = atoi(cData[9].c_str());
-									int climHum = atoi(cData[10].c_str());
-
-
-									//make the country
-									Country c = Country(
-										cData[0], //id
-										cData[1], //country name
-										rCol, //red
-										gCol, //green
-										bCol, //blue
-										cPop, //country population
-										gdp, //country gdp
-										mb, //military budget
-										rb, //research budget
-										climTemp, //temperature
-										climHum, //humidity
-										cLandLinks, //land borders
-										cSeaLinks, //sea links
-										cAirLinks //air links
-									);
-
-									countryList.push_back(c);
-								}
-
-								//update scanpos
-								scanPos++;
 							}
-							catch (const std::exception& e)
+
+							//handling sea links
+							if (scanPos == 12)
 							{
-								//print error
-								std::cerr << e.what() << std::endl;
+								//loaded country id
+								std::string cID;
+
+								//loop through ths section
+								while (std::getline(ss, cData[12], ','))
+								{
+									//add the country ID to the sea link
+									cSeaLinks.push_back(cID);
+								}
 							}
+
+							//handling air links
+							if (scanPos == 13)
+							{
+								//loaded country ID
+								std::string cID;
+
+								//loop through this section
+								while (std::getline(ss, cData[13], ','))
+								{
+									//add the country ID to the air link
+									cAirLinks.push_back(cID);
+								}
+							}
+
+							//once end is reached
+							if (scanPos == 14)
+							{
+								//country colours
+								int rCol = atoi(cData[2].c_str());
+								int gCol = atoi(cData[3].c_str());
+								int bCol = atoi(cData[4].c_str());
+
+								//convert population to unsigned long long
+								unsigned long long int cPop = strtoull(cData[5].c_str(), (char**) NULL, 10);
+								//country gdp
+								unsigned long long int gdp = strtoull(cData[6].c_str(), (char**)NULL, 10);
+								//military budget
+								unsigned long long int mb = strtoull(cData[7].c_str(), (char**) NULL, 10);
+								//research budget
+								unsigned long long int rb = strtoull(cData[8].c_str(), (char**) NULL, 10);
+
+								//climate types
+								int climTemp = atoi(cData[9].c_str());
+								int climHum = atoi(cData[10].c_str());
+
+
+								//make the country
+								Country c = Country(
+									cData[0], //id
+									cData[1], //country name
+									rCol, //red
+									gCol, //green
+									bCol, //blue
+									cPop, //country population
+									gdp, //country gdp
+									mb, //military budget
+									rb, //research budget
+									climTemp, //temperature
+									climHum, //humidity
+									cLandLinks, //land borders
+									cSeaLinks, //sea links
+									cAirLinks //air links
+								);
+
+								countryList.push_back(c);
+
+								scanPos = 0;
+							}
+
+							std::cout << cData[0] << 
+								cData[1] <<
+								cData[2] <<
+								cData[3] <<
+								cData[4] <<
+								cData[5] <<
+								cData[6] <<
+								cData[7] <<
+								cData[8] <<
+								cData[9] <<
+								cData[10] <<
+								cData[11] <<
+								std::endl;
 						}
+						catch (const std::exception& e)
+						{
+							//print error
+							std::cerr << e.what() << std::endl;
+						}
+
+						//update scanpos
+						scanPos++;
 					}
 				}
 
