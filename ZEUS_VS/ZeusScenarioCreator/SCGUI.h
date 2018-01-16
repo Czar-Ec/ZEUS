@@ -536,7 +536,7 @@ void SCGUI::open(SDL_Renderer *renderer)
 				//everything else is a country
 				else
 				{
-					
+					std::cout << lineBuf << std::endl;
 					//helps keep track of which part of the line is being scanned
 					int scanPos = 0;
 
@@ -554,43 +554,19 @@ void SCGUI::open(SDL_Renderer *renderer)
 							//handling the land borders
 							if (scanPos == 11)
 							{
-								//loaded country ID
-								std::string cID;
 
-								//loop through this section
-								while (std::getline(ss, cData[11], ','))
-								{
-									//add the country ID to the landborder list
-									cLandLinks.push_back(cID);
-								}
 							}
 
 							//handling sea links
 							if (scanPos == 12)
 							{
-								//loaded country id
-								std::string cID;
-
-								//loop through ths section
-								while (std::getline(ss, cData[12], ','))
-								{
-									//add the country ID to the sea link
-									cSeaLinks.push_back(cID);
-								}
+								
 							}
 
 							//handling air links
 							if (scanPos == 13)
 							{
-								//loaded country ID
-								std::string cID;
-
-								//loop through this section
-								while (std::getline(ss, cData[13], ','))
-								{
-									//add the country ID to the air link
-									cAirLinks.push_back(cID);
-								}
+								
 							}
 
 							//once end is reached
@@ -638,19 +614,7 @@ void SCGUI::open(SDL_Renderer *renderer)
 								scanPos = 0;
 							}
 
-							std::cout << cData[0] << 
-								cData[1] <<
-								cData[2] <<
-								cData[3] <<
-								cData[4] <<
-								cData[5] <<
-								cData[6] <<
-								cData[7] <<
-								cData[8] <<
-								cData[9] <<
-								cData[10] <<
-								cData[11] <<
-								std::endl;
+
 						}
 						catch (const std::exception& e)
 						{

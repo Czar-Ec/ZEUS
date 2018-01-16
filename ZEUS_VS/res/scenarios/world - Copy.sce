@@ -1,6 +1,6 @@
 ﻿world
 ..\res\img\worldHigh.png
-﻿ID|CountryNa|0|0|0|0|0|0|0|0|||
+﻿ID|CountryName|0|0|0|0|0|0|0|0|0|test,test1,test2|test,test1|test,test1
 AD|Andorra|200|200|200|76965|0|0|0|0|0|||
 AE|United-Arab-Emirates|200|200|201|9400145|0|0|0|0|0|||
 AF|Afghanistan|200|200|202|35530081|0|0|0|0|0|||
