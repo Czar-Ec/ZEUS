@@ -499,6 +499,8 @@ void SCGUI::open(SDL_Renderer *renderer)
 
 		std::string loadSceName;
 		std::string loadTexturePath;
+		//country links
+		std::vector<std::string> cLandLinks, cSeaLinks, cAirLinks;
 
 		
 		//check if file is valid
@@ -554,25 +556,86 @@ void SCGUI::open(SDL_Renderer *renderer)
 								//handling the land borders
 								if (scanPos == 11)
 								{
+									//loaded country ID
+									std::string cID;
 
+									//loop through this section
+									while (std::getline(ss, cData[11], ','))
+									{
+										//add the country ID to the landborder list
+										cLandLinks.push_back(cID);
+									}
 								}
 
 								//handling sea links
 								if (scanPos == 12)
 								{
+									//loaded country id
+									std::string cID;
 
+									//loop through ths section
+									while (std::getline(ss, cData[12], ','))
+									{
+										//add the country ID to the sea link
+										cSeaLinks.push_back(cID);
+									}
 								}
 
 								//handling air links
 								if (scanPos == 13)
 								{
+									//loaded country ID
+									std::string cID;
 
+									//loop through this section
+									while (std::getline(ss, cData[13], ','))
+									{
+										//add the country ID to the air link
+										cAirLinks.push_back(cID);
+									}
 								}
 
 								//once end is reached
 								if (scanPos == 14)
 								{
+									//country colours
+									int rCol = atoi(cData[2].c_str());
+									int gCol = atoi(cData[3].c_str());
+									int bCol = atoi(cData[4].c_str());
 
+									//convert population to unsigned long long
+									unsigned long long int cPop = strtoull(cData[5].c_str(), (char**) NULL, 10);
+									//country gdp
+									unsigned long long int gdp = strtoull(cData[6].c_str(), (char**)NULL, 10);
+									//military budget
+									unsigned long long int mb = strtoull(cData[7].c_str(), (char**) NULL, 10);
+									//research budget
+									unsigned long long int rb = strtoull(cData[8].c_str(), (char**) NULL, 10);
+
+									//climate types
+									int climTemp = atoi(cData[9].c_str());
+									int climHum = atoi(cData[10].c_str());
+
+
+									//make the country
+									Country c = Country(
+										cData[0], //id
+										cData[1], //country name
+										rCol, //red
+										gCol, //green
+										bCol, //blue
+										cPop, //country population
+										gdp, //country gdp
+										mb, //military budget
+										rb, //research budget
+										climTemp, //temperature
+										climHum, //humidity
+										cLandLinks, //land borders
+										cSeaLinks, //sea links
+										cAirLinks //air links
+									);
+
+									countryList.push_back(c);
 								}
 
 								//update scanpos
@@ -591,6 +654,8 @@ void SCGUI::open(SDL_Renderer *renderer)
 				count++;
 			}
 
+
+			scenarioLoaded = true;
 		}
 		else
 		{
@@ -600,6 +665,8 @@ void SCGUI::open(SDL_Renderer *renderer)
 
 		//close file
 		file.close();
+
+
 	}
 }
 
