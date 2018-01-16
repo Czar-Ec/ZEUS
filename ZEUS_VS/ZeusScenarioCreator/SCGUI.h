@@ -480,7 +480,7 @@ void SCGUI::open(SDL_Renderer *renderer)
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-	ofn.lpstrFilter = "ZEUS Scenario Files (*.sim; *.dat)\0*.sim;*.dat\0";
+	ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0*.sce\0";
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = "Open Scenario";
@@ -496,20 +496,110 @@ void SCGUI::open(SDL_Renderer *renderer)
 
 		//line buffer
 		std::string lineBuf;
+
+		std::string loadSceName;
+		std::string loadTexturePath;
+
 		
 		//check if file is valid
 		if (file.is_open())
 		{
+			int count = 0;
+
 			//read the entire file
 			while (!file.eof())
 			{
-				std::cout << lineBuf << std::endl;
+				//send line to data buffer
+				file >> lineBuf;
+
+				//string stream
+				std::stringstream ss;
+				ss.str(lineBuf);
+
+				//processed line
+				std::string processed;
+
+				//first line is the scenario name
+				if (count == 0)
+				{
+					loadSceName = lineBuf;
+				}
+
+				//second line is the scenario texture
+				else if (count == 1)
+				{
+					loadTexturePath = lineBuf;
+				}
+
+				//everything else is a country
+				else
+				{
+					//ignore empty lines
+					if (processed != "")
+					{
+						//helps keep track of which part of the line is being scanned
+						int scanPos = 0;
+
+						std::string cData[14];
+						
+						//loop through the line
+						while (std::getline(ss, processed, '|'))
+						{
+							//try catch to prevent crashes
+							try
+							{
+								//add data to the relevant position
+								cData[scanPos] = processed;
+
+								//handling the land borders
+								if (scanPos == 11)
+								{
+
+								}
+
+								//handling sea links
+								if (scanPos == 12)
+								{
+
+								}
+
+								//handling air links
+								if (scanPos == 13)
+								{
+
+								}
+
+								//once end is reached
+								if (scanPos == 14)
+								{
+
+								}
+
+								//update scanpos
+								scanPos++;
+							}
+							catch (const std::exception& e)
+							{
+								//print error
+								std::cerr << e.what() << std::endl;
+							}
+						}
+					}
+				}
+
+				//counts countries
+				count++;
 			}
+
 		}
 		else
 		{
 			std::cout << "Error while loading, file could not be opened\n";
+
 		}
+
+		//close file
+		file.close();
 	}
 }
 
@@ -591,7 +681,7 @@ void SCGUI::saveFile(std::string filepath)
 	else
 	{
 		//first line is always the scenario name
-		file << "Scenario Name: " << scenarioName << "\n";
+		file << scenarioName << "\n";
 
 		//second line will be the map's image/texture
 		file << textureLoc << "\n";

@@ -1,4 +1,4 @@
-Scenario Name: world
+﻿world
 ..\res\img\worldHigh.png
 ﻿ID|CountryName|0|0|0|0|0|0|0|0|0|||
 AD|Andorra|200|200|200|76965|0|0|0|0|0|||

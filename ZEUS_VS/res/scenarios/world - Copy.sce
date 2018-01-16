@@ -1,6 +1,6 @@
-Scenario Name: world
+﻿world
 ..\res\img\worldHigh.png
-﻿ID|CountryName|0|0|0|0|0|0|0|0|0|||
+﻿ID|CountryNa|0|0|0|0|0|0|0|0|||
 AD|Andorra|200|200|200|76965|0|0|0|0|0|||
 AE|United-Arab-Emirates|200|200|201|9400145|0|0|0|0|0|||
 AF|Afghanistan|200|200|202|35530081|0|0|0|0|0|||
