@@ -506,71 +506,106 @@ void SCGUI::open(SDL_Renderer *renderer)
 		//check if file is valid
 		if (file.is_open())
 		{
+			//clear the country list
+			countryList.clear();
+
 			int count = 0;
 
+			//string stream to parse line by line
+			std::stringstream ss;
+			ss.str(lineBuf);
+
+			//processed line
+			std::string processed;
+
 			//read the entire file
-			while (!file.eof())
+			while (file >> lineBuf)
 			{
-				//send line to data buffer
-				file >> lineBuf;
-
-				//string stream
-				std::stringstream ss;
-				ss.str(lineBuf);
-
-				//processed line
-				std::string processed;
-
-				//first line is the scenario name
-				if (count == 0)
+				//ignore empty lines
+				if (lineBuf != "")
 				{
-					loadSceName = lineBuf;
-				}
+					//first line is the scenario name
+					if (count == 0) { loadSceName = lineBuf; }
 
-				//second line is the scenario texture
-				else if (count == 1)
-				{
-					loadTexturePath = lineBuf;
-				}
+					//second line is the scenario texture
+					else if (count == 1) { loadTexturePath = lineBuf; }
 
-				//everything else is a country
-				else
-				{
-					std::cout << lineBuf << std::endl;
-					//helps keep track of which part of the line is being scanned
-					int scanPos = 0;
-
-					std::string cData[14];
-						
-					//loop through the line
-					while (std::getline(ss, processed, '|'))
+					//everything else is a country
+					else
 					{
-						//try catch to prevent crashes
-						try
+						//helps keep track of which part of the line is being scanned
+						int scanPos = 0;
+
+						//temporarily holds data
+						std::string cData[14];
+
+						//string stream to parse the line
+						std::stringstream lineStream;
+						lineStream.str(lineBuf);
+
+						//loop through the line
+						while (std::getline(lineStream, processed, '|'))
 						{
+							std::cout << scanPos << " " << processed << std::endl;
 							//add data to the relevant position
 							cData[scanPos] = processed;
 
 							//handling the land borders
 							if (scanPos == 11)
 							{
+								//parsing the land borders
+								std::stringstream landProcess;
+								landProcess.str(cData[11]);
 
+								//string buffer
+								std::string landProcessBuf;
+
+								//loop through the land borders
+								while (std::getline(landProcess, landProcessBuf, ','))
+								{
+									//std::cout << "buffer: " << landProcessBuf << std::endl;
+									cLandLinks.push_back(landProcessBuf);
+								}
 							}
 
 							//handling sea links
 							if (scanPos == 12)
 							{
-								
+								//parsing the seaLinks
+								std::stringstream seaProcess;
+								seaProcess.str(cData[12]);
+
+								//string buffer
+								std::string seaProcessBuf;
+
+								//loop through the land borders
+								while (std::getline(seaProcess, seaProcessBuf, ','))
+								{
+									//std::cout << "buffer: " << landProcessBuf << std::endl;
+									cSeaLinks.push_back(seaProcessBuf);
+								}
 							}
 
 							//handling air links
 							if (scanPos == 13)
 							{
-								
+								//parsing the land borders
+								std::stringstream airProcess;
+								airProcess.str(cData[13]);
+
+								//string buffer
+								std::string airProcessBuf;
+
+								//loop through the land borders
+								while (std::getline(airProcess, airProcessBuf, ','))
+								{
+									//std::cout << "buffer: " << landProcessBuf << std::endl;
+									cAirLinks.push_back(airProcessBuf);
+								}
 							}
 
 							//once end is reached
-							if (scanPos == 14)
+							if (scanPos == 13)
 							{
 								//country colours
 								int rCol = atoi(cData[2].c_str());
@@ -578,18 +613,31 @@ void SCGUI::open(SDL_Renderer *renderer)
 								int bCol = atoi(cData[4].c_str());
 
 								//convert population to unsigned long long
-								unsigned long long int cPop = strtoull(cData[5].c_str(), (char**) NULL, 10);
+								unsigned long long int cPop = strtoull(cData[5].c_str(), (char**)NULL, 10);
 								//country gdp
 								unsigned long long int gdp = strtoull(cData[6].c_str(), (char**)NULL, 10);
 								//military budget
-								unsigned long long int mb = strtoull(cData[7].c_str(), (char**) NULL, 10);
+								unsigned long long int mb = strtoull(cData[7].c_str(), (char**)NULL, 10);
 								//research budget
-								unsigned long long int rb = strtoull(cData[8].c_str(), (char**) NULL, 10);
+								unsigned long long int rb = strtoull(cData[8].c_str(), (char**)NULL, 10);
 
 								//climate types
 								int climTemp = atoi(cData[9].c_str());
 								int climHum = atoi(cData[10].c_str());
 
+								//applying empty vectors to countries without borders
+								if (cLandLinks.size() == 0)
+								{
+									cLandLinks = emptyVec;
+								}
+								if (cSeaLinks.size() == 0)
+								{
+									cSeaLinks = emptyVec;
+								}
+								if (cAirLinks.size() == 0)
+								{
+									cAirLinks = emptyVec;
+								}
 
 								//make the country
 								Country c = Country(
@@ -609,26 +657,43 @@ void SCGUI::open(SDL_Renderer *renderer)
 									cAirLinks //air links
 								);
 
+								/*std::cout <<
+								c.getID() << std::endl <<
+								c.getCountryName() << std::endl <<
+								(int)c.getColour().r << std::endl <<
+								(int)c.getColour().g << std::endl <<
+								(int)c.getColour().b << std::endl <<
+								c.getPopulation() << std::endl <<
+								c.getGDP() << std::endl <<
+								c.getMilitaryBudget() << std::endl <<
+								c.getResearchBudget() << std::endl <<
+								c.getTemperature() << std::endl << std::endl;*/
+
+								for (int i = 0; i < cLandLinks.size(); i++)
+								{
+									std::cout << cLandLinks[i] << std::endl;
+								}
+
 								countryList.push_back(c);
+
+								//clear the vectors
+								cLandLinks.clear();
+								cSeaLinks.clear();
+								cAirLinks.clear();
+
+								std::cout << "\n\n\n\n"<< std::endl;
 
 								scanPos = 0;
 							}
 
-
+							//update scanpos
+							scanPos++;
 						}
-						catch (const std::exception& e)
-						{
-							//print error
-							std::cerr << e.what() << std::endl;
-						}
-
-						//update scanpos
-						scanPos++;
 					}
-				}
 
-				//counts countries
-				count++;
+					//counts countries
+					count++;
+				}
 			}
 
 
@@ -636,8 +701,8 @@ void SCGUI::open(SDL_Renderer *renderer)
 		}
 		else
 		{
+			//error message
 			std::cout << "Error while loading, file could not be opened\n";
-
 		}
 
 		//close file

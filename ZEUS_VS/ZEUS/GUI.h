@@ -299,8 +299,8 @@ int GUI::loadCountryData(std::string filePath)
 				//ignores any empty lines
 				if (processedData != "")
 				{
+
 					//store the processed data in the appropriate array location
-					//std::replace(processedData.begin(), processedData.end(), '_', ' ');
 					countryData[count] = processedData;
 
 					if (count == 5)
