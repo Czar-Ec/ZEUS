@@ -1981,7 +1981,7 @@ void SCGUI::editCountryMenu()
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryGDPinput", editGDP, sizeof(editGDP), ImGuiInputTextFlags_CharsDecimal);
 	//limiting GDP	
-	editGDPInt = strtoull(tempGDP, (char**)NULL, 10);
+	editGDPInt = strtoull(editGDP, (char**)NULL, 10);
 	if (editGDPInt > 99999999999999) strcpy(editGDP, "99999999999999");
 	//<insert joke about removing government debt here>
 	if (editGDPInt < 0) strcpy(editGDP, "0");
@@ -2000,7 +2000,7 @@ void SCGUI::editCountryMenu()
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryMBinput", editMilitaryBudget, sizeof(editMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	editMBInt = strtoull(tempMilitaryBudget, (char**)NULL, 10);
+	editMBInt = strtoull(editMilitaryBudget, (char**)NULL, 10);
 	if (editMBInt > 99999999999999) strcpy(editMilitaryBudget, "99999999999999");
 	//cannot be negative
 	if (editMBInt < 0) strcpy(editMilitaryBudget, "0");
@@ -2020,7 +2020,7 @@ void SCGUI::editCountryMenu()
 	ImGui::NextColumn();
 	ImGui::InputText("##ecountryRBinput", editResearchSpending, sizeof(editResearchSpending), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
-	editRSInt = strtoull(tempResearchSpending, (char**)NULL, 10);
+	editRSInt = strtoull(editResearchSpending, (char**)NULL, 10);
 	if (editRSInt > 99999999999999) strcpy(editResearchSpending, "99999999999999");
 	//cannot be negative
 	if (editRSInt < 0) strcpy(editResearchSpending, "0");

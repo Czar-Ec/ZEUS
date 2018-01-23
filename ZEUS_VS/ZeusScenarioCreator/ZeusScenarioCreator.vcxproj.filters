@@ -71,5 +71,8 @@
     <ClInclude Include="..\sharedobjects\Country.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="..\sharedobjects\DataHandler.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

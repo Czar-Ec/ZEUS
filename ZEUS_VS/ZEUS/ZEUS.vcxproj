@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sharedobjects\Country.h" />
+    <ClInclude Include="..\sharedobjects\DataHandler.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
