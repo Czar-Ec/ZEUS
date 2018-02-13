@@ -11,12 +11,12 @@
 #include <SDL\SDL_opengl.h>
 
 //IMGUI
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "imgui_impl_sdl.h"
-#include "stb_rect_pack.h"
-#include "stb_textedit.h"
-#include "stb_truetype.h"
+#include "../sharedobjects/imgui.h"
+#include "../sharedobjects/imgui_internal.h"
+#include "../sharedobjects/imgui_impl_sdl.h"
+#include "../sharedobjects/stb_rect_pack.h"
+#include "../sharedobjects/stb_textedit.h"
+#include "../sharedobjects/stb_truetype.h"
 
 //C/C++ libraries
 #include <iostream>

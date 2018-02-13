@@ -5,12 +5,12 @@
 //C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\um for include files glu.h and gl.h
 
 //IMGUI
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "imgui_impl_sdl.h"
-#include "stb_rect_pack.h"
-#include "stb_textedit.h"
-#include "stb_truetype.h"
+#include "../sharedobjects/imgui.h"
+#include "../sharedobjects/imgui_impl_sdl.h"
+#include "../sharedobjects/imgui_impl_sdl.h"
+#include "../sharedobjects/stb_rect_pack.h"
+#include "../sharedobjects/stb_textedit.h"
+#include "../sharedobjects/stb_truetype.h"
 
 //SDL libraries
 #define SDL_STATIC
@@ -35,6 +35,8 @@
 
 //other classes
 #include "../sharedobjects/Country.h"
+#include "../sharedobjects/DataHandler.h"
+#include "../sharedobjects/UX.h"
 
 /**
 * GUI Class
@@ -54,6 +56,7 @@ public:
 
 	//file handling
 	void open(SDL_Renderer *renderer);
+	bool loadScenario(std::string filePath, SDL_Renderer *renderer);
 	void save();
 	void saveAs();
 	void saveFile(std::string filepath);
@@ -79,7 +82,6 @@ public:
 	bool doesCountryExist(std::string id);
 
 	//ease of access
-	void helpMarker(const char* desc);
 	void eyedropTool();
 
 	//Control functions
@@ -98,6 +100,7 @@ private:
 	ImVec4 bkgColour = ImColor(0,0,44);
 
 	bool newScenario = false;
+	bool openScenario = false;
 	bool addNewCountry = false;
 	bool editCountry = false;
 	bool viewCountriesWin = false;
@@ -116,7 +119,7 @@ private:
 
 	#pragma region SAVING AND LOADING
 	//////////////////////////////////////////////////////////////////////////////////
-	std::string curFileName = "";
+	char curFileName[MAX_PATH] = "";
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -145,8 +148,10 @@ private:
 	//scenario name
 	char scenarioName[30] = "";
 	//file path for the scenario map
+	char scenarioPath[MAX_PATH] = "";
 	char imgFilePath[MAX_PATH] = "";
 	std::string imgType = "";
+	int totalCountries = 0, worldPopulation = 0;
 
 	//loaded scenario
 	bool scenarioLoaded = false;
@@ -353,7 +358,7 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		//Open existing simulation
 		if (ImGui::MenuItem("Open Scenario", "CTRL+O"))
 		{
-			open(renderer);
+			openScenario = true;
 		}
 
 		//Save current simulation
@@ -454,6 +459,11 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 		newScenarioWin(renderer);
 	}
 
+	if (openScenario)
+	{
+		open(renderer);
+	}
+
 	if (viewCountriesWin)
 	{
 		viewCountries();
@@ -471,245 +481,120 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 }
 
 void SCGUI::open(SDL_Renderer *renderer)
-{
-	newScenario = false;
-
+{	
 	char filename[MAX_PATH];
 	OPENFILENAME ofn;
 	ZeroMemory(&filename, sizeof(filename));
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-	ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0*.sce\0";
+	ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0"
+		"*.sce\0";
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = "Open Scenario";
-	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-	if (GetOpenFileNameA(&ofn))
+	if (GetOpenFileName(&ofn))
 	{
-		//open the file
-		std::ifstream file;
+		strcpy(scenarioPath, filename);
+		//std::cout << tempMapFilePath << "\n";
+	}
+	
+	//check if file is valid
+	FILE *fp = fopen(scenarioPath, "r");
+	if (fp != NULL)
+	{
+		DataHandler d = DataHandler(scenarioPath);
+		d.loadScenario();
+			
+		//image file path
+		strcpy(textureLoc, d.getTexturePath().c_str());
 
-		//open file
-		file.open(filename);
-
-		//line buffer
-		std::string lineBuf;
-
-		std::string loadSceName;
-		std::string loadTexturePath;
-		//country links
-		std::vector<std::string> cLandLinks, cSeaLinks, cAirLinks;
-
-		
-		//check if file is valid
-		if (file.is_open())
+		//load the texture
+		if (textureLoc != "")
 		{
-			//clear the country list
-			countryList.clear();
+			SDL_Surface *surf = IMG_Load(d.getTexturePath().c_str());
+			map = SDL_CreateTextureFromSurface(renderer, surf);
 
-			int count = 0;
 
-			//string stream to parse line by line
-			std::stringstream ss;
-			ss.str(lineBuf);
-
-			//processed line
-			std::string processed;
-
-			//read the entire file
-			while (file >> lineBuf)
+			if (map != NULL)
 			{
-				//ignore empty lines
-				if (lineBuf != "")
-				{
-					//first line is the scenario name
-					if (count == 0) { loadSceName = lineBuf; }
+				SDL_RenderCopy(renderer, map, NULL, NULL);//get texture size
+				SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
+				vpSrc = { 0, 0, wMapX, wMapY };
 
-					//second line is the scenario texture
-					else if (count == 1) { loadTexturePath = lineBuf; }
+				//set scenario values
+				//scenario name
+				strcpy(scenarioName, d.getSceName().c_str());
+					
+				//countryList
+				countryList = d.getCountryList();
 
-					//everything else is a country
-					else
-					{
-						//helps keep track of which part of the line is being scanned
-						int scanPos = 0;
-
-						//temporarily holds data
-						std::string cData[14];
-
-						//string stream to parse the line
-						std::stringstream lineStream;
-						lineStream.str(lineBuf);
-
-						//loop through the line
-						while (std::getline(lineStream, processed, '|'))
-						{
-							std::cout << scanPos << " " << processed << std::endl;
-							//add data to the relevant position
-							cData[scanPos] = processed;
-
-							//handling the land borders
-							if (scanPos == 11)
-							{
-								//parsing the land borders
-								std::stringstream landProcess;
-								landProcess.str(cData[11]);
-
-								//string buffer
-								std::string landProcessBuf;
-
-								//loop through the land borders
-								while (std::getline(landProcess, landProcessBuf, ','))
-								{
-									//std::cout << "buffer: " << landProcessBuf << std::endl;
-									cLandLinks.push_back(landProcessBuf);
-								}
-							}
-
-							//handling sea links
-							if (scanPos == 12)
-							{
-								//parsing the seaLinks
-								std::stringstream seaProcess;
-								seaProcess.str(cData[12]);
-
-								//string buffer
-								std::string seaProcessBuf;
-
-								//loop through the land borders
-								while (std::getline(seaProcess, seaProcessBuf, ','))
-								{
-									//std::cout << "buffer: " << landProcessBuf << std::endl;
-									cSeaLinks.push_back(seaProcessBuf);
-								}
-							}
-
-							//handling air links
-							if (scanPos == 13)
-							{
-								//parsing the land borders
-								std::stringstream airProcess;
-								airProcess.str(cData[13]);
-
-								//string buffer
-								std::string airProcessBuf;
-
-								//loop through the land borders
-								while (std::getline(airProcess, airProcessBuf, ','))
-								{
-									//std::cout << "buffer: " << landProcessBuf << std::endl;
-									cAirLinks.push_back(airProcessBuf);
-								}
-							}
-
-							//once end is reached
-							if (scanPos == 13)
-							{
-								//country colours
-								int rCol = atoi(cData[2].c_str());
-								int gCol = atoi(cData[3].c_str());
-								int bCol = atoi(cData[4].c_str());
-
-								//convert population to unsigned long long
-								unsigned long long int cPop = strtoull(cData[5].c_str(), (char**)NULL, 10);
-								//country gdp
-								unsigned long long int gdp = strtoull(cData[6].c_str(), (char**)NULL, 10);
-								//military budget
-								unsigned long long int mb = strtoull(cData[7].c_str(), (char**)NULL, 10);
-								//research budget
-								unsigned long long int rb = strtoull(cData[8].c_str(), (char**)NULL, 10);
-
-								//climate types
-								int climTemp = atoi(cData[9].c_str());
-								int climHum = atoi(cData[10].c_str());
-
-								//applying empty vectors to countries without borders
-								if (cLandLinks.size() == 0)
-								{
-									cLandLinks = emptyVec;
-								}
-								if (cSeaLinks.size() == 0)
-								{
-									cSeaLinks = emptyVec;
-								}
-								if (cAirLinks.size() == 0)
-								{
-									cAirLinks = emptyVec;
-								}
-
-								//make the country
-								Country c = Country(
-									cData[0], //id
-									cData[1], //country name
-									rCol, //red
-									gCol, //green
-									bCol, //blue
-									cPop, //country population
-									gdp, //country gdp
-									mb, //military budget
-									rb, //research budget
-									climTemp, //temperature
-									climHum, //humidity
-									cLandLinks, //land borders
-									cSeaLinks, //sea links
-									cAirLinks //air links
-								);
-
-								/*std::cout <<
-								c.getID() << std::endl <<
-								c.getCountryName() << std::endl <<
-								(int)c.getColour().r << std::endl <<
-								(int)c.getColour().g << std::endl <<
-								(int)c.getColour().b << std::endl <<
-								c.getPopulation() << std::endl <<
-								c.getGDP() << std::endl <<
-								c.getMilitaryBudget() << std::endl <<
-								c.getResearchBudget() << std::endl <<
-								c.getTemperature() << std::endl << std::endl;*/
-
-								for (int i = 0; i < cLandLinks.size(); i++)
-								{
-									std::cout << cLandLinks[i] << std::endl;
-								}
-
-								countryList.push_back(c);
-
-								//clear the vectors
-								cLandLinks.clear();
-								cSeaLinks.clear();
-								cAirLinks.clear();
-
-								std::cout << "\n\n\n\n"<< std::endl;
-
-								scanPos = 0;
-							}
-
-							//update scanpos
-							scanPos++;
-						}
-					}
-
-					//counts countries
-					count++;
-				}
+				openScenario = false;
+				scenarioLoaded = true;
+			}
+			else
+			{
+				std::cout << map << " " << IMG_GetError() << "\n";
+				std::cout << map << " " << SDL_GetError() << "\n";
 			}
 
-
-			scenarioLoaded = true;
+			SDL_FreeSurface(surf);
+			surf = NULL;
 		}
-		else
-		{
-			//error message
-			std::cout << "Error while loading, file could not be opened\n";
-		}
-
-		//close file
-		file.close();
-
-
+			
 	}
+	else
+	{
+		//otherwise the file does not exist
+		std::cout << "Error: File not found\n";
+	}
+}
+
+bool SCGUI::loadScenario(std::string filePath, SDL_Renderer *renderer)
+{
+	bool loaded = false;
+
+	//load the scenario
+	DataHandler d = DataHandler(filePath);
+	d.loadScenario();
+
+	//debug
+	std::cout << d.getSceName() << " " << d.getTexturePath() << "\n";
+
+	//load the map texture
+	//SDL_Surface *worldSurf = IMG_Load(d.getTexturePath().c_str());
+	SDL_Surface *worldSurf = IMG_Load(d.getTexturePath().c_str());
+	map = SDL_CreateTextureFromSurface(renderer, worldSurf);
+	//finished with the surface
+	SDL_FreeSurface(worldSurf);
+
+	//check if the texture is loaded
+	if (map != NULL)
+	{
+		//reset world X and Y
+		worldX = worldY = 0;
+
+		//get texture size
+		SDL_QueryTexture(map, NULL, NULL, &wMapX, &wMapY);
+		vpSrc = { 0, 0, wMapX, wMapY };
+
+		//set global scenario values
+		strcpy(scenarioName, d.getSceName().c_str());
+		countryList = d.getCountryList();
+		totalCountries = d.getCountryCount();
+		worldPopulation = d.getTotalPop();
+
+		loaded = true;
+	}
+	else
+	{
+		//warn about the map not being loaded
+		std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
+	}
+
+	return loaded;
 }
 
 /**
@@ -756,7 +641,7 @@ void SCGUI::saveAs()
 		ofn.lpstrFile = filename;
 		ofn.nMaxFile = MAX_PATH;
 		ofn.lpstrTitle = "Save Scenario";
-		ofn.Flags = OFN_DONTADDTORECENT;
+		ofn.Flags = OFN_DONTADDTORECENT | OFN_NOCHANGEDIR;
 
 		if (GetSaveFileNameA(&ofn))
 		{
@@ -858,14 +743,14 @@ void SCGUI::saveFile(std::string filepath)
 			}
 
 			//finish the country by adding a new line
-			file << "\n";
+			file << "|\n";
 		}
 	}
 
 	file.close();
 
 	//this file is now this filepath
-	curFileName = filepath;
+	strcpy(curFileName, filepath.c_str());
 }
 
 /**
@@ -1085,11 +970,12 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 		ofn.lpstrFile = filename;
 		ofn.nMaxFile = MAX_PATH;
 		ofn.lpstrTitle = "Select map image";
-		ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+		ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
 		if (GetOpenFileName(&ofn))
 		{
 			strcpy(tempMapFilePath, filename);
+			//std::cout << tempMapFilePath << "\n";
 		}
 	}
 
@@ -1169,7 +1055,8 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 			//load the texture
 			if (tempMapFilePath != "")
 			{
-				SDL_Surface* tempSurf = IMG_Load(imgFilePath);
+				//SDL_Surface* tempSurf = IMG_Load(imgFilePath);
+				SDL_Surface* tempSurf = IMG_Load(tempMapFilePath);
 
 				map = SDL_CreateTextureFromSurface(renderer, tempSurf);
 				SDL_FreeSurface(tempSurf);
@@ -1188,7 +1075,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 			scenarioLoaded = true;
 
 			//tells the program that this is a new scenario, not a loaded scenario
-			curFileName = "";
+			strcpy(curFileName, "");
 
 			//also clear all the countries
 			countryList.clear();
@@ -2338,6 +2225,7 @@ void SCGUI::render(SDL_Window * window, SDL_Renderer * renderer)
 	if (map != NULL)
 	{
 		SDL_RenderCopy(renderer, map, &vpSrc, NULL);
+		//std::cout << "test\n";
 	}
 
 	//not to show tooltip if either eyedroppers are active 
@@ -2376,26 +2264,6 @@ bool SCGUI::doesCountryExist(std::string id)
 	}
 
 	return exist;
-}
-
-/**
-* helpMarker
-* function that makes a little popup that contains the text passed to it when 
-* the user scrolls over the question mark that activates the function
-*
-* @param const char *desc
-*/
-void SCGUI::helpMarker(const char * desc)
-{
-	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(450.0f);
-		ImGui::TextUnformatted(desc);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
 }
 
 /**

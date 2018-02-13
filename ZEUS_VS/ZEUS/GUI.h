@@ -1,11 +1,11 @@
 #pragma once
 //IMGUI
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "imgui_impl_sdl.h"
-#include "stb_rect_pack.h"
-#include "stb_textedit.h"
-#include "stb_truetype.h"
+#include "../sharedobjects/imgui.h"
+#include "../sharedobjects/imgui_internal.h"
+#include "../sharedobjects/imgui_impl_sdl.h"
+#include "../sharedobjects/stb_rect_pack.h"
+#include "../sharedobjects/stb_textedit.h"
+#include "../sharedobjects/stb_truetype.h"
 
 //SDL libraries
 #define SDL_STATIC
@@ -35,6 +35,8 @@
 
 //other items
 #include "../sharedobjects/Country.h"
+#include "../sharedobjects/DataHandler.h"
+#include "../sharedobjects/UX.h"
 
 /**
 * GUI Class
@@ -48,7 +50,7 @@ static class GUI
 		~GUI();
 
 		//load country data
-		int loadCountryData(std::string filePath);
+		bool loadScenario(SDL_Renderer *renderer, std::string filePath);
 
 		//draw menu bar
 		void menuBar(bool &appRun);
@@ -132,6 +134,9 @@ static class GUI
 
 		#pragma region GLOBAL DATA VARIABLES
 		////////////////////////////////////////////////////////////////////////////////
+		//current scenario name
+		std::string scenarioName;
+		
 		//total number of countries in the world
 		int totalCountries = 0;
 
@@ -202,28 +207,12 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//background colour
 	bkgColour = ImColor(0, 0, 44);
 
-	//load the worldmap textures
-	SDL_Surface *worldSurf = IMG_Load("..\\res\\img\\worldHigh.png");
-	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
-	//remove the surface, no longer needed
-	SDL_FreeSurface(worldSurf);
-	//check if texture is loaded
-	if (worldMap == NULL)
+	//this is default opening scenario
+	if (!loadScenario(renderer, "..\\res\\scenarios\\world.sce"))
 	{
-		std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
-		worldX = worldY = 0;
+		std::cout << "Error: Scenario cannot be loaded\n";
 	}
-
-	//get texture size
-	SDL_QueryTexture(worldMap, NULL, NULL, &wMapX, &wMapY);
-
-	//load the country data
-	if (loadCountryData("..\\res\\dat\\countrydata.dat") < 0)
-	{
-		std::cout << "Country File not loaded\n";
-	}
-
-	vpSrc = { 0, 0, wMapX, wMapY };
+	
 }
 
 /**
@@ -234,145 +223,51 @@ GUI::~GUI()
 	
 }
 
-/**
-* loadCountryData
-* function which loads the file path given to it.
-* the countries loaded are then instantiated and added to the country list
-*
-* @param string filePath
-* @return loaded (0 = success, -1 = failed)
-*/
-int GUI::loadCountryData(std::string filePath)
+bool GUI::loadScenario(SDL_Renderer *renderer, std::string filePath)
 {
-	//if the file was successfully loaded or not
-	int loaded = 0;
+	bool success = false;
 
-	//clear country list
-	countryList.empty();
+	//DataHandler class to start the parsing
+	DataHandler d = DataHandler(filePath);
+	//tell the class what kind of file to load
+	d.loadScenario();
 
-	//vectors that store strings for data
-	std::vector<std::string> cID;
-	std::vector<std::string> cName;
-	std::vector<std::string> cRed;
-	std::vector<std::string> cGreen;
-	std::vector<std::string> cBlue;
-	std::vector<std::string> cPopulation;
-	
-	//line buffer
-	std::string lineBuffer;
+	//load the worldmap textures
+	SDL_Surface *worldSurf = IMG_Load(d.getTexturePath().c_str());
+	worldMap = SDL_CreateTextureFromSurface(renderer, worldSurf);
+	//remove the surface, no longer needed
+	SDL_FreeSurface(worldSurf);
 
-	//get the country data file
-	std::ifstream cData;
-	cData.open(filePath);
-
-	//error checking
-	if (cData.is_open())
+	//check if texture is loaded
+	if (worldMap != NULL)
 	{
-		//counts the number of loaded countries
-		int countries = 0;
+		//reset world X and Y
+		worldX = worldY = 0;
 
-		//loop until end of file
-		while (!cData.eof())
-		{
-			//send the retrieved line to the line buffer
-			cData >> lineBuffer;
+		//get texture size
+		SDL_QueryTexture(worldMap, NULL, NULL, &wMapX, &wMapY);
+		vpSrc = { 0, 0, wMapX, wMapY };
 
-			//string stream to process the line
-			std::stringstream ss;
-			ss.str(lineBuffer);
+		//set the global scenario values
+		scenarioName = d.getSceName();
+		countryList = d.getCountryList();
+		totalCountries = d.getCountryCount();
+		worldPopulation = d.getTotalPop();
 
-			//store processed line
-			std::string processedData;
-
-			//actual country data
-			std::string countryData[6];
-
-			//separator for each line
-			char delimiter = ',';
-
-			//counts the number of items in the line
-			int count = 0;
-
-			//loop to read the entire line
-			while (std::getline(ss, processedData, delimiter))
-			{
-				//ignores any empty lines
-				if (processedData != "")
-				{
-
-					//store the processed data in the appropriate array location
-					countryData[count] = processedData;
-
-					if (count == 5)
-					{
-						//for debugging if the data was input correctly
-						/*std::cout <<
-						"ID: " << countryData[0] << std::endl <<
-						"Name: " << countryData[1] << std::endl <<
-						"Red: " << countryData[2] << std::endl <<
-						"Green: " << countryData[3] << std::endl <<
-						"Blue: " << countryData[4] << std::endl <<
-						"Population: " << countryData[5] << std::endl;*/
-
-						//process the data i.e. turn string to int
-						//as well as just making clear which variable is which
-						std::string id = countryData[0];
-						//replace dashes with spaces
-						std::replace(countryData[1].begin(), countryData[1].end(), '-', ' ');
-						std::string name = countryData[1];
-						//std::cout << name << std::endl;
-						int red = atoi(countryData[2].c_str());
-						int green = atoi(countryData[3].c_str());
-						int blue = atoi(countryData[4].c_str());
-						unsigned long int pop = atoi(countryData[5].c_str());
-
-						if (pop > 0)
-						{
-							//add the country's population the the total population
-							worldPopulation += pop;
-						}
-						//create new instance of a country
-						Country c = Country(id, name, red, green, blue, pop, 0, 0, 0, 0, 0, emptyVec, emptyVec, emptyVec);
-
-						//add the country to the country list
-						countryList.push_back(c);
-
-						//reset count
-						count = 0;
-					}
-
-					//increment
-					count++;
-				}
-			}
-
-			//next line therefore increment
-			countries++;
-		}
-
-		totalCountries = countries;
-
-		//close file after reading
-		cData.close();
+		success = true;
 	}
 	else
 	{
-		loaded = -1;
+		//warn about the map not being loaded
+		std::cerr << "World Map not found!\n" << IMG_GetError() << std::endl;
 	}
 
-	//debugging
-	/*for (int i = 0; i < countryList.size(); i++)
-	{
-		std::cout << "ID: " << countryList[i].getID() << std::endl;
-		std::cout << "Name: " << countryList[i].getCountryName() << std::endl;
-		std::cout << "Population: " << countryList[i].getPopulation() << std::endl << std::endl;
-	}*/
+	
 
-	//std::cout << "Total Countries: " << totalCountries << std::endl;
-	//std::cout << "Total Population: " << worldPopulation << std::endl;
-
-	return loaded;
+	return success;
 }
+
+
 
 /**
 * menuBar
@@ -548,12 +443,171 @@ void GUI::infoBox()
 	//display the data of the selected country
 	if (ImGui::CollapsingHeader("Selected Country"))
 	{
+		ImGui::Separator();
+		ImGui::Separator();
 		//country ID
 		ImGui::TextWrapped("ID: %s", curCountry.getID().c_str());
 		//country Name
 		ImGui::TextWrapped("Name: %s", curCountry.getCountryName().c_str());
-		//country Population
-		ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
+		ImGui::Separator();
+		ImGui::Separator();
+
+		//header for country statistics
+		if (ImGui::CollapsingHeader("Country Statistics"))
+		{
+			//country Population
+			ImGui::NewLine();
+			ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
+			ImGui::NewLine();
+
+			//country economy
+			if (ImGui::CollapsingHeader("Country Economy"))
+			{
+				ImGui::TextWrapped("All values in Million US Dollars ($)");
+				ImGui::Separator();
+				ImGui::Separator();
+				ImGui::NewLine();
+
+				//country GDP
+				ImGui::TextWrapped("Gross Domestic Product: %d", curCountry.getGDP());
+
+				//country military spending
+				ImGui::TextWrapped("Military Spending: %d", curCountry.getMilitaryBudget());
+
+				//country research budget
+				ImGui::TextWrapped("Research Budget: %d", curCountry.getResearchBudget());
+			}
+
+			//country climate
+			if (ImGui::CollapsingHeader("Country Climate"))
+			{
+				//different output depending on climate type
+				//switch case is more effective than nested if-elses
+
+				//country temprature
+				std::string temperature = "";
+				switch (curCountry.getTemperature())
+				{
+					//neutral
+					case 0: { temperature = "Neutral"; }
+					break;
+
+					//warm
+					case 1: { temperature = "Warm"; }
+					break;
+
+					//cold
+					case 2: { temperature = "Cold"; }
+					break;
+
+					default: { temperature = "Error: Country temperature is not a valid value"; }
+					break;
+				}
+				//show to sidebar
+				ImGui::TextWrapped("Temperature: %s", temperature.c_str());
+
+
+				//country humidity
+				std::string humidity = "";
+				switch (curCountry.getHumidity())
+				{
+					case 0: { humidity = "Neutral"; }
+					break;
+				
+					case 1: { humidity = "Wet"; }
+					break;
+				
+					case 2: { humidity = "Dry"; }
+					break;
+
+					default: { humidity = "Error: Country temperature is not a valid value"; }
+					break;
+				}
+				//show to sidebar
+				ImGui::TextWrapped("Humidity: %s", humidity.c_str());
+			}
+
+			//country links
+			if (ImGui::CollapsingHeader("Country External Links"))
+			{
+				//get all links now
+				//so that the check is only run once
+
+				//get the land borders
+				std::vector<std::string> tempLand = curCountry.getLandBorders();
+
+				//get sea links
+				std::vector<std::string> tempSea = curCountry.getSeaLinks();
+
+				//get air links
+				std::vector<std::string> tempAir = curCountry.getAirLinks();
+
+				//loop through the countries to change the ids that match to 
+				//countrylist to the name instead
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					//go through land borders
+					for (int landCount = 0; landCount < tempLand.size(); landCount++)
+					{
+						if (countryList[i].getID() == tempLand[landCount])
+						{
+							tempLand[landCount] = "[" + tempLand[landCount] + "] " + countryList[i].getCountryName();
+						}
+					}
+
+					//go through sea links
+					for (int seaCount = 0; seaCount < tempSea.size(); seaCount++)
+					{
+						if (countryList[i].getID() == tempSea[seaCount])
+						{
+							tempSea[seaCount] = "[" + tempSea[seaCount] + "] " + countryList[i].getCountryName();
+						}
+					}
+
+					//go through air links
+					for (int airCount = 0; airCount < tempAir.size(); airCount++)
+					{
+						if (countryList[i].getID() == tempAir[airCount])
+						{
+							tempAir[airCount] = "[" + tempAir[airCount] + "] " + countryList[i].getCountryName();
+						}
+					}
+				}
+
+
+				//land borders
+				if (ImGui::CollapsingHeader("Land Borders"))
+				{
+					for (int i = 0; i < tempLand.size(); i++)
+					{
+						ImGui::TextWrapped(tempLand[i].c_str());
+					}
+				}
+
+				//sea links
+				if (ImGui::CollapsingHeader("Sea/Ocean Links"))
+				{
+					for (int i = 0; i < tempSea.size(); i++)
+					{
+						ImGui::TextWrapped(tempSea[i].c_str());
+					}
+				}
+
+				//air links
+				if (ImGui::CollapsingHeader("Air Links"))
+				{
+					for (int i = 0; i < tempAir.size(); i++)
+					{
+						ImGui::TextWrapped(tempAir[i].c_str());
+					}
+				}
+			}
+		}
+
+		
+
+
+
 
 	}
 	

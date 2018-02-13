@@ -23,235 +23,43 @@ public:
 	~Country();
 
 	//getters and setters for the country data
-	/**
-	* getID
-	* returns a country's ID
-	*
-	* @return id
-	*/
-	std::string getID() { return id; };
+	std::string getID();
+	void setID(std::string newID);
 
-	/**
-	* setID
-	* edits the country ID
-	*
-	* @param string id
-	*/
-	void setID(std::string newID) { id = newID; };
+	std::string Country::getCountryName();
+	void setCountryName(std::string newCName);
 
-	/**
-	* getCountryName
-	* returns a country's Name
-	*
-	* @return cname
-	*/
-	std::string getCountryName() { return cname; };
+	SDL_Color getColour();
+	void setColour(int newR, int newG, int newB);
 
-	/**
-	* setCountryName
-	* allows the modification of the country name
-	*
-	* @param string newCName
-	*/
-	void setCountryName(std::string newCName) { cname = newCName; };
+	unsigned long long int getPopulation();
 
-	/**
-	* getColour
-	* returns a country's colour
-	*
-	* @return cColour (return type is SDL_Color)
-	*/
-	SDL_Color getColour() { return cColour; };
+	void setGDP(unsigned long long int gdp);
+	unsigned long long int getGDP();
 
-	/**
-	* setColour
-	* allows the modification of country region
-	*
-	* @param int r
-	* @param int g
-	* @param int b
-	*/
-	void setColour(int newR, int newG, int newB) { cColour.r = newR, cColour.g = newG, cColour.b = newB; };
+	void setMilitaryBudget(unsigned long long int mb);
+	unsigned long long int getMilitaryBudget();
 
-	/**
-	* getPopulation
-	* returns a country's population
-	*
-	* @return population
-	*/
-	unsigned long long int getPopulation() { return population; };
+	void setResearchBudget(unsigned long long int rb);
+	unsigned long long int getResearchBudget();
 
-	/**
-	* setGDP
-	* allows for the country's GDP to be modified
-	*
-	* @param int gdp
-	*/
-	void setGDP(unsigned long long int gdp) { countryGDP = gdp; };
+	int getTemperature();
 
-	/**
-	* getGDP
-	* returns the country's GDP
-	*
-	* @return countryGDP
-	*/
-	unsigned long long int getGDP() { return countryGDP; };
+	int getHumidity();
 
-	/**
-	* setMilitaryBudget
-	* allows for the military budget to be modified
-	* 
-	* @param int mb
-	*/
-	void setMilitaryBudget(unsigned long long int mb) { militarySpending = mb; };
+	void linkLand(std::string id);
+	void removeLinkLand(std::string id);
+	std::vector<std::string> getLandBorders();
 
-	/**
-	* getMilitaryBudget
-	* returns the country military budget
-	*
-	* @return militarySpending
-	*/
-	unsigned long long int getMilitaryBudget() { return militarySpending; };
+	void linkSea(std::string id);
+	void removeLinkSea(std::string id);
+	std::vector<std::string> getSeaLinks();
 
-	/**
-	* setResearchBudget
-	* allows for the research budget to be modified
-	*
-	* @param int rb
-	*/
-	void setResearchBudget(unsigned long long int rb) { researchSpending = rb; };
+	void linkAir(std::string id);
+	void removeLinkAir(std::string id);
+	std::vector<std::string> getAirLinks();
 
-	/**
-	* getResearchBudget
-	* returns the country research budget
-	*
-	* @return researchBudget
-	*/
-	unsigned long long int getResearchBudget() { return researchSpending; };
 
-	/**
-	* getTemperature
-	* returns the country's temperature type
-	*
-	* @return temperature
-	*/
-	int getTemperature() { return temperature; };
-
-	/**
-	* getHumidity
-	* returns the country's humidity type
-	*
-	* @return humidity
-	*/
-	int getHumidity() { return humidity; };
-
-	/**
-	* linkLand
-	* function that adds a country to this country's land border list
-	*
-	* @param string id
-	*/
-	void linkLand(std::string id) { landBorders.push_back(id); };
-
-	/**
-	* removeLinkLand
-	* function that removes a country from this country's land border list
-	*
-	* @param string id
-	*/
-	void removeLinkLand(std::string id) 
-	{
-		//loop through the land border list
-		for (int i = 0; i < landBorders.size(); i++)
-		{
-			//remove from list if id is found
-			if (id == landBorders[i])
-			{
-				landBorders.erase(landBorders.begin() + i);
-				break;
-			}
-		}
-	}
-
-	/**
-	* getLandBorders
-	* returns a vector containing the ID's of the country's neighbours
-	*
-	* @return landBorders
-	*/
-	std::vector<std::string> getLandBorders() { return landBorders; };
-
-	/**
-	* linkSea
-	* function that adds a country to this country's sea link list
-	*
-	* @param string id
-	*/
-	void linkSea(std::string id) { seaLinks.push_back(id); };
-
-	/**
-	* removeLinkSea
-	* function that removes a country from this country's sea link list
-	*
-	* @param string id
-	*/
-	void removeLinkSea(std::string id)
-	{
-		//loop through the land border list
-		for (int i = 0; i < seaLinks.size(); i++)
-		{
-			//remove from list if id is found
-			if (id == seaLinks[i])
-			{
-				seaLinks.erase(seaLinks.begin() + i);
-				break;
-			}
-		}
-	}
-
-	/**
-	* getSeaLinks
-	* returns a vector containing the ID's of the country's sea links
-	*
-	* @return sealLinks
-	*/
-	std::vector<std::string> getSeaLinks() { return seaLinks; };
-
-	/**
-	* linkAir
-	* function that adds a country to this country's air links
-	*
-	* @param string id
-	*/
-	void linkAir(std::string id) { airLinks.push_back(id); };
-
-	/**
-	* removeLinkAir
-	* function that removes a country from this country's air link list
-	*
-	* @param string id
-	*/
-	void removeLinkAir(std::string id)
-	{
-		//loop through the land border list
-		for (int i = 0; i < airLinks.size(); i++)
-		{
-			//remove from list if id is found
-			if (id == airLinks[i])
-			{
-				airLinks.erase(airLinks.begin() + i);
-				break;
-			}
-		}
-	}
-
-	/**
-	* getAirLinks
-	* returns a vector containing the ID's of the country's air links
-	*
-	* @return airLinks
-	*/
-	std::vector<std::string> getAirLinks() { return airLinks; };
 
 	bool selectedBorder, selectedSea, selectedAir;
 
@@ -275,8 +83,21 @@ private:
 	unsigned long long int researchSpending;
 
 	//country environment
-	long long int temperature;
-	long long int humidity;
+	/**
+	* Temperature values:
+	* NEUTRAL TEMP = 0
+	* HOT TEMP = 1
+	* COLD TEMP = 2
+	*/
+	int temperature;
+
+	/**
+	* Humidity values:
+	* NEUTRAL HUM = 0
+	* WET HUM = 1
+	* DRY HUM = 2
+	*/
+	int humidity;
 
 	//country borders and links
 	std::vector<std::string> landBorders;
@@ -353,3 +174,232 @@ Country::~Country()
 {
 }
 
+/**
+* getID
+* returns a country's ID
+*
+* @return id
+*/
+std::string Country::getID() { return id; };
+
+/**
+* setID
+* edits the country ID
+*
+* @param string id
+*/
+void Country::setID(std::string newID) { id = newID; };
+
+/**
+* getCountryName
+* returns a country's Name
+*
+* @return cname
+*/
+std::string Country::getCountryName() { return cname; };
+
+/**
+* setCountryName
+* allows the modification of the country name
+*
+* @param string newCName
+*/
+void Country::setCountryName(std::string newCName) { cname = newCName; };
+
+/**
+* getColour
+* returns a country's colour
+*
+* @return cColour (return type is SDL_Color)
+*/
+SDL_Color Country::getColour() { return cColour; };
+
+/**
+* setColour
+* allows the modification of country region
+*
+* @param int r
+* @param int g
+* @param int b
+*/
+void Country::setColour(int newR, int newG, int newB) { cColour.r = newR, cColour.g = newG, cColour.b = newB; };
+
+/**
+* getPopulation
+* returns a country's population
+*
+* @return population
+*/
+unsigned long long int Country::getPopulation() { return population; };
+
+/**
+* setGDP
+* allows for the country's GDP to be modified
+*
+* @param int gdp
+*/
+void Country::setGDP(unsigned long long int gdp) { countryGDP = gdp; };
+
+/**
+* getGDP
+* returns the country's GDP
+*
+* @return countryGDP
+*/
+unsigned long long int Country::getGDP() { return countryGDP; };
+
+/**
+* setMilitaryBudget
+* allows for the military budget to be modified
+*
+* @param int mb
+*/
+void Country::setMilitaryBudget(unsigned long long int mb) { militarySpending = mb; };
+
+/**
+* getMilitaryBudget
+* returns the country military budget
+*
+* @return militarySpending
+*/
+unsigned long long int Country::getMilitaryBudget() { return militarySpending; };
+
+/**
+* setResearchBudget
+* allows for the research budget to be modified
+*
+* @param int rb
+*/
+void Country::setResearchBudget(unsigned long long int rb) { researchSpending = rb; };
+
+/**
+* getResearchBudget
+* returns the country research budget
+*
+* @return researchBudget
+*/
+unsigned long long int Country::getResearchBudget() { return researchSpending; };
+
+/**
+* getTemperature
+* returns the country's temperature type
+*
+* @return temperature
+*/
+int Country::getTemperature() { return temperature; };
+
+/**
+* getHumidity
+* returns the country's humidity type
+*
+* @return humidity
+*/
+int Country::getHumidity() { return humidity; };
+
+/**
+* linkLand
+* function that adds a country to this country's land border list
+*
+* @param string id
+*/
+void Country::linkLand(std::string id) { landBorders.push_back(id); };
+
+/**
+* removeLinkLand
+* function that removes a country from this country's land border list
+*
+* @param string id
+*/
+void Country::removeLinkLand(std::string id)
+{
+	//loop through the land border list
+	for (int i = 0; i < landBorders.size(); i++)
+	{
+		//remove from list if id is found
+		if (id == landBorders[i])
+		{
+			landBorders.erase(landBorders.begin() + i);
+			break;
+		}
+	}
+}
+
+/**
+* getLandBorders
+* returns a vector containing the ID's of the country's neighbours
+*
+* @return landBorders
+*/
+std::vector<std::string> Country::getLandBorders() { return landBorders; };
+
+/**
+* linkSea
+* function that adds a country to this country's sea link list
+*
+* @param string id
+*/
+void Country::linkSea(std::string id) { seaLinks.push_back(id); };
+
+/**
+* removeLinkSea
+* function that removes a country from this country's sea link list
+*
+* @param string id
+*/
+void Country::removeLinkSea(std::string id)
+{
+	//loop through the land border list
+	for (int i = 0; i < seaLinks.size(); i++)
+	{
+		//remove from list if id is found
+		if (id == seaLinks[i])
+		{
+			seaLinks.erase(seaLinks.begin() + i);
+			break;
+		}
+	}
+}
+
+/**
+* getSeaLinks
+* returns a vector containing the ID's of the country's sea links
+*
+* @return sealLinks
+*/
+std::vector<std::string> Country::getSeaLinks() { return seaLinks; };
+
+/**
+* linkAir
+* function that adds a country to this country's air links
+*
+* @param string id
+*/
+void Country::linkAir(std::string id) { airLinks.push_back(id); };
+
+/**
+* removeLinkAir
+* function that removes a country from this country's air link list
+*
+* @param string id
+*/
+void Country::removeLinkAir(std::string id)
+{
+	//loop through the land border list
+	for (int i = 0; i < airLinks.size(); i++)
+	{
+		//remove from list if id is found
+		if (id == airLinks[i])
+		{
+			airLinks.erase(airLinks.begin() + i);
+			break;
+		}
+	}
+}
+
+/**
+* getAirLinks
+* returns a vector containing the ID's of the country's air links
+*
+* @return airLinks
+*/
+std::vector<std::string> Country::getAirLinks() { return airLinks; };
