@@ -1,40 +1,36 @@
 ﻿  main.cpp
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(316): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(352): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(388): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(71): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\xf008064\zeus\zeus_vs\sharedobjects\country.h(324): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\sharedobjects\country.h(367): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\sharedobjects\country.h(411): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\sharedobjects\datahandler.h(71): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(265): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(127): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(128): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(163): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(423): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(425): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(547): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(550): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(559): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(568): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(581): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(590): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(599): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(663): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(664): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(665): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(682): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(765): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(859): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(926): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(927): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(280): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(419): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(430): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(371): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(372): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(373): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(374): warning C4390: ';': empty controlled statement found; is this the intent?
-  imgui_impl_sdl.cpp
-  imgui_draw.cpp
-  imgui_demo.cpp
-  imgui.cpp
-  Generating Code...
-  ZEUS.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Debug\ZEUS.exe
+c:\users\xf008064\zeus\zeus_vs\sharedobjects\datahandler.h(265): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(127): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(128): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(163): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(423): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(425): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(547): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(550): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(559): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(568): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(581): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(590): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(599): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(663): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(664): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(665): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(682): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(765): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(859): warning C4018: '<': signed/unsigned mismatch
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(926): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\gui.h(927): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(280): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(419): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(430): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(371): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(372): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(373): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\xf008064\zeus\zeus_vs\zeus\main.h(374): warning C4390: ';': empty controlled statement found; is this the intent?
+  ZEUS.vcxproj -> C:\Users\xf008064\ZEUS\ZEUS_VS\Debug\ZEUS.exe
+  ZEUS.vcxproj -> C:\Users\xf008064\ZEUS\ZEUS_VS\Debug\ZEUS.pdb (Partial PDB)

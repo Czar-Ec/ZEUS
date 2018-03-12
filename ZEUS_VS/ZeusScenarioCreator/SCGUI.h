@@ -707,7 +707,7 @@ void SCGUI::saveFile(std::string filepath)
 				file << lBorder[borderScan];
 
 				//add a comma after each one except for the last one
-				if (!borderScan == lBorder.size()-1)
+				if (!(borderScan == lBorder.size()-1))
 				{
 					file << ",";
 				}
@@ -722,7 +722,7 @@ void SCGUI::saveFile(std::string filepath)
 				file << sLink[seaScan];
 
 				//add a comma after each one except for the last one
-				if (!seaScan == sLink.size()-1)
+				if (!(seaScan == sLink.size()-1))
 				{
 					file << ",";
 				}
@@ -736,7 +736,7 @@ void SCGUI::saveFile(std::string filepath)
 				file << aLink[airScan];
 
 				//add a comma after each one except for the last one
-				if (!airScan == aLink.size()-1)
+				if (!(airScan == aLink.size()-1))
 				{
 					file << ",";
 				}

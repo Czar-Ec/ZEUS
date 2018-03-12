@@ -6,6 +6,7 @@
 //C/C++ libraries
 #include <vector>
 #include <string>
+#include <algorithm>
 
 /**
 * Country Class
@@ -302,7 +303,14 @@ int Country::getHumidity() { return humidity; };
 *
 * @param string id
 */
-void Country::linkLand(std::string id) { landBorders.push_back(id); };
+void Country::linkLand(std::string id) 
+{ 
+	//check if ID already in the list
+	if (!(std::find(landBorders.begin(), landBorders.end(), id) != landBorders.end()))
+	{
+		landBorders.push_back(id); 
+	}
+};
 
 /**
 * removeLinkLand
@@ -338,7 +346,14 @@ std::vector<std::string> Country::getLandBorders() { return landBorders; };
 *
 * @param string id
 */
-void Country::linkSea(std::string id) { seaLinks.push_back(id); };
+void Country::linkSea(std::string id) 
+{ 
+	//check if the ID is already in the list
+	if (!(std::find(seaLinks.begin(), seaLinks.end(), id) != seaLinks.end()))
+	{
+		seaLinks.push_back(id);
+	}
+};
 
 /**
 * removeLinkSea
@@ -374,7 +389,15 @@ std::vector<std::string> Country::getSeaLinks() { return seaLinks; };
 *
 * @param string id
 */
-void Country::linkAir(std::string id) { airLinks.push_back(id); };
+void Country::linkAir(std::string id) 
+{ 
+	//check if ID is already in the list
+	if (!(std::find(seaLinks.begin(), seaLinks.end(), id) != airLinks.end()))
+	{
+		airLinks.push_back(id);
+	}
+	
+};
 
 /**
 * removeLinkAir
