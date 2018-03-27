@@ -277,7 +277,7 @@ private:
 
 	//error checking
 	std::string errID, errName;
-	bool acceptNewCID, isNewCIDunique, acceptNewCName;
+	bool acceptNewCID, isNewCIDunique, acceptNewCName, acceptPerc;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	#pragma endregion
@@ -1173,7 +1173,7 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 
 	//make the window
 	ImGui::Begin("New Country", &addNewCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImGui::SetWindowSize(ImVec2(700, 500), NULL);
+	ImGui::SetWindowSize(ImVec2(700, 600), NULL);
 
 	ImGui::Separator();
 	#pragma region INPUT: CID AND CNAME
@@ -1296,26 +1296,26 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	ImGui::Separator();
 
 	ImGui::NextColumn();
-	ImGui::Text("Military Budget (Million US Dollars): ");
+	ImGui::Text("Military Budget (Percentage of GDP): ");
 	ImGui::SameLine();
 	helpMarker(
 		"The military budget will be used to determine how\n"
 		"well the country will fare in a zombie scenario.\n"
-		"Maximum 14 characters (9.99x10^20 million USD)"
+		"Value between 0 and 100"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
 	ImGui::InputText("##countryMBinput", tempMilitaryBudget, sizeof(tempMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
 	tempMBInt = strtoull(tempMilitaryBudget, (char**)NULL, 10);
-	if (tempMBInt > 99999999999999) strcpy(tempMilitaryBudget, "99999999999999");
+	if (tempMBInt > 100) strcpy(tempMilitaryBudget, "100");
 	//cannot be negative
 	if (tempMBInt < 0) strcpy(tempMilitaryBudget, "0");
 
 	ImGui::Separator();
 
 	ImGui::NextColumn();
-	ImGui::Text("Research Budget (Million US Dollars): ");
+	ImGui::Text("Research Budget (Percentage of GDP): ");
 	ImGui::SameLine();
 	helpMarker(
 		"This is the country's contribution to the global research pool.\n"
@@ -1328,7 +1328,7 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 	ImGui::InputText("##countryRBinput", tempResearchSpending, sizeof(tempResearchSpending), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
 	tempRSInt = strtoull(tempResearchSpending, (char**)NULL, 10);
-	if (tempRSInt > 99999999999999) strcpy(tempResearchSpending, "99999999999999");
+	if (tempRSInt > 100) strcpy(tempResearchSpending, "100");
 	//cannot be negative
 	if (tempRSInt < 0) strcpy(tempResearchSpending, "0");
 		
@@ -1508,6 +1508,7 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 		acceptNewCID = false;
 		isNewCIDunique = false;
 		acceptNewCName = false;
+		acceptPerc = false;
 
 		//check if the id is not empty
 		if (!strlen(tempID) == 0)
@@ -1540,16 +1541,23 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 			acceptNewCName = true;
 		}
 
+		//check if the percentages don't exceed 100
+		if ((tempRSInt + tempMBInt) <= 100)
+		{
+			acceptPerc = true;
+		}
+
 		#pragma endregion NEW COUNTRY VALIDATION CHECK
 
-		if (acceptNewCID && acceptNewCName && isNewCIDunique)
+		if (acceptNewCID && acceptNewCName && isNewCIDunique && acceptPerc)
 		{
 			//find the correct value for climates
-			int climTemp, climHum;
+			int climTemp = 0, climHum = 0;
 
 			if (neutralTemp) climTemp = 0;
 			if (hotTemp) climTemp = 1;
 			if (coldTemp) climTemp = 2;
+			
 
 			if (neutralHum) climHum = 0;
 			if (wetHum) climHum = 1;
@@ -1660,7 +1668,11 @@ void SCGUI::newCountryMenu(int r, int g, int b)
 		}
 		if (!acceptNewCName)
 		{
-			ImGui::Text("The country must have a name");
+			ImGui::Text("The country must have a name\n");
+		}
+		if (!acceptPerc)
+		{
+			ImGui::Text("The percentages of research \nspending and military budget \nexceed 100%");
 		}
 
 		ImGui::Separator();
@@ -1757,7 +1769,7 @@ void SCGUI::editCountryMenu()
 {
 	//make the window
 	ImGui::Begin("Edit Country", &editCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImGui::SetWindowSize(ImVec2(700, 500), NULL);
+	ImGui::SetWindowSize(ImVec2(700, 600), NULL);
 
 	ImGui::Separator();
 
@@ -1876,26 +1888,26 @@ void SCGUI::editCountryMenu()
 	ImGui::Separator();
 
 	ImGui::NextColumn();
-	ImGui::Text("Military Budget (Million US Dollars): ");
+	ImGui::Text("Military Budget (Percentage of GDP): ");
 	ImGui::SameLine();
 	helpMarker(
 		"The military budget will be used to determine how\n"
 		"well the country will fare in a zombie scenario.\n"
-		"Maximum 12 characters (9.99x10^20 million USD)"
+		"Value between 0 and 100"
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
-	ImGui::InputText("##ecountryMBinput", editMilitaryBudget, sizeof(editMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
+	ImGui::InputText("##countryMBinput", editMilitaryBudget, sizeof(editMilitaryBudget), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
 	editMBInt = strtoull(editMilitaryBudget, (char**)NULL, 10);
-	if (editMBInt > 99999999999999) strcpy(editMilitaryBudget, "99999999999999");
+	if (editMBInt > 100) strcpy(editMilitaryBudget, "100");
 	//cannot be negative
 	if (editMBInt < 0) strcpy(editMilitaryBudget, "0");
 
 	ImGui::Separator();
 
 	ImGui::NextColumn();
-	ImGui::Text("Research Budget (Million US Dollars): ");
+	ImGui::Text("Research Budget (Percentage of GDP): ");
 	ImGui::SameLine();
 	helpMarker(
 		"This is the country's contribution to the global research pool.\n"
@@ -1905,14 +1917,12 @@ void SCGUI::editCountryMenu()
 	);
 	ImGui::SameLine();
 	ImGui::NextColumn();
-	ImGui::InputText("##ecountryRBinput", editResearchSpending, sizeof(editResearchSpending), ImGuiInputTextFlags_CharsDecimal);
+	ImGui::InputText("##countryRBinput", editResearchSpending, sizeof(editResearchSpending), ImGuiInputTextFlags_CharsDecimal);
 	//limiting Military budget
 	editRSInt = strtoull(editResearchSpending, (char**)NULL, 10);
-	if (editRSInt > 99999999999999) strcpy(editResearchSpending, "99999999999999");
+	if (editRSInt > 100) strcpy(editResearchSpending, "100");
 	//cannot be negative
 	if (editRSInt < 0) strcpy(editResearchSpending, "0");
-
-	ImGui::Separator();
 
 	ImGui::EndColumns();
 
@@ -2096,93 +2106,183 @@ void SCGUI::editCountryMenu()
 		{
 			countryList.erase(countryList.begin() + currentCountry);
 		}
-		
-		//find the correct value for climates
-		int climTemp, climHum;
 
-		if (eneutralTemp) climTemp = 0;
-		if (ehotTemp) climTemp = 1;
-		if (ecoldTemp) climTemp = 2;
+		acceptNewCID = false;
+		isNewCIDunique = false;
+		acceptNewCName = false;
+		acceptPerc = false;
 
-		if (eneutralHum) climHum = 0;
-		if (ewetHum) climHum = 1;
-		if (edryHum) climHum = 2;
-		
-		//find the country(ies) selected as this country's land neighbours
-		std::vector<std::string> landBorders;
-		for (int borderScan = 0; borderScan < countryList.size(); borderScan++)
+		//check if the id is not empty
+		if (!strlen(editID) == 0)
 		{
-			//if selected
-			if (countryList[borderScan].selectedBorder)
-			{
-				landBorders.push_back(countryList[borderScan].getID());
+			acceptNewCID = true;
 
-				//add this country to the other country's border list too
-				countryList[borderScan].linkLand(editID);
+			//check if the id is unique
+			//the ID is a unique identifier, since some countries may have similar names
+			if (doesCountryExist(editID))
+			{
+				//find the offending country
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					if (editID == countryList[i].getID())
+					{
+						errID = editID;
+						errName = countryList[i].getCountryName();
+					}
+				}
 			}
 			else
 			{
-				//if not selected, remove from the country's list, just in case
-				countryList[borderScan].removeLinkLand(editID);
+				isNewCIDunique = true;
 			}
 		}
 
-		//find the sea links
-		std::vector<std::string> seaLinks;
-		for (int seaScan = 0; seaScan < countryList.size(); seaScan++)
+		//check if the country name is empty
+		if (!strlen(editCName) == 0)
 		{
-			//if selected
-			if (countryList[seaScan].selectedSea)
-			{
-				seaLinks.push_back(countryList[seaScan].getID());
-
-				//add this country to the other country's border list too
-				countryList[seaScan].linkSea(editID);
-			}
-			else
-			{
-				//if not selected, remove from the country's list, just in case
-				countryList[seaScan].removeLinkSea(editID);
-			}
+			acceptNewCName = true;
 		}
 
-		//find air links
-		std::vector<std::string> airLinks;
-		for (int airScan = 0; airScan < countryList.size(); airScan++)
+		//check if the percentages don't exceed 100
+		if ((editRSInt + editMBInt) <= 100)
 		{
-			//if selected
-			if (countryList[airScan].selectedAir)
-			{
-				airLinks.push_back(countryList[airScan].getID());
-
-				//add this country to the other country's border list too
-				countryList[airScan].linkAir(editID);
-			}
-			else
-			{
-				//if not selected, remove from the country's list, just in case
-				countryList[airScan].removeLinkAir(editID);
-			}
+			acceptPerc = true;
 		}
 
-		//create the country
-		Country newCountry = Country(
-			editID,
-			editCName,
-			editR, editG, editB,
-			editPopInt,
-			editGDPInt,
-			editMBInt,
-			editRSInt,
-			climTemp,
-			climHum,
-			landBorders,
-			seaLinks,
-			airLinks
-		);
+		if (acceptNewCID && acceptNewCName && isNewCIDunique && acceptPerc)
+		{
 
-		//add to country list
-		countryList.insert(countryList.begin() + currentCountry, newCountry);
+			//find the correct value for climates
+			int climTemp, climHum;
+
+			if (eneutralTemp) climTemp = 0;
+			if (ehotTemp) climTemp = 1;
+			if (ecoldTemp) climTemp = 2;
+
+			if (eneutralHum) climHum = 0;
+			if (ewetHum) climHum = 1;
+			if (edryHum) climHum = 2;
+
+			//find the country(ies) selected as this country's land neighbours
+			std::vector<std::string> landBorders;
+			for (int borderScan = 0; borderScan < countryList.size(); borderScan++)
+			{
+				//if selected
+				if (countryList[borderScan].selectedBorder)
+				{
+					landBorders.push_back(countryList[borderScan].getID());
+
+					//add this country to the other country's border list too
+					countryList[borderScan].linkLand(editID);
+				}
+				else
+				{
+					//if not selected, remove from the country's list, just in case
+					countryList[borderScan].removeLinkLand(editID);
+				}
+			}
+
+			//find the sea links
+			std::vector<std::string> seaLinks;
+			for (int seaScan = 0; seaScan < countryList.size(); seaScan++)
+			{
+				//if selected
+				if (countryList[seaScan].selectedSea)
+				{
+					seaLinks.push_back(countryList[seaScan].getID());
+
+					//add this country to the other country's border list too
+					countryList[seaScan].linkSea(editID);
+				}
+				else
+				{
+					//if not selected, remove from the country's list, just in case
+					countryList[seaScan].removeLinkSea(editID);
+				}
+			}
+
+			//find air links
+			std::vector<std::string> airLinks;
+			for (int airScan = 0; airScan < countryList.size(); airScan++)
+			{
+				//if selected
+				if (countryList[airScan].selectedAir)
+				{
+					airLinks.push_back(countryList[airScan].getID());
+
+					//add this country to the other country's border list too
+					countryList[airScan].linkAir(editID);
+				}
+				else
+				{
+					//if not selected, remove from the country's list, just in case
+					countryList[airScan].removeLinkAir(editID);
+				}
+			}
+
+			//create the country
+			Country newCountry = Country(
+				editID,
+				editCName,
+				editR, editG, editB,
+				editPopInt,
+				editGDPInt,
+				editMBInt,
+				editRSInt,
+				climTemp,
+				climHum,
+				landBorders,
+				seaLinks,
+				airLinks
+			);
+
+			//add to country list
+			countryList.insert(countryList.begin() + currentCountry, newCountry);
+		}
+		else
+		{
+			ImGui::OpenPopup("Cannot Edit Country");
+		}
+	}
+
+	//Error popup if country cannot be created
+	bool error = true;
+	if (ImGui::BeginPopupModal("Cannot Edit Country", &error, ImGuiWindowFlags_NoResize))
+	{
+		ImGui::SetWindowSize(ImVec2(400, 200));
+
+		//printing the error messages
+		if (!acceptNewCID)
+		{
+			ImGui::Text("The Unique ID must not be empty\n");
+			ImGui::NewLine();
+		}
+		if (!isNewCIDunique && acceptNewCID)
+		{
+			std::string errText =
+				"The ID must be unique\nCountry: " + errID + "-" + errName + " already exists with ID\n";
+
+			ImGui::Text(errText.c_str());
+			ImGui::NewLine();
+		}
+		if (!acceptNewCName)
+		{
+			ImGui::Text("The country must have a name\n");
+		}
+		if (!acceptPerc)
+		{
+			ImGui::Text("The percentages of research \nspending and military budget \nexceed 100%");
+		}
+
+		ImGui::Separator();
+		//close the popup
+		if (ImGui::Button("Close", ImVec2(ImGui::GetWindowWidth(), 20)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::Separator();
+
+		ImGui::EndPopup();
 	}
 
 	ImGui::End();
