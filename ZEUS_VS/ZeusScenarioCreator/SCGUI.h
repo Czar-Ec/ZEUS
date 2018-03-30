@@ -374,15 +374,6 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 			saveAs();
 		}
 
-
-		ImGui::Separator();
-		if (ImGui::BeginMenu("Recent Files"))
-		{
-			// iterate items..
-			// eg if (ImGui::Item("&1. filename.txt")) {}
-			ImGui::EndMenu();
-		}
-		ImGui::Separator();
 		ImGui::EndMenu();
 	}
 
@@ -507,6 +498,8 @@ void SCGUI::open(SDL_Renderer *renderer)
 	{
 		DataHandler d = DataHandler(scenarioPath);
 		d.loadScenario();
+
+		strcpy(curFileName, scenarioPath);
 			
 		//image file path
 		strcpy(textureLoc, d.getTexturePath().c_str());
@@ -542,8 +535,7 @@ void SCGUI::open(SDL_Renderer *renderer)
 
 			SDL_FreeSurface(surf);
 			surf = NULL;
-		}
-			
+		}			
 	}
 	else
 	{
@@ -2153,7 +2145,7 @@ void SCGUI::editCountryMenu()
 		{
 
 			//find the correct value for climates
-			int climTemp, climHum;
+			int climTemp = 0, climHum = 0;
 
 			if (eneutralTemp) climTemp = 0;
 			if (ehotTemp) climTemp = 1;
