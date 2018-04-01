@@ -92,6 +92,14 @@ static class GUI
 		//bool for menubar windows
 		bool newSimWindow, openSimWindow;
 
+		#pragma region SIMULATION SETUP
+		////////////////////////////////////////////////////////////////////////////////
+		//simulation name
+		char tempName[30] = "";
+
+		////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
+
 		#pragma region APPEARANCE PREFERENCES
 		////////////////////////////////////////////////////////////////////////////////
 		//Appearance Preferences
@@ -127,7 +135,6 @@ static class GUI
 			minZoom = 0.1,
 			zoomInterval = 0.025;
 
-		SDL_Point oldMousePos;
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -312,15 +319,6 @@ void GUI::menuBar(bool &appRun)
 
 		}
 
-
-		ImGui::Separator();
-		if (ImGui::BeginMenu("Recent Files"))
-		{
-			// iterate items..
-			// eg if (ImGui::Item("&1. filename.txt")) {}
-			ImGui::EndMenu();
-		}
-		ImGui::Separator();
 		ImGui::EndMenu();
 	}
 
@@ -339,6 +337,15 @@ void GUI::menuBar(bool &appRun)
 	//View
 	if (ImGui::BeginMenu("View"))
 	{
+		if (ImGui::MenuItem("Scenario details"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Simulation details"))
+		{
+
+		}
 
 		ImGui::EndMenu();
 	}
@@ -349,7 +356,7 @@ void GUI::menuBar(bool &appRun)
 		//allows user to change simulation appearance
 		if (ImGui::MenuItem("Appearance Preferences"))
 		{
-			aPrefWin ^= 1;
+			aPrefWin = true;
 		}
 		ImGui::EndMenu();
 	}
@@ -414,15 +421,15 @@ void GUI::menuBar(bool &appRun)
 void GUI::infoBox()
 {	
 	//make the side bar
-	ImGui::Begin("", NULL, 
+	ImGui::Begin("infobox", NULL, 
 		ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoResize);
 	//set the side bar position, which is on the infobox rect
-	ImGui::SetWindowPos("", ImVec2(infoBoxRect.x, infoBoxRect.y));
+	ImGui::SetWindowPos("infobox", ImVec2(infoBoxRect.x, infoBoxRect.y));
 	//set the side bar size
-	ImGui::SetWindowSize("", ImVec2(infoBoxRect.w, infoBoxRect.h));
+	ImGui::SetWindowSize("infobox", ImVec2(infoBoxRect.w, infoBoxRect.h));
 
 	#pragma region WORLD STATISTICS
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -485,7 +492,7 @@ void GUI::infoBox()
 				//switch case is more effective than nested if-elses
 
 				//country temprature
-				std::string temperature = "";
+				std::string temperature = "Not Set";
 				switch (curCountry.getTemperature())
 				{
 					//neutral
@@ -500,7 +507,7 @@ void GUI::infoBox()
 					case 2: { temperature = "Cold"; }
 					break;
 
-					default: { temperature = "Error: Country temperature is not a valid value"; }
+					default: { temperature = "Temperature not set"; }
 					break;
 				}
 				//show to sidebar
@@ -508,7 +515,7 @@ void GUI::infoBox()
 
 
 				//country humidity
-				std::string humidity = "";
+				std::string humidity = "Not Set";
 				switch (curCountry.getHumidity())
 				{
 					case 0: { humidity = "Neutral"; }
@@ -520,7 +527,7 @@ void GUI::infoBox()
 					case 2: { humidity = "Dry"; }
 					break;
 
-					default: { humidity = "Error: Country temperature is not a valid value"; }
+					default: { humidity = "Humidity not set"; }
 					break;
 				}
 				//show to sidebar
@@ -629,8 +636,21 @@ void GUI::newSim()
 	//open new simulation window
 	if (newSimWindow)
 	{
-		ImGui::Begin("New Simulation", &newSimWindow, ImGuiWindowFlags_NoCollapse);
-		ImGui::Text("New Sim");
+		ImGui::Begin("New Simulation", &newSimWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		ImGui::SetWindowSize("NewSimWin", ImVec2(600, 500));
+
+		ImGui::Separator();
+
+		//Scenario name label
+		ImGui::Text("Simulation Name: ");
+		ImGui::SameLine();
+		helpMarker("The name of the simulation. Maximum 30 characters and no spaces.");
+		//Scenario name input
+		ImGui::InputText("##simname", tempName, sizeof(tempName), ImGuiInputTextFlags_CharsNoBlank);
+
+		ImGui::Separator();
+
+
 		ImGui::End();
 	}
 }
