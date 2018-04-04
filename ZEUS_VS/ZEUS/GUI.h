@@ -96,6 +96,7 @@ static class GUI
 		////////////////////////////////////////////////////////////////////////////////
 		//simulation name
 		char tempName[30] = "";
+		char tempFilePath[MAX_PATH] = "";
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -126,7 +127,7 @@ static class GUI
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
-
+		
 		#pragma region CONTROL VARIABLES
 		////////////////////////////////////////////////////////////////////////////////
 		//zoom values
@@ -641,12 +642,44 @@ void GUI::newSim()
 
 		ImGui::Separator();
 
-		//Scenario name label
+		//Sim name label
 		ImGui::Text("Simulation Name: ");
 		ImGui::SameLine();
 		helpMarker("The name of the simulation. Maximum 30 characters and no spaces.");
-		//Scenario name input
+		//Sim name input
 		ImGui::InputText("##simname", tempName, sizeof(tempName), ImGuiInputTextFlags_CharsNoBlank);
+
+		//Simulation scenario
+		ImGui::Text("Simulation Scenario: ");
+		ImGui::SameLine();
+		helpMarker("The scenario the simulation is to be applied to. Not required\n" 
+		"to set up the simulation, however is required to run the simulation");
+
+		ImGui::InputText("##scenariopath", tempFilePath, sizeof(tempFilePath));
+		ImGui::SameLine();
+		if (ImGui::Button("Browse"))
+		{
+			char filename[MAX_PATH];
+			OPENFILENAME ofn;
+			ZeroMemory(&filename, sizeof(filename));
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+								   //only able to use image type files
+			ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0"
+				"*.sce\0";
+			ofn.lpstrFile = filename;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.lpstrTitle = "Select simulation scenario";
+			ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+			if (GetOpenFileName(&ofn))
+			{
+				strcpy(tempFilePath, filename);
+				//std::cout << tempMapFilePath << "\n";
+			}
+		}
+
 
 		ImGui::Separator();
 
