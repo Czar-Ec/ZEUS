@@ -160,7 +160,7 @@ private:
 	/////////////////////
 	//TEMPORARY VARIABLES
 	/////////////////////
-	//temporary variables, will be pushed into global after pressing create simulation
+	//temporary variables, will be pushed into global after pressing create scenario
 	char tempName[30] = "";
 	char tempMapFilePath[MAX_PATH] = "";
 	std::string tempImgType = "";
@@ -349,25 +349,25 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	//File
 	if (ImGui::BeginMenu("File"))
 	{
-		//Make a new simulation
+		//Make a new scenario
 		if (ImGui::MenuItem("New Scenario", "CTRL+N"))
 		{
 			newScenario = true;
 		}
 
-		//Open existing simulation
+		//Open existing scenario
 		if (ImGui::MenuItem("Open Scenario", "CTRL+O"))
 		{
 			openScenario = true;
 		}
 
-		//Save current simulation
+		//Save current scenario
 		if (ImGui::MenuItem("Save", "CTRL+S"))
 		{
 			save();
 		}
 
-		//Save current simulation with a different name
+		//Save current scenario with a different name
 
 		if (ImGui::MenuItem("Save As"))
 		{
@@ -651,7 +651,7 @@ void SCGUI::saveAs()
 */
 void SCGUI::saveFile(std::string filepath)
 {
-	//check if the .sim extension is already added, if not add it
+	//check if the .sce extension is already added, if not add it
 	if (!(filepath.substr(filepath.find_last_of(".") + 1) == "sce"))
 	{
 		filepath = filepath + ".sce";
@@ -976,7 +976,7 @@ void SCGUI::newScenarioWin(SDL_Renderer *renderer)
 	//create scenario button
 	ImGui::Separator();
 	ImGui::Separator();
-	if (ImGui::Button("Create simulation", ImVec2(ImGui::GetWindowWidth(), 20)))
+	if (ImGui::Button("Create scenario", ImVec2(ImGui::GetWindowWidth(), 20)))
 	{
 		//validation checks
 		if (strcmp(tempName, "") != 0)
@@ -1127,8 +1127,7 @@ void SCGUI::resetNewScenario()
 {
 	/*std::cout << "Name: " << name << std::endl
 		<< "filepath: " << imgFilePath << std::endl
-		<< "img type: " << imgType << std::endl
-		<< "zombies: " << simulateZombies << std::endl;*/
+		<< "img type: " << imgType << std::endl;*/
 	
 	//reset the values relevant to new scenario
 	strcpy(tempName, "");

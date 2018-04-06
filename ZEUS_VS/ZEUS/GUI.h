@@ -60,6 +60,8 @@ static class GUI
 
 		//menu bar functions
 		void newSim();
+		void resetNewSim();
+
 		void openSim();
 
 		//render items
@@ -683,9 +685,22 @@ void GUI::newSim()
 
 		ImGui::Separator();
 
+		if (ImGui::Button("Create Simulation", ImVec2(ImGui::GetWindowWidth(), 20)))
+		{
+			//check the simulation name
+
+		}
 
 		ImGui::End();
 	}
+}
+
+void GUI::resetNewSim()
+{
+	strcpy(tempName, "");
+	strcpy(tempFilePath, "");
+
+	newSimWindow = false;
 }
 
 /**
