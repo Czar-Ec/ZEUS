@@ -391,7 +391,7 @@ void Main::mainLoop()
 		
 		//update frame for imgui
 		ImGui_ImplSdlGL2_NewFrame(window);
-		gui.menuBar(appRun);
+		gui.menuBar(appRun, renderer);
 		//draw
 		updateMain();
 

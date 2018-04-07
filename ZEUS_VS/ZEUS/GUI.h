@@ -53,13 +53,13 @@ static class GUI
 		bool loadScenario(SDL_Renderer *renderer, std::string filePath);
 
 		//draw menu bar
-		void menuBar(bool &appRun);
+		void menuBar(bool &appRun, SDL_Renderer *renderer);
 
 		//info box
 		void infoBox();
 
 		//menu bar functions
-		void newSim();
+		void newSim(SDL_Renderer *renderer);
 		void resetNewSim();
 
 		void openSim();
@@ -237,6 +237,12 @@ bool GUI::loadScenario(SDL_Renderer *renderer, std::string filePath)
 {
 	bool success = false;
 
+	//reset values
+	scenarioName = "";
+	countryList.clear();
+	totalCountries = 0;
+	worldPopulation = 0;
+
 	//DataHandler class to start the parsing
 	DataHandler d = DataHandler(filePath);
 	//tell the class what kind of file to load
@@ -286,7 +292,7 @@ bool GUI::loadScenario(SDL_Renderer *renderer, std::string filePath)
 *
 * @param bool &appRun (uses the pointer to the bool value so that the quit option of the menu can shut down the program)
 */
-void GUI::menuBar(bool &appRun)
+void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 {
 	//display the side info box
 	infoBox();
@@ -333,7 +339,10 @@ void GUI::menuBar(bool &appRun)
 
 		}
 
+		if (ImGui::MenuItem("Change Scenario"))
+		{
 
+		}
 		ImGui::EndMenu();
 	}
 
@@ -412,7 +421,7 @@ void GUI::menuBar(bool &appRun)
 	}
 
 	//if the user wants to create a new simulation
-	newSim();
+	newSim(renderer);
 	//if the user wants to open a previous simulation
 	openSim();
 }
@@ -597,10 +606,10 @@ void GUI::infoBox()
 				//sea links
 				if (ImGui::CollapsingHeader("Sea/Ocean Links"))
 				{
-					for (int i = 0; i < tempSea.size(); i++)
-					{
-						ImGui::TextWrapped(tempSea[i].c_str());
-					}
+for (int i = 0; i < tempSea.size(); i++)
+{
+	ImGui::TextWrapped(tempSea[i].c_str());
+}
 				}
 
 				//air links
@@ -614,17 +623,17 @@ void GUI::infoBox()
 			}
 		}
 
-		
+
 
 
 
 
 	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	#pragma endregion
 
-	//std::cout << curCountry.getID() << ", " << curCountry.getCountryName() << ", " << curCountry.getPopulation() << std::endl;
+	///////////////////////////////////////////////////////////////////////////////////////////////
+#pragma endregion
+
+//std::cout << curCountry.getID() << ", " << curCountry.getCountryName() << ", " << curCountry.getPopulation() << std::endl;
 
 	ImGui::End();
 
@@ -632,9 +641,9 @@ void GUI::infoBox()
 
 /**
 * newSim
-* function that uses an imgui window to allow the user to create a new simulation 
+* function that uses an imgui window to allow the user to create a new simulation
 */
-void GUI::newSim()
+void GUI::newSim(SDL_Renderer *renderer)
 {
 	//open new simulation window
 	if (newSimWindow)
@@ -654,8 +663,8 @@ void GUI::newSim()
 		//Simulation scenario
 		ImGui::Text("Simulation Scenario: ");
 		ImGui::SameLine();
-		helpMarker("The scenario the simulation is to be applied to. Not required\n" 
-		"to set up the simulation, however is required to run the simulation");
+		helpMarker("The scenario the simulation is to be applied to. Not required\n"
+			"to set up the simulation, however is required to run the simulation");
 
 		ImGui::InputText("##scenariopath", tempFilePath, sizeof(tempFilePath));
 		ImGui::SameLine();
@@ -687,8 +696,37 @@ void GUI::newSim()
 
 		if (ImGui::Button("Create Simulation", ImVec2(ImGui::GetWindowWidth(), 20)))
 		{
-			//check the simulation name
+			bool acceptName = false, acceptScenario = false;
 
+			//check the simulation name
+			if (strcmp(tempName, "") != 0)
+			{
+				acceptName = true;
+			}
+
+			//check if the scenario is valid
+			if (strcmp(tempFilePath, "") == 0)
+			{
+				//valid if empty
+				acceptScenario = true;
+			}
+			else
+			{
+				//check if the file exists
+				std::ifstream infile(tempFilePath);
+				if (infile.good())
+				{
+					//std::cout << "File exists\n";
+					acceptScenario = true;
+				}
+			}
+
+			//check if valid
+			if (acceptName && acceptScenario)
+			{
+				//load the scenario, should be empty if no scenario input
+				loadScenario(renderer, tempFilePath);
+			}
 		}
 
 		ImGui::End();

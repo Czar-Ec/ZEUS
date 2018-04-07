@@ -27,6 +27,7 @@ class DataHandler
 		*/
 		////////////////////////////////////////////////////////////////////////////////////
 		void loadScenario();
+		void resetAll();
 
 		//getters
 		std::string getSceName();
@@ -73,6 +74,8 @@ DataHandler::DataHandler(std::string _filepath)
 
 void DataHandler::loadScenario()
 {
+	resetAll();
+
 	//open the file
 	std::ifstream file;
 	file.open(filepath);
@@ -301,6 +304,15 @@ void DataHandler::loadScenario()
 	}
 
 	file.close();
+}
+
+inline void DataHandler::resetAll()
+{
+	loadSceName = "";
+	scenarioTexturePath = "";
+	countryList.clear();
+	countryCount = 0;
+	totalPop = 0;
 }
 
 inline std::string DataHandler::getSceName()
