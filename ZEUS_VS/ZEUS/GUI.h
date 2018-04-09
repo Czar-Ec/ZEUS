@@ -64,6 +64,9 @@ static class GUI
 
 		void openSim();
 
+		void save();
+		void saveAs();
+
 		//render items
 		void render(SDL_Window *window, SDL_Renderer *renderer);
 
@@ -99,6 +102,8 @@ static class GUI
 		//simulation name
 		char tempName[30] = "";
 		char tempFilePath[MAX_PATH] = "";
+
+		std::string simPath = "";
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -144,6 +149,9 @@ static class GUI
 
 		#pragma region GLOBAL DATA VARIABLES
 		////////////////////////////////////////////////////////////////////////////////
+		//current simulation name
+		std::string simName = "";
+		
 		//current scenario name
 		std::string scenarioName = "";
 		
@@ -168,6 +176,61 @@ static class GUI
 
 		SDL_Color curCol = { 0, 0, 0 };
 		Country scrollCountry = Country("None", "None", 0, 0, 0, 0, 0, 0, 0, -1, -1, emptyVec, emptyVec, emptyVec);
+
+		bool sceDetails = false, simDetails = false, viewCountries = false, detailedCountry = false;
+		//////////////////////////////////////////////////////////////////////////////////////
+		#pragma endregion
+
+		#pragma region VIEW COUNTRY DETAILS
+		//////////////////////////////////////////////////////////////////////////////////////
+		int currentCountry = -1;
+
+		char editID[5] = "";
+		char editCName[31] = "";
+		int editR = 0,
+			editG = 0,
+			editB = 0;
+
+		//country's population
+		char editPop[15] = "";
+		unsigned long long int editPopInt;
+
+		//country GDP
+		char editGDP[15] = "";
+		unsigned long long int editGDPInt;
+
+		//country military budget
+		char editMilitaryBudget[15] = "";
+		unsigned long long int editMBInt;
+
+		//country research spending
+		char editResearchSpending[15] = "";
+		unsigned long long int editRSInt;
+
+		//climate booleans
+		bool
+			//temperatures
+			ehotTemp = false,
+			ecoldTemp = false,
+			eneutralTemp = true,
+
+			//humidity
+			ewetHum = false,
+			edryHum = false,
+			eneutralHum = true;
+
+		//country borders
+		std::vector<std::string> elandBorders;
+
+		//air and ocean links
+		std::vector<std::string> eairLinks;
+		std::vector<std::string> eseaLinks;
+
+
+		//borders
+		std::vector<std::string> tempLandBorders, tempSeaLinks, tempAirLinks;
+
+
 		//////////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
 };
@@ -209,6 +272,10 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//not initially open
 	newSimWindow = false;
 	openSimWindow= false;
+	sceDetails = false;
+	simDetails = false;
+	viewCountries = false;
+	detailedCountry = false;
 
 	//pref window not open unless chosen
 	aPrefWin = false;
@@ -223,6 +290,8 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 		std::cout << "Error: Scenario cannot be loaded\n";
 	}
 	
+	//default simulation setup
+	simName = "world";
 }
 
 /**
@@ -312,13 +381,21 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		//Open existing simulation
 		if (ImGui::MenuItem("Open Simulation", "CTRL+O"))
 		{
-			openSimWindow = true;
+			openSim();
 		}
 
 		//Save current simulation
 		if (ImGui::MenuItem("Save", "CTRL+S"))
 		{
-
+			//check if the file was already saved, if not then call save as
+			if (simPath == "")
+			{
+				saveAs();
+			}
+			else
+			{
+				save();
+			}
 		}
 
 		//Save current simulation with a different name
@@ -351,12 +428,17 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 	{
 		if (ImGui::MenuItem("Scenario details"))
 		{
-
+			sceDetails = true;
 		}
 
 		if (ImGui::MenuItem("Simulation details"))
 		{
+			simDetails = true;
+		}
 
+		if (ImGui::MenuItem("View all countries"))
+		{
+			viewCountries = true;
 		}
 
 		ImGui::EndMenu();
@@ -420,10 +502,210 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		ImGui::End();
 	}
 
+	//simulation details
+	if (simDetails)
+	{
+		ImGui::Begin("Simulation Details", &simDetails, ImGuiWindowFlags_NoCollapse);
+		ImGui::Separator();
+
+		//Simulation name
+		ImGui::Text("Simulation Name: ");
+		ImGui::SameLine();
+		ImGui::Text("%s", simName.c_str());
+
+		ImGui::End();
+	}
+
+	if (sceDetails)
+	{
+		ImGui::Begin("Scenario Details", &sceDetails, ImGuiWindowFlags_NoCollapse);
+		ImGui::Separator();
+
+		//Simulation name
+		ImGui::Text("Scenario Name: ");
+		ImGui::SameLine();
+		ImGui::Text("%s", scenarioName.c_str());
+
+		ImGui::Separator();
+
+		//number of countries
+		ImGui::Text("Number of countries: ");
+		ImGui::SameLine();
+		ImGui::Text("%d", totalCountries);
+
+		//total population in scenario
+		ImGui::Text("Total Scenario Population: ");
+		ImGui::SameLine();
+		ImGui::Text("%llu", worldPopulation);
+
+		ImGui::End();
+	}
+
+	if (viewCountries)
+	{
+		//make the window
+		ImGui::Begin("View Country", &viewCountries, ImGuiWindowFlags_NoCollapse);
+		ImGui::SetWindowSize(ImVec2(750, 500));
+		ImGui::BeginColumns("View Countries", 3, NULL);
+
+		//column titles
+		ImGui::Text("Country ID");
+		ImGui::NextColumn();
+
+		ImGui::Text("Country Name");
+		ImGui::NextColumn();
+
+		helpMarker("Press View to view the country data");
+		ImGui::NextColumn();
+
+		//add all information from the country list
+		for (int count = 0; count < countryList.size(); count++)
+		{
+			//show the ID in the first column
+			ImGui::Text(countryList[count].getID().c_str());
+			ImGui::NextColumn();
+
+			//show country name
+			ImGui::Text(countryList[count].getCountryName().c_str());
+			ImGui::NextColumn();
+
+			std::string viewButtonText = "View " + countryList[count].getID();
+			//view button
+			if (ImGui::Button(viewButtonText.c_str()))
+			{
+				currentCountry = count;
+
+				//set edit ID
+				strcpy(editID, countryList[count].getID().c_str());
+
+				//set edit name
+				strcpy(editCName, countryList[count].getCountryName().c_str());
+
+				//set region colours
+				SDL_Color colour = countryList[count].getColour();
+				editR = colour.r;
+				editG = colour.g;
+				editB = colour.b;
+
+				//set population
+				strcpy(editPop, std::to_string(countryList[count].getPopulation()).c_str());
+
+				//set gdp
+				strcpy(editGDP, std::to_string(countryList[count].getGDP()).c_str());
+
+				//set military budget
+				strcpy(editMilitaryBudget, std::to_string(countryList[count].getMilitaryBudget()).c_str());
+
+				//set research budget
+				strcpy(editResearchSpending, std::to_string(countryList[count].getResearchBudget()).c_str());
+
+				int temp = countryList[count].getTemperature();
+				eneutralTemp = ehotTemp = ecoldTemp = false;
+				int hum = countryList[count].getHumidity();
+				eneutralHum = ewetHum = edryHum = false;
+
+				//setting correct settings for temperature
+				switch (temp)
+				{
+				case 0:
+					eneutralTemp = true;
+					break;
+
+				case 1:
+					ehotTemp = true;
+					break;
+
+				case 2:
+					ecoldTemp = true;
+					break;
+
+				default:
+					break;
+				}
+
+				//setting correct settings for humidity
+				switch (hum)
+				{
+				case 0:
+					eneutralHum = true;
+					break;
+
+				case 1:
+					ewetHum = true;
+					break;
+
+				case 2:
+					edryHum = true;
+					break;
+
+				default:
+					break;
+				}
+
+				//set land air and sea borders equal to the temps
+				tempLandBorders = countryList[count].getLandBorders();
+				tempSeaLinks = countryList[count].getSeaLinks();
+				tempAirLinks = countryList[count].getAirLinks();
+
+				//load land, air and sea borders
+				for (int scan = 0; scan < countryList.size(); scan++)
+				{
+					//check for land borders
+					for (int landScan = 0; landScan < tempLandBorders.size(); landScan++)
+					{
+						//if ID's match then set selected for land and then break loop
+						if (tempLandBorders[landScan] == countryList[scan].getID())
+						{
+							countryList[scan].selectedBorder = true;
+							break;
+						}
+					}
+
+					//doing the same for air and sea
+					for (int seaScan = 0; seaScan < tempSeaLinks.size(); seaScan++)
+					{
+						if (tempSeaLinks[seaScan] == countryList[scan].getID())
+						{
+							countryList[scan].selectedSea = true;
+							break;
+						}
+					}
+
+					for (int airScan = 0; airScan < tempAirLinks.size(); airScan++)
+					{
+						if (tempAirLinks[airScan] == countryList[scan].getID())
+						{
+							countryList[scan].selectedAir = true;
+							break;
+						}
+					}
+				}
+
+				//opens the detailed menu
+				detailedCountry ^= 1;
+			}
+			ImGui::NextColumn();
+		}
+
+		ImGui::EndColumns();
+
+		ImGui::End();
+	}
+
+	//opens a window that shows all country details
+	if (detailedCountry)
+	{
+		//new window to view details of the country
+		ImGui::Begin("View Country Detail", &detailedCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		ImGui::SetWindowSize(ImVec2(700, 600), NULL);
+
+		ImGui::Separator();
+
+		ImGui::End();
+	}
+
 	//if the user wants to create a new simulation
 	newSim(renderer);
-	//if the user wants to open a previous simulation
-	openSim();
 }
 
 /**
@@ -724,8 +1006,15 @@ void GUI::newSim(SDL_Renderer *renderer)
 			//check if valid
 			if (acceptName && acceptScenario)
 			{
+				//simulation name
+				simName = tempName;
+
 				//load the scenario, should be empty if no scenario input
 				loadScenario(renderer, tempFilePath);
+
+				
+				//reset the new simulator creator
+				resetNewSim();
 			}
 		}
 
@@ -747,13 +1036,34 @@ void GUI::resetNewSim()
 */
 void GUI::openSim()
 {
-	//open the existing simulation window
-	if (openSimWindow)
+	char filename[MAX_PATH];
+	OPENFILENAME ofn;
+	ZeroMemory(&filename, sizeof(filename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.lpstrFilter = "ZEUS Simulation Files (*.zsim)\0"
+		"*.zsim\0";
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Open Simulation";
+	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+	if (GetOpenFileName(&ofn))
 	{
-		ImGui::Begin("Open Simulation", &openSimWindow, ImGuiWindowFlags_NoCollapse);
-		ImGui::Text("Open Sim");
-		ImGui::End();
+		simPath = filename;
+		//std::cout << tempMapFilePath << "\n";
 	}
+}
+
+void GUI::save()
+{
+
+}
+
+void GUI::saveAs()
+{
+
 }
 
 /**
@@ -843,15 +1153,23 @@ void GUI::mouseOver()
 	// Get the device context for the screen
 	hDC = GetDC(NULL);
 	if (hDC == NULL)
-		std::cout << "Unable to get screen context\n";
+	{
+		//std::cout << "Unable to get screen context\n";
+	}
+		
 
 	if (!b)
-		std::cout << "Unable to get cursor position\n";
-
+	{
+		//std::cout << "Unable to get cursor position\n";
+	}
+	
 	// Retrieve the color at that position
 	colour = GetPixel(hDC, p.x, p.y);
 	if (colour == CLR_INVALID)
-		std::cout << "Obtained colour invalid\n";
+	{
+		//std::cout << "Obtained colour invalid\n";
+	}
+		
 
 	// Release the device context again
 	ReleaseDC(GetDesktopWindow(), hDC);
@@ -916,7 +1234,7 @@ void GUI::mouseOver()
 		if (countryFound)
 		{
 			//get country name
-			ImGui::TextUnformatted(scrollCountry.getCountryName().c_str());
+			ImGui::Text("[%s] - %s", scrollCountry.getID().c_str(), scrollCountry.getCountryName().c_str());
 		}
 
 		ImGui::PopTextWrapPos();
@@ -993,17 +1311,20 @@ void GUI::leftClick()
 */
 void GUI::zoom(int zoomType)
 {
-	//store the old zoom
-	float oldZoom = zoomVal;
-	
-	//determine the zoom type and alter the zoom val
-	switch (zoomType)
+	//prevents the control if the user is over any ImGui components
+	if (!ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered())
 	{
+		//store the old zoom
+		float oldZoom = zoomVal;
+
+		//determine the zoom type and alter the zoom val
+		switch (zoomType)
+		{
 		case -1:
 			//place holder input
 			break;
 
-		//zoom in
+			//zoom in
 		case 0:
 			if (zoomVal - zoomInterval > minZoom)
 			{
@@ -1012,7 +1333,7 @@ void GUI::zoom(int zoomType)
 			}
 			break;
 
-		//zoom out
+			//zoom out
 		case 1:
 			if (zoomVal + zoomInterval <= maxZoom)
 			{
@@ -1024,21 +1345,22 @@ void GUI::zoom(int zoomType)
 		default:
 			std::cout << "Unknown zoom type" << std::endl;
 			break;
-	}
+		}
 
-	//adjust vpSrc
-	if (oldZoom - zoomVal != 0)
-	{
-		vpSrc.w = wMapX * zoomVal;
-		vpSrc.h = wMapY * zoomVal;
-		vpSrc.x = wMapX / 2 - vpSrc.w / 2;
-		vpSrc.y = wMapY / 2 - vpSrc.h / 2;
-	}
-	
-	//std::cout << zoomVal << std::endl;
+		//adjust vpSrc
+		if (oldZoom - zoomVal != 0)
+		{
+			vpSrc.w = wMapX * zoomVal;
+			vpSrc.h = wMapY * zoomVal;
+			vpSrc.x = wMapX / 2 - vpSrc.w / 2;
+			vpSrc.y = wMapY / 2 - vpSrc.h / 2;
+		}
 
-	//limit the x and y of the source
-	panLimiting();
+		//std::cout << zoomVal << std::endl;
+
+		//limit the x and y of the source
+		panLimiting();
+	}
 }
 
 /**

@@ -469,6 +469,16 @@ void SCGUI::menuBar(SDL_Renderer *renderer, bool &appRun)
 	{
 		editCountryMenu();
 	}
+	else
+	{
+		//clear selected
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			countryList[i].selectedBorder = false;
+			countryList[i].selectedAir = false;
+			countryList[i].selectedSea = false;
+		}
+	}
 }
 
 void SCGUI::open(SDL_Renderer *renderer)
@@ -1758,11 +1768,41 @@ void SCGUI::resetNewCountry()
 */
 void SCGUI::editCountryMenu()
 {
-	//make the window
+		//make the window
 	ImGui::Begin("Edit Country", &editCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(700, 600), NULL);
 
 	ImGui::Separator();
+
+	//if id is not empty find the borders for the country and set it as selectable
+	if (strcmp(curCountry.getID().c_str(), "") != 0)
+	{
+		//set selectable matching ids
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			std::string countryID = countryList[i].getID();
+			std::vector<std::string> border = curCountry.getLandBorders();
+
+			if (std::find(border.begin(), border.end(), countryID) != border.end())
+			{
+				countryList[i].selectedBorder = true;
+			}
+
+			border = curCountry.getSeaLinks();
+
+			if (std::find(border.begin(), border.end(), countryID) != border.end())
+			{
+				countryList[i].selectedSea = true;
+			}
+
+			border = curCountry.getAirLinks();
+
+			if (std::find(border.begin(), border.end(), countryID) != border.end())
+			{
+				countryList[i].selectedAir = true;
+			}
+		}
+	}
 
 	//unique country ID
 	ImGui::Text("Country ID: ");
@@ -2643,7 +2683,7 @@ void SCGUI::mouseOver()
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(450.0f);
 		//get country name
-		ImGui::TextUnformatted(scrollCountry.getCountryName().c_str());
+		ImGui::Text("[%s] - %s", scrollCountry.getID().c_str(), scrollCountry.getCountryName().c_str());
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 		newCountryOnClick = false;
