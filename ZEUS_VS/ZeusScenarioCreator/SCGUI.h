@@ -600,7 +600,7 @@ void SCGUI::save()
 	if (scenarioLoaded)
 	{
 		//check if this file was opened or was newly created
-		if (curFileName == "")
+		if (curFileName == "" || strcmp(curFileName, "") == 0)
 		{
 			//call the save as function
 			saveAs();

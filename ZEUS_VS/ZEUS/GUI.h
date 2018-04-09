@@ -107,7 +107,7 @@ static class GUI
 		////////////////////////////////////////////////////////////////////////////////
 		//Appearance Preferences
 		//bool if window should be open or not
-		bool aPrefWin;
+		bool aPrefWin = false;
 
 		//colour of the background
 		ImVec4 bkgColour;
@@ -145,7 +145,7 @@ static class GUI
 		#pragma region GLOBAL DATA VARIABLES
 		////////////////////////////////////////////////////////////////////////////////
 		//current scenario name
-		std::string scenarioName;
+		std::string scenarioName = "";
 		
 		//total number of countries in the world
 		int totalCountries = 0;
