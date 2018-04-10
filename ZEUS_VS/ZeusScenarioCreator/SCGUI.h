@@ -763,7 +763,7 @@ void SCGUI::saveFile(std::string filepath)
 void SCGUI::viewCountries()
 {
 	//make the window
-	ImGui::Begin("View Country", &viewCountriesWin, ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("View Country", &viewCountriesWin, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(750, 500));
 	ImGui::BeginColumns("View Countries", 4, NULL);
 

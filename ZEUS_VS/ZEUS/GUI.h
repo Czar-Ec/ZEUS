@@ -67,6 +67,8 @@ static class GUI
 		void save();
 		void saveAs();
 
+		void editSimVals();
+
 		//render items
 		void render(SDL_Window *window, SDL_Renderer *renderer);
 
@@ -177,7 +179,8 @@ static class GUI
 		SDL_Color curCol = { 0, 0, 0 };
 		Country scrollCountry = Country("None", "None", 0, 0, 0, 0, 0, 0, 0, -1, -1, emptyVec, emptyVec, emptyVec);
 
-		bool sceDetails = false, simDetails = false, viewCountries = false, detailedCountry = false;
+		bool sceDetails = false, simDetails = false, viewCountries = false, detailedCountry = false,
+			editSim = false;
 		//////////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
 
@@ -192,20 +195,7 @@ static class GUI
 			editB = 0;
 
 		//country's population
-		char editPop[15] = "";
-		unsigned long long int editPopInt;
-
-		//country GDP
-		char editGDP[15] = "";
-		unsigned long long int editGDPInt;
-
-		//country military budget
-		char editMilitaryBudget[15] = "";
-		unsigned long long int editMBInt;
-
-		//country research spending
-		char editResearchSpending[15] = "";
-		unsigned long long int editRSInt;
+		unsigned long long int editPopInt = 0, editGDPInt = 0, editMBInt = 0, editRSInt = 0;
 
 		//climate booleans
 		bool
@@ -272,6 +262,7 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//not initially open
 	newSimWindow = false;
 	openSimWindow= false;
+	editSim = false;
 	sceDetails = false;
 	simDetails = false;
 	viewCountries = false;
@@ -413,12 +404,32 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 	{
 		if (ImGui::MenuItem("Edit Simulation"))
 		{
-
+			editSim = true;
 		}
 
 		if (ImGui::MenuItem("Change Scenario"))
 		{
+			char filename[MAX_PATH];
+			OPENFILENAME ofn;
+			ZeroMemory(&filename, sizeof(filename));
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+								   //only able to use image type files
+			ofn.lpstrFilter = "ZEUS Scenario Files (*.sce)\0"
+				"*.sce\0";
+			ofn.lpstrFile = filename;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.lpstrTitle = "Select simulation scenario";
+			ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
+			if (GetOpenFileName(&ofn))
+			{
+				strcpy(tempFilePath, filename);
+				//std::cout << tempMapFilePath << "\n";
+
+				loadScenario(renderer, tempFilePath);
+			}
 		}
 		ImGui::EndMenu();
 	}
@@ -489,6 +500,12 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 	//end of main menu bar
 	ImGui::EndMainMenuBar();
 
+	//editing the simulation
+	if (editSim)
+	{
+		editSimVals();
+	}
+
 	//components of main menu bar
 	//Appearance Preferences window
 	if (aPrefWin)
@@ -556,6 +573,7 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		ImGui::NextColumn();
 
 		helpMarker("Press View to view the country data");
+		ImGui::NewLine();
 		ImGui::NextColumn();
 
 		//add all information from the country list
@@ -566,7 +584,9 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 			ImGui::NextColumn();
 
 			//show country name
-			ImGui::Text(countryList[count].getCountryName().c_str());
+			std::string cNameStr = countryList[count].getCountryName();
+			std::replace(cNameStr.begin(), cNameStr.end(), '-', ' ');
+			ImGui::Text(cNameStr.c_str());
 			ImGui::NextColumn();
 
 			std::string viewButtonText = "View " + countryList[count].getID();
@@ -588,16 +608,16 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 				editB = colour.b;
 
 				//set population
-				strcpy(editPop, std::to_string(countryList[count].getPopulation()).c_str());
+				editPopInt = countryList[count].getPopulation();
 
 				//set gdp
-				strcpy(editGDP, std::to_string(countryList[count].getGDP()).c_str());
+				editGDPInt = countryList[count].getGDP();
 
 				//set military budget
-				strcpy(editMilitaryBudget, std::to_string(countryList[count].getMilitaryBudget()).c_str());
+				editMBInt = countryList[count].getMilitaryBudget();
 
 				//set research budget
-				strcpy(editResearchSpending, std::to_string(countryList[count].getResearchBudget()).c_str());
+				editRSInt = countryList[count].getResearchBudget();
 
 				int temp = countryList[count].getTemperature();
 				eneutralTemp = ehotTemp = ecoldTemp = false;
@@ -647,40 +667,6 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 				tempSeaLinks = countryList[count].getSeaLinks();
 				tempAirLinks = countryList[count].getAirLinks();
 
-				//load land, air and sea borders
-				for (int scan = 0; scan < countryList.size(); scan++)
-				{
-					//check for land borders
-					for (int landScan = 0; landScan < tempLandBorders.size(); landScan++)
-					{
-						//if ID's match then set selected for land and then break loop
-						if (tempLandBorders[landScan] == countryList[scan].getID())
-						{
-							countryList[scan].selectedBorder = true;
-							break;
-						}
-					}
-
-					//doing the same for air and sea
-					for (int seaScan = 0; seaScan < tempSeaLinks.size(); seaScan++)
-					{
-						if (tempSeaLinks[seaScan] == countryList[scan].getID())
-						{
-							countryList[scan].selectedSea = true;
-							break;
-						}
-					}
-
-					for (int airScan = 0; airScan < tempAirLinks.size(); airScan++)
-					{
-						if (tempAirLinks[airScan] == countryList[scan].getID())
-						{
-							countryList[scan].selectedAir = true;
-							break;
-						}
-					}
-				}
-
 				//opens the detailed menu
 				detailedCountry ^= 1;
 			}
@@ -697,9 +683,191 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 	{
 		//new window to view details of the country
 		ImGui::Begin("View Country Detail", &detailedCountry, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-		ImGui::SetWindowSize(ImVec2(700, 600), NULL);
+		ImGui::SetWindowSize(ImVec2(500, 600), NULL);
 
 		ImGui::Separator();
+
+		//country ID
+		ImGui::BeginColumns("##countrydetails", 2);
+		ImGui::Text("Country ID:");
+		ImGui::NextColumn();
+		ImGui::Text("%s", editID);
+
+		//country name
+		ImGui::NextColumn();
+		ImGui::Text("Country Name:");
+		ImGui::NextColumn();
+		std::string nameStr = editCName;
+		std::replace(nameStr.begin(), nameStr.end(), '-', ' ');
+		ImGui::Text("%s", nameStr.c_str());
+		ImGui::NewLine();
+		ImGui::NextColumn();
+
+		//RGB colours
+		ImGui::Separator();
+		ImGui::Text("Country Colour Identifier");
+		ImGui::NextColumn();
+		helpMarker("The unique colour for each country territory, in RGB format.");
+		ImGui::NewLine();
+		ImGui::NextColumn();
+
+		ImGui::Text("Red:");
+		ImGui::NextColumn();
+		ImGui::Text("%d", editR);
+		ImGui::NextColumn();
+
+		ImGui::Text("Green:");
+		ImGui::NextColumn();
+		ImGui::Text("%d", editG);
+		ImGui::NextColumn();
+
+
+		ImGui::Text("Blue:");
+		ImGui::NextColumn();
+		ImGui::Text("%d", editB);
+		ImGui::NextColumn();
+		ImGui::NewLine();
+		ImGui::Separator();
+
+		//attributes
+		ImGui::Text("Country Attributes");
+		ImGui::NextColumn();
+		helpMarker("The country's different attribute values. These values are used in the simulation to determine how the disease spreads.");
+		ImGui::NewLine();
+		ImGui::NextColumn();
+
+		//population
+		ImGui::Text("Population:");
+		ImGui::NextColumn();
+		ImGui::Text("%llu", editPopInt);
+		ImGui::NextColumn();
+
+		//GDP
+		ImGui::Text("GDP:");
+		ImGui::SameLine();
+		helpMarker("In million USD (US Dollars)");
+		ImGui::NextColumn();
+		ImGui::Text("%llu", editGDPInt);
+		ImGui::NextColumn();
+
+		//military budget
+		ImGui::Text("Military Budget:");
+		ImGui::SameLine();
+		helpMarker("In million USD (US Dollars)");
+		ImGui::NextColumn();
+		ImGui::Text("%llu", editMBInt);
+		ImGui::NextColumn();
+
+		//research budget
+		ImGui::Text("Research Budget:");
+		ImGui::SameLine();
+		helpMarker("In million USD (US Dollars)");
+		ImGui::NextColumn();
+		ImGui::Text("%llu", editRSInt);
+		ImGui::NewLine();
+		ImGui::NextColumn();
+		ImGui::Separator();
+
+		//climate
+		ImGui::Text("Country Climate");
+		ImGui::NextColumn();
+		helpMarker("The country's climate. The climate affects  diseases differently according to the climate.");
+		ImGui::NewLine();
+		ImGui::NextColumn();
+
+		//temperature
+		ImGui::Text("Temperature:");
+		ImGui::NextColumn();
+		if (ehotTemp)
+			ImGui::Text("Hot");
+		if (ecoldTemp)
+			ImGui::Text("Cold");
+		if (eneutralTemp)
+			ImGui::Text("Neutral");
+
+
+		ImGui::NextColumn();
+
+		//humidity
+		ImGui::Text("Humidity:");
+		ImGui::NextColumn();
+		if (edryHum)
+			ImGui::Text("Dry");
+		if (ewetHum)
+			ImGui::Text("Wet");
+		if (eneutralHum)
+			ImGui::Text("Neutral");
+
+		ImGui::NewLine();
+		ImGui::NextColumn();
+		ImGui::EndColumns();
+		ImGui::Separator();
+		ImGui::NewLine();
+
+		//print out the neighbours
+		if (tempLandBorders.size() > 0)
+		{
+			if (ImGui::TreeNode("Land Borders"))
+			{
+				for (int i = 0; i < tempLandBorders.size(); i++)
+				{
+					for (int j = 0; j < countryList.size(); j++)
+					{
+						if (countryList[j].getID() == tempLandBorders[i])
+						{
+							std::string printout = "[" + tempLandBorders[i] + "] - " + countryList[j].getCountryName();
+							ImGui::Text(printout.c_str());
+						}
+					}
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
+		ImGui::NewLine();
+
+		if (tempSeaLinks.size() > 0)
+		{
+			if (ImGui::TreeNode("Sea Links"))
+			{
+				for (int i = 0; i < tempSeaLinks.size(); i++)
+				{
+					for (int j = 0; j < countryList.size(); j++)
+					{
+						if (countryList[j].getID() == tempSeaLinks[i])
+						{
+							std::string printout = "[" + tempSeaLinks[i] + "] - " + countryList[j].getCountryName();
+							ImGui::Text(printout.c_str());
+						}
+					}
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
+		ImGui::NewLine();
+
+		if (tempAirLinks.size() > 0)
+		{
+			if (ImGui::TreeNode("Air Links"))
+			{
+				for (int i = 0; i < tempAirLinks.size(); i++)
+				{
+					for (int j = 0; j < countryList.size(); j++)
+					{
+						if (countryList[j].getID() == tempAirLinks[i])
+						{
+							std::string printout = "[" + tempAirLinks[i] + "] - " + countryList[j].getCountryName();
+							ImGui::Text(printout.c_str());
+						}
+					}
+				}
+
+				ImGui::TreePop();
+			}
+		}
 
 		ImGui::End();
 	}
@@ -1064,6 +1232,14 @@ void GUI::save()
 void GUI::saveAs()
 {
 
+}
+
+void GUI::editSimVals()
+{
+	ImGui::Begin("Edit Simulation", &editSim, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowSize(ImVec2(400, 500));
+
+	ImGui::End();
 }
 
 /**
