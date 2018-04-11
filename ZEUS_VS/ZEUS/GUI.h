@@ -107,6 +107,12 @@ static class GUI
 
 		std::string simPath = "";
 
+		//is a zombie sim
+		bool simulateZombies = true;
+
+		//allowing different infection vectors
+		bool allowLandInfect = true, allowSeaInfect = true, allowAirInfect = true;
+
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
 
@@ -275,7 +281,7 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//background colour
 	bkgColour = ImColor(0, 0, 44);
 
-	//this is default opening scenario
+	//default opening scenario
 	if (!loadScenario(renderer, "..\\res\\scenarios\\world.sce"))
 	{
 		std::cout << "Error: Scenario cannot be loaded\n";
@@ -450,6 +456,27 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		if (ImGui::MenuItem("View all countries"))
 		{
 			viewCountries = true;
+		}
+
+		ImGui::EndMenu();
+	}
+
+	//Simulation
+	if (ImGui::BeginMenu("Simulation"))
+	{
+		if (ImGui::MenuItem("Run"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Pause"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Reset"))
+		{
+
 		}
 
 		ImGui::EndMenu();
@@ -1238,6 +1265,74 @@ void GUI::editSimVals()
 {
 	ImGui::Begin("Edit Simulation", &editSim, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(400, 500));
+
+	//options for simulated disease
+	if (ImGui::TreeNode("Disease Settings"))
+	{
+		ImGui::BeginColumns("##checkboxSeparator", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+
+		ImGui::Text("Zombies");
+		ImGui::SameLine();
+		helpMarker("Uncheck to disable the simulation of zombies, making the simulation purely for spread of disease.");
+		ImGui::NextColumn();
+		ImGui::Checkbox("##zombieOption", &simulateZombies);
+		ImGui::EndColumns();
+
+		if (simulateZombies && ImGui::TreeNode("Zombie Settings"))
+		{
+
+
+			ImGui::TreePop();
+		}
+
+		
+
+		ImGui::TreePop();
+	}
+
+	//allowing infection of other countries via specific connections
+	if (ImGui::TreeNode("Country Border Settings"))
+	{
+		ImGui::TextWrapped("Uncheck any of the settings to stop the simulation spreading via these country connections.");
+		helpMarker(
+			" Note that removing the ability to spread via certain connections may make it impossible to infect countries "
+			" more speifically, islands (if the sea links option is disabled)");
+		ImGui::NewLine();
+
+		ImGui::BeginColumns("##checkboxSeparator", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+
+		ImGui::Text("Land Borders");
+		ImGui::NextColumn();
+		ImGui::Checkbox("##landborderUse", &allowLandInfect);
+		ImGui::NextColumn();
+
+		ImGui::Text("Sea Links");
+		ImGui::NextColumn();
+		ImGui::Checkbox("##seaLinkUse", &allowSeaInfect);
+		ImGui::NextColumn();
+
+		ImGui::Text("Air Links");
+		ImGui::NextColumn();
+		ImGui::Checkbox("##airLinkUse", &allowAirInfect);
+		ImGui::NextColumn();
+
+
+		ImGui::EndColumns();
+
+
+		ImGui::TreePop();
+	}
+
+	ImGui::NewLine();
+	ImGui::NewLine();
+	ImGui::Separator();
+
+	if (ImGui::Button("Set Simulation", ImVec2(ImGui::GetWindowWidth(), 20)))
+	{
+
+	}
+
+	ImGui::Separator();
 
 	ImGui::End();
 }
