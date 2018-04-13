@@ -51,7 +51,6 @@ public:
 	void updateMain();
 
 private:
-
 	//constant values
 	const int ZOOM_IN = 1;
 	const int ZOOM_OUT = 0;
@@ -82,14 +81,12 @@ private:
 	float fps = 0;
 	int fpsLimit = 120;
 
-	//pause sim
-	bool pauseSim = false;
-
 	//panning
 	bool isPanning = false;
 
 	//the GUI class used with the Main
 	SCGUI gui;
+
 };
 
 /**
@@ -144,7 +141,7 @@ void SCMain::init()
 
 		//create the window
 		window = SDL_CreateWindow(
-			"ZEUS",
+			"ZEUS Scenario Creator",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
 			//window width
@@ -162,7 +159,8 @@ void SCMain::init()
 		);
 
 		//get display size
-		SDL_GetWindowSize(window, &winX, &winY);
+		//debug
+		//SDL_GetWindowSize(window, &winX, &winY);
 
 		//opengl context
 		glcontext = SDL_GL_CreateContext(window);
@@ -343,13 +341,6 @@ void SCMain::mainLoop()
 				break;
 			}
 
-			//moving the viewport
-			if (key[SDL_SCANCODE_UP]);
-			if (key[SDL_SCANCODE_DOWN]);
-			if (key[SDL_SCANCODE_LEFT]);
-			if (key[SDL_SCANCODE_RIGHT]);
-
-
 			//ctrl + S shortcut
 			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_S] ||
 				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_S])
@@ -358,26 +349,22 @@ void SCMain::mainLoop()
 			}
 		}
 
-		//only done if the simulation is not paused
-		if (!pauseSim)
+		//update frame for imgui
+		ImGui_ImplSdlGL2_NewFrame(window);
+
+		//call the gui menubar
+		gui.menuBar(renderer, appRun);
+
+		//draw
+		updateMain();
+
+		//if the user is panning the world map
+		if (isPanning)
 		{
-			//update frame for imgui
-			ImGui_ImplSdlGL2_NewFrame(window);
-
-			//call the gui menubar
-			gui.menuBar(renderer, appRun);
-
-			//draw
-			updateMain();
-
-			//if the user is panning the world map
-			if (isPanning)
+			if (eventMain.type == SDL_MOUSEMOTION)
 			{
-				if (eventMain.type == SDL_MOUSEMOTION)
-				{
-					//pan
-					gui.pan(&mousePos, -eventMain.motion.xrel, -eventMain.motion.yrel);
-				}
+				//pan
+				gui.pan(&mousePos, -eventMain.motion.xrel, -eventMain.motion.yrel);
 			}
 		}
 

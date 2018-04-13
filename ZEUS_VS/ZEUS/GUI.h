@@ -107,8 +107,13 @@ static class GUI
 
 		std::string simPath = "";
 
+		int infectionRateSlider = 98, naturalDeathRateSlider = 2;
+
 		//is a zombie sim
 		bool simulateZombies = true;
+
+		//zombie conversion rate
+		float zconvertionRate = 0.3f, zdeathRate = 0.1f;
 
 		//allowing different infection vectors
 		bool allowLandInfect = true, allowSeaInfect = true, allowAirInfect = true;
@@ -1265,24 +1270,70 @@ void GUI::editSimVals()
 {
 	ImGui::Begin("Edit Simulation", &editSim, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowSize(ImVec2(400, 500));
+	
+	ImGui::Separator();
+	ImGui::BeginColumns("##checkboxSeparator", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+
+	ImGui::Text("Zombies");
+	ImGui::SameLine();
+	helpMarker("Uncheck to disable the simulation of zombies, making the simulation purely for spread of disease.");
+	ImGui::NextColumn();
+	ImGui::Checkbox("##zombieOption", &simulateZombies);
+	
+	ImGui::EndColumns();
+	ImGui::Separator();
 
 	//options for simulated disease
 	if (ImGui::TreeNode("Disease Settings"))
 	{
-		ImGui::BeginColumns("##checkboxSeparator", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-
-		ImGui::Text("Zombies");
+		//infection rate of disease
+		ImGui::Text("Infection rate");
 		ImGui::SameLine();
-		helpMarker("Uncheck to disable the simulation of zombies, making the simulation purely for spread of disease.");
-		ImGui::NextColumn();
-		ImGui::Checkbox("##zombieOption", &simulateZombies);
-		ImGui::EndColumns();
+		helpMarker("Determines how fast the infection spreads across the simulation");
+		ImGui::SliderInt("##infectionrateslider", &infectionRateSlider, 0, 100, "%.0f%%");
+		ImGui::NewLine();
 
-		if (simulateZombies && ImGui::TreeNode("Zombie Settings"))
+		naturalDeathRateSlider = 100 - infectionRateSlider;
+		//limit values
+		if (infectionRateSlider > 100) { infectionRateSlider = 100; }
+		if (infectionRateSlider < 0) { infectionRateSlider = 0; }
+
+		//death rate from infection
+		ImGui::Text("Natural death rate");
+		ImGui::SameLine();
+		helpMarker("Rate at which individuals die from natural causes");
+		ImGui::SliderInt("##naturaldeathslider", &naturalDeathRateSlider, 0, 100, "%.0f%%");
+		ImGui::NewLine();
+
+		infectionRateSlider = 100 - naturalDeathRateSlider;
+		if (naturalDeathRateSlider > 100) { naturalDeathRateSlider = 100; }
+		if (naturalDeathRateSlider < 0) { naturalDeathRateSlider = 0; }
+
+		if (simulateZombies)
+		{
+			if (ImGui::TreeNode("Zombie Settings"))
+			{
+				//rate of infected turning into zombies
+				ImGui::Text("Zombie conversion rate");
+				ImGui::SameLine();
+				helpMarker("Rate at which infected become zombies. This also affects death rate.");
+				ImGui::SliderFloat("##zconversionrate", &zconvertionRate, 0.0f, 1.0f, "zombie conversion rate: %.2f");
+				ImGui::NewLine();
+
+				//death rate from zombie attack
+				ImGui::Text("Zombie death rate");
+				ImGui::SameLine();
+				helpMarker("Rate at which people die from zombie attacks");
+				ImGui::SliderFloat("##zdeathrate", &zdeathRate, 0.0f, 1.0f, "zomnoe death rate: %.2f");
+				ImGui::NewLine();
+
+				//rate of infected dying
+				ImGui::TreePop();
+			}
+		}
+		else
 		{
 
-
-			ImGui::TreePop();
 		}
 
 		
@@ -1322,17 +1373,6 @@ void GUI::editSimVals()
 
 		ImGui::TreePop();
 	}
-
-	ImGui::NewLine();
-	ImGui::NewLine();
-	ImGui::Separator();
-
-	if (ImGui::Button("Set Simulation", ImVec2(ImGui::GetWindowWidth(), 20)))
-	{
-
-	}
-
-	ImGui::Separator();
 
 	ImGui::End();
 }

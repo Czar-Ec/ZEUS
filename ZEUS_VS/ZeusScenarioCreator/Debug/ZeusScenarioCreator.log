@@ -149,11 +149,7 @@ c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scgui.h(2793): warning 
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
 c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scgui.h(2796): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(275): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(395): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(406): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(347): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(348): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(349): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(350): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(272): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(381): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\scmain.h(392): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
   ZeusScenarioCreator.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Debug\ZeusScenarioCreator.exe
