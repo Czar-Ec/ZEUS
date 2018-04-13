@@ -94,6 +94,7 @@ public:
 
 	//shortcut controls
 	void ctrlS() { save(); };
+	void ctrlN() { newScenario = true; }
 
 private:
 	//colour of the background

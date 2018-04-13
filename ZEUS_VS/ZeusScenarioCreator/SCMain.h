@@ -347,6 +347,20 @@ void SCMain::mainLoop()
 			{
 				gui.ctrlS();
 			}
+
+			//ctrl + O shortcut
+			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_O] ||
+				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_O])
+			{
+				gui.open(renderer);
+			}
+
+			//ctrl + N shortcut
+			if (key[SDL_SCANCODE_LCTRL] && key[SDL_SCANCODE_N] ||
+				key[SDL_SCANCODE_RCTRL] && key[SDL_SCANCODE_N])
+			{
+				gui.ctrlN();
+			}
 		}
 
 		//update frame for imgui
