@@ -1394,7 +1394,7 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	infoBoxRect.x = vp.w;
 	infoBoxRect.y = 20;
 	infoBoxRect.w = ((int)ImGui::GetIO().DisplaySize.x) / 4;
-	infoBoxRect.h = ((int)ImGui::GetIO().DisplaySize.y);
+	infoBoxRect.h = ((int)ImGui::GetIO().DisplaySize.y) - 20;
 
 	//gets the world size
 	SDL_GetWindowSize(window, &worldX, &worldY);
