@@ -60,11 +60,50 @@ public:
 	void removeLinkAir(std::string id);
 	std::vector<std::string> getAirLinks();
 
+	//get simulation variables
+	unsigned long long int getHealthyPop() { return healthyPop; }
+	unsigned long long int getInfectedPop() { return infectedPop; }
+	unsigned long long int getDeadPop() { return deadPop; }
+	unsigned long long int getZombiePop() { return zombiePop; }
+	unsigned long long int getRemovedPop() { return removedPop; }
 
+	//reset simulation variables
+	void resetSimVal();
+
+	//initial infection
+	bool infected = false;
+
+	//simulate spread
+	void simulate(bool simulateZombies, int simFrame, 
+		float infRate, float naturalDeathRate,
+		float recoveryRate, float infDeathRate,
+		float zconversionRate, float zdeathRate,
+		float zremoveRate, float corpseDecayRate,
+		float reanimationRate, bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect,
+		std::vector<Country> &countryList);
+
+	void receiveInfection(int infectedPassengers);
 
 	bool selectedBorder, selectedSea, selectedAir;
 
 private:
+
+	float getRand(float range1, float range2);
+
+
+	//natural deaths
+	void naturalDeaths(bool simulateZombies, float naturalDeathRate);
+
+	//spread infection
+	void spreadInfection(bool simulateZombies, float infRate, 
+		float recoveryRate);
+
+	//deaths from infection
+	void deathRates(bool simulateZombies, float infDeathRate);
+
+	//spread to other countries
+	void infectCountries(bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect, std::vector<Country> &countrylist);
+
 	#pragma region Country Attributes
 	//country unique ID
 	std::string id;
@@ -107,6 +146,17 @@ private:
 
 
 	#pragma endregion
+
+	#pragma region SIMULATOR VARIABLES
+
+	//variables only used in the simulator
+	int simulationFrame = 0;
+	unsigned long long int healthyPop, infectedPop, deadPop, zombiePop, removedPop;
+
+	std::vector<std::string> tempLandBorder, tempSeaLink, tempAirLink;
+
+	#pragma endregion
+
 };
 
 /**
@@ -165,6 +215,8 @@ Country::Country(std::string ID, std::string cName, int red, int green, int blue
 	airLinks = air;
 
 	selectedBorder = selectedSea = selectedAir = false;
+
+	resetSimVal();
 }
 
 /**
@@ -425,4 +477,379 @@ void Country::removeLinkAir(std::string id)
 *
 * @return airLinks
 */
-std::vector<std::string> Country::getAirLinks() { return airLinks; };
+std::vector<std::string> Country::getAirLinks() { return airLinks; }
+
+/**
+* resetSimVal
+* resets the simulation values
+*/
+void Country::resetSimVal()
+{
+	healthyPop = population;
+	infectedPop = 0;
+	zombiePop = 0;
+	deadPop = 0;
+	removedPop = 0;
+
+	tempLandBorder = landBorders;
+	tempSeaLink = seaLinks;
+	tempAirLink = airLinks;
+
+	infected = false;
+}
+
+void Country::simulate(bool simulateZombies, int simFrame, float infRate, float naturalDeathRate, float recoveryRate, float infDeathRate, float zconversionRate, float zdeathRate, float zremoveRate, float corpseDecayRate, float reanimationRate, bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect, std::vector<Country>& countryList)
+{
+	//debug
+	//std::cout << id << std::endl;
+
+	//check if it is the first frame
+	if (simFrame == 0)
+	{
+		//if the country is set to be initially infected, set up the country to
+		//have one infected individual
+		if (infected)
+		{
+			healthyPop--;
+			infectedPop = 1;
+		}
+		
+	}
+
+	//else proceed as normal
+	else
+	{
+		//natural deaths occur regardless of country's infection status
+		naturalDeaths(simulateZombies, naturalDeathRate);
+
+		//infection spreads within the country
+		if (infectedPop > 0)
+		{
+			spreadInfection(simulateZombies, infRate,
+				recoveryRate);
+
+			deathRates(simulateZombies, infDeathRate);
+
+			//if over 1% of the population is infected, spread to other countries
+			if (((float)population / (float)infectedPop) > 0.01)
+			{
+				infectCountries(allowLandInfect, allowSeaInfect, allowAirInfect, countryList);
+			}
+		}
+	}
+}
+
+void Country::receiveInfection(int infectedPassengers)
+{
+	//country is now infected
+	infected = true;
+
+	//add the infected passengets tot he population pool
+	population += infectedPassengers;
+
+	//add the infected passengers to the infected pool
+	infectedPop += infectedPassengers;
+}
+
+
+float Country::getRand(float range1, float range2)
+{
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = range2 - range1;
+	float r = random * diff;
+	return range1 + r;
+}
+
+void Country::naturalDeaths(bool simulateZombies, float naturalDeathRate)
+{
+	//small random chance for a random people between 0 and natural
+	//death rate to die
+	float deathChance = rand() % 1000000;
+
+	if (deathChance <= 1)
+	{
+		//random number between 0 and the natural death rate
+		float randDeathPerc = ((float) rand() / (float) naturalDeathRate) * naturalDeathRate ;
+
+		
+		//check if the healthy pop if the death will not give negative values
+		int populationToRemove = healthyPop * getRand(0, naturalDeathRate);
+
+		//prevents small populations from not dying out
+		if (populationToRemove == 0)
+		{
+			populationToRemove = 1;
+		}
+		if (populationToRemove > 10000)
+		{
+			populationToRemove /= 100;
+		}
+		if (populationToRemove > 100000)
+		{
+			populationToRemove /= 1000;
+		}
+		if (populationToRemove > 1000000)
+		{
+			populationToRemove /= 10000;
+		}
+
+		//if simulating zombies, the individuals are removed
+		//otherwise they are just dead
+		if (simulateZombies)
+		{
+			//check if the population to remove does not exceed the healthy pop
+			if (populationToRemove >= healthyPop)
+			{
+				removedPop += healthyPop;
+				healthyPop = 0;
+			}
+			else
+			{
+				healthyPop -= populationToRemove;
+				removedPop += populationToRemove;
+			}
+		}
+		else
+		{
+			//converts removed and zombies to dead should the user change
+			//the option mid simulation
+			if (zombiePop > 0)
+			{
+				deadPop += zombiePop;
+				zombiePop = 0;
+			}
+			if (removedPop > 0)
+			{
+				deadPop += removedPop;
+				removedPop = 0;
+			}
+
+			if (populationToRemove >= healthyPop)
+			{
+				deadPop += healthyPop;
+				healthyPop = 0;
+			}
+			else
+			{
+				healthyPop -= populationToRemove;
+				deadPop += populationToRemove;
+			}
+		}
+	}
+
+
+}
+
+void Country::spreadInfection(bool simulateZombies, float infRate, float recoveryRate)
+{
+	/*random value between 0 and the infRate, spread is calculated by 
+	new infected num = 
+	((rand[0 - infRate] * current infected num) + current infected num)
+	
+	recovery rate only kicks in after 0.01% of the total pop is infected and
+	is subtracted from the above calculation
+
+	death rate also subtracts from the new infected and will be added to the dead group
+	regardless of whether or not this is a zombie sim
+	*/
+
+	float randChance = rand() % 200;
+
+	//random chances of spreading
+	if (randChance <= 1)
+	{
+		//new infections
+		float randInfRate = getRand(0, infRate / 100);
+
+		int newInfectedCount = 0;
+
+		newInfectedCount = infectedPop * randInfRate;
+		//std::cout << "test\n";
+		//limiting infected count
+		if (newInfectedCount == 0) { newInfectedCount = 1; }
+		/*if (newInfectedCount > 10000) { newInfectedCount /= 10; }
+		if (newInfectedCount > 100000) { newInfectedCount /= 100; }
+		if (newInfectedCount > 1000000) { newInfectedCount /= 1000; }*/
+
+		//std::cout << (float)infectedPop / (float)population << std::endl;
+
+		//recoveries and deaths after 1% of population is infected
+		if (((float)infectedPop / (float)population) > 0.0001)
+		{
+			float randRecoveryRate = getRand(0, recoveryRate / 100);
+			newInfectedCount -= (infectedPop * randRecoveryRate);
+		}
+
+		//ensures that the infected does not exceed the healthyPop
+		if (newInfectedCount >= healthyPop)
+		{
+			infectedPop += healthyPop;
+			healthyPop = 0;
+		}
+		else if (newInfectedCount < 0)
+		{
+			healthyPop += newInfectedCount;
+			infectedPop -= newInfectedCount;
+		}
+		else
+		{
+			infectedPop += newInfectedCount;
+			healthyPop -= newInfectedCount;
+		}		
+	}
+
+	
+	
+}
+
+void Country::deathRates(bool simulateZombies, float infDeathRate)
+{
+	float randChance = rand() % 200;
+
+	if (randChance <= 1)
+	{
+		float randDeathRate = getRand(0, infDeathRate / 100);
+
+		int deathRate = 0;
+		deathRate = deadPop * randDeathRate;
+
+		if (deathRate == 0) { deathRate = 1; }
+
+		if (((float)infectedPop / (float)population) > 0.005)
+		{
+			if (deathRate >= infectedPop)
+			{
+				deadPop += infectedPop;
+				infectedPop = 0;
+			}
+			else
+			{
+				deadPop += deathRate;
+				infectedPop -= deathRate;
+			}
+		}
+	}
+}
+
+void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect, std::vector<Country> &countryList)
+{
+	//small chance to infect another country
+	float randChance = rand() % 5000;
+
+	if (randChance <= 1)
+	{
+		//booleans to see if another country was infected
+		bool infectionHasSpread = false;
+
+		//check if spreading by land is possible
+		//additional randomisation
+		float randLand = rand() % 100;
+		if (allowLandInfect && !infectionHasSpread && randLand <= 10)
+		{
+			//only loop if there are land borders
+			while (tempLandBorder.size() > 0)
+			{
+				//shuffle the land border
+				std::random_shuffle(tempLandBorder.begin(), tempLandBorder.end());
+
+				//check if the country is already infected
+				//if not, infect it and remove from the list
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					//compare IDs
+					if (tempLandBorder.back() == countryList[i].getID())
+					{
+						//check if infected
+						if (countryList[i].infected)
+						{
+							//remove if already infected
+							tempLandBorder.pop_back();
+						}
+						else
+						{
+							//infect the country
+							int randAmountPeople = 1;
+							population -= randAmountPeople;
+							infectedPop -= randAmountPeople;
+							countryList[i].receiveInfection(randAmountPeople);
+							infectionHasSpread = true;
+						}
+					}
+				}
+			}
+		}
+
+		//check if spreading via sea is possible
+		//additional randomisation
+		float randSea = rand() % 100;
+		if (allowSeaInfect && !infectionHasSpread && randSea <= 1)
+		{
+			//only loop if there are sea links
+			while (tempSeaLink.size() > 0)
+			{
+				//shuffle sea links
+				std::random_shuffle(tempSeaLink.begin(), tempSeaLink.end());
+
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					//compare ID
+					if (tempSeaLink.back() == countryList[i].getID())
+					{
+						//check if infected
+						if (countryList[i].infected)
+						{
+							//remove if already infected
+							tempSeaLink.pop_back();
+						}
+						else
+						{
+							//infect the country
+							int randAmountPeople = 1;
+							population -= randAmountPeople;
+							infectedPop -= randAmountPeople;
+							countryList[i].receiveInfection(randAmountPeople);
+							infectionHasSpread = true;
+						}
+					}
+				}
+			}
+		}
+
+		//check if spreading via air is possible
+		//no additional spread
+
+		if (allowAirInfect && !infectionHasSpread)
+		{
+			//only loop if there are air links
+			while (tempAirLink.size() > 0)
+			{
+				//shuffle air links
+				std::random_shuffle(tempAirLink.begin(), tempAirLink.end());
+
+				for (int i = 0; i < countryList.size(); i++)
+				{
+					//compare ID
+					if (tempAirLink.back() == countryList[i].getID())
+					{
+						//check if infected
+						if (countryList[i].infected)
+						{
+							//remove if already infected
+							tempAirLink.pop_back();
+						}
+						else
+						{
+							//infect the country
+							int randAmountPeople = 1;
+							population -= randAmountPeople;
+							infectedPop -= randAmountPeople;
+							countryList[i].receiveInfection(randAmountPeople);
+							infectionHasSpread = true;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+

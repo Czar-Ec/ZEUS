@@ -56,9 +56,6 @@
     <ClInclude Include="..\sharedobjects\DataHandler.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\sharedobjects\CountryLink.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="..\sharedobjects\UX.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>

@@ -33,6 +33,9 @@
 #include <string>
 #include <algorithm>
 
+//threading
+#include <thread>
+
 //other items
 #include "../sharedobjects/Country.h"
 #include "../sharedobjects/DataHandler.h"
@@ -69,12 +72,17 @@ static class GUI
 
 		void editSimVals();
 
+		//run simulations
+		void simulate();
+		void countrySim(int countryNum);
+
 		//render items
 		void render(SDL_Window *window, SDL_Renderer *renderer);
 
 		//CONTROLS AND SHORTCUTS
 		void ctrlN();	//new simulation shortcut
 		void ctrlO();	//open simulation shortcut
+		void spaceBar();
 
 		void mouseOver();	//mouseover countries, so user can see the country where the mouse is over
 
@@ -107,16 +115,23 @@ static class GUI
 
 		std::string simPath = "";
 
-		int infectionRateSlider = 98, naturalDeathRateSlider = 2;
+		float infectionRateSlider = 99.5f, 
+			naturalDeathRateSlider = 0.5f,
+			recoveryRateSlider = 0.5f, 
+			infDeathRateSlider = 40.0f,
+			zconversionRate = 0.3f, 
+			zdeathRate = 1.0f, 
+			zremoveRate = 1.0f,
+			corpseDecayRate = 0.5f,
+			reanimationRate = 10.0f;
 
 		//is a zombie sim
 		bool simulateZombies = true;
 
-		//zombie conversion rate
-		float zconvertionRate = 0.3f, zdeathRate = 0.1f;
-
 		//allowing different infection vectors
 		bool allowLandInfect = true, allowSeaInfect = true, allowAirInfect = true;
+
+		int simFrame = 0;
 
 		////////////////////////////////////////////////////////////////////////////////
 		#pragma endregion
@@ -155,6 +170,8 @@ static class GUI
 			maxZoom = 1, 
 			minZoom = 0.1,
 			zoomInterval = 0.025;
+
+		bool run = false;
 
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -365,9 +382,6 @@ bool GUI::loadScenario(SDL_Renderer *renderer, std::string filePath)
 */
 void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 {
-	//display the side info box
-	infoBox();
-
 	//menu bar
 	ImGui::BeginMainMenuBar();
 
@@ -471,17 +485,26 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 	{
 		if (ImGui::MenuItem("Run"))
 		{
-
+			run = true;			
 		}
 
 		if (ImGui::MenuItem("Pause"))
 		{
-
+			run = false;
 		}
 
 		if (ImGui::MenuItem("Reset"))
 		{
+			//reset all country values
+			for (int i = 0; i < countryList.size(); i++)
+			{
+				countryList[i].resetSimVal();
+			}
 
+			//reset simulation frame
+			simFrame = 0;
+
+			run = false;
 		}
 
 		ImGui::EndMenu();
@@ -595,7 +618,7 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		//make the window
 		ImGui::Begin("View Country", &viewCountries, ImGuiWindowFlags_NoCollapse);
 		ImGui::SetWindowSize(ImVec2(750, 500));
-		ImGui::BeginColumns("View Countries", 3, NULL);
+		ImGui::BeginColumns("View Countries", 4, NULL);
 
 		//column titles
 		ImGui::Text("Country ID");
@@ -604,7 +627,25 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		ImGui::Text("Country Name");
 		ImGui::NextColumn();
 
+		ImGui::Text("View Country");
+		ImGui::SameLine();
 		helpMarker("Press View to view the country data");
+		ImGui::NewLine();
+		ImGui::NextColumn();
+
+		ImGui::Text("Initially Infected");
+		ImGui::SameLine();
+		helpMarker("Click to set the country as an initial infector");
+		ImGui::NewLine();
+		if (ImGui::Button("Reset All"))
+		{
+			for (int i = 0; i < countryList.size(); i++)
+			{
+				countryList[i].infected = false;
+			}
+		}
+		ImGui::SameLine();
+		helpMarker("Reset All removes the infected status for all countries");
 		ImGui::NewLine();
 		ImGui::NextColumn();
 
@@ -702,6 +743,13 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 				//opens the detailed menu
 				detailedCountry ^= 1;
 			}
+			ImGui::NextColumn();
+
+			//checkbox to set the infected country
+			std::string checkboxLabel = "##checkbox" + countryList[count].getID();
+			ImGui::Checkbox(checkboxLabel.c_str(), &countryList[count].infected);
+			
+
 			ImGui::NextColumn();
 		}
 
@@ -906,6 +954,11 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 
 	//if the user wants to create a new simulation
 	newSim(renderer);
+
+	if (run)
+	{
+		simulate();
+	}
 }
 
 /**
@@ -914,6 +967,15 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 */
 void GUI::infoBox()
 {	
+	//update currentCountry
+	for (int i = 0; i < countryList.size(); i++)
+	{
+		if (curCountry.getID() == countryList[i].getID())
+		{
+			curCountry = countryList[i];
+		}
+	}
+
 	//make the side bar
 	ImGui::Begin("infobox", NULL, 
 		ImGuiWindowFlags_NoCollapse
@@ -924,6 +986,15 @@ void GUI::infoBox()
 	ImGui::SetWindowPos("infobox", ImVec2(infoBoxRect.x, infoBoxRect.y));
 	//set the side bar size
 	ImGui::SetWindowSize("infobox", ImVec2(infoBoxRect.w, infoBoxRect.h));
+
+	//running sim
+	ImGui::Separator();
+	ImGui::Separator();
+	ImGui::Text("Simulation status: ");
+	ImGui::SameLine();
+	ImGui::Text(run ? "Running" : "Paused");
+	ImGui::Separator();
+	ImGui::Separator();
 
 	#pragma region WORLD STATISTICS
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -961,6 +1032,31 @@ void GUI::infoBox()
 			ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
 			ImGui::NewLine();
 
+			if (ImGui::CollapsingHeader("Simulation Statistics"))
+			{
+				ImGui::TextWrapped("Healthy: %d", curCountry.getHealthyPop());
+				ImGui::NewLine();
+
+				ImGui::TextWrapped("Infected: %d", curCountry.getInfectedPop());
+				ImGui::NewLine();
+
+				ImGui::TextWrapped("Dead: %d", curCountry.getDeadPop());
+				ImGui::NewLine();
+
+				if (simulateZombies)
+				{
+					ImGui::TextWrapped("Zombie: %d", curCountry.getZombiePop());
+					ImGui::NewLine();
+
+					ImGui::TextWrapped("Removed");
+					ImGui::SameLine();
+					helpMarker("The individuals that can no longer be animated therefore removed from the simulation");
+					ImGui::SameLine();
+					ImGui::TextWrapped(": %d", curCountry.getRemovedPop());
+					ImGui::NewLine();
+				}
+			}			
+
 			//country economy
 			if (ImGui::CollapsingHeader("Country Economy"))
 			{
@@ -985,6 +1081,9 @@ void GUI::infoBox()
 				//different output depending on climate type
 				//switch case is more effective than nested if-elses
 
+				helpMarker("The Climate conditions of the country");
+				ImGui::NewLine();
+
 				//country temprature
 				std::string temperature = "Not Set";
 				switch (curCountry.getTemperature())
@@ -1007,6 +1106,7 @@ void GUI::infoBox()
 				//show to sidebar
 				ImGui::TextWrapped("Temperature: %s", temperature.c_str());
 
+				ImGui::NewLine();
 
 				//country humidity
 				std::string humidity = "Not Set";
@@ -1026,11 +1126,14 @@ void GUI::infoBox()
 				}
 				//show to sidebar
 				ImGui::TextWrapped("Humidity: %s", humidity.c_str());
+				ImGui::NewLine();
 			}
 
 			//country links
 			if (ImGui::CollapsingHeader("Country External Links"))
 			{
+				helpMarker("Shows whether or not a country is linked via land, sea or air to other countries");
+
 				//get all links now
 				//so that the check is only run once
 
@@ -1043,65 +1146,28 @@ void GUI::infoBox()
 				//get air links
 				std::vector<std::string> tempAir = curCountry.getAirLinks();
 
-				//loop through the countries to change the ids that match to 
-				//countrylist to the name instead
-				for (int i = 0; i < countryList.size(); i++)
-				{
-					//go through land borders
-					for (int landCount = 0; landCount < tempLand.size(); landCount++)
-					{
-						if (countryList[i].getID() == tempLand[landCount])
-						{
-							tempLand[landCount] = "[" + tempLand[landCount] + "] " + countryList[i].getCountryName();
-						}
-					}
+				//display that the country has land borders
+				bool hasLandBorder = false, hasSeaLink = false, hasAirLink = false;
 
-					//go through sea links
-					for (int seaCount = 0; seaCount < tempSea.size(); seaCount++)
-					{
-						if (countryList[i].getID() == tempSea[seaCount])
-						{
-							tempSea[seaCount] = "[" + tempSea[seaCount] + "] " + countryList[i].getCountryName();
-						}
-					}
+				if (tempLand.size() > 0) { hasLandBorder = true; }
+				if (tempSea.size() > 0) { hasSeaLink = true; }
+				if (tempAir.size() > 0) { hasAirLink = true; }
 
-					//go through air links
-					for (int airCount = 0; airCount < tempAir.size(); airCount++)
-					{
-						if (countryList[i].getID() == tempAir[airCount])
-						{
-							tempAir[airCount] = "[" + tempAir[airCount] + "] " + countryList[i].getCountryName();
-						}
-					}
-				}
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 
+				ImGui::Text("Land Borders:\t ");
+				ImGui::SameLine();
+				ImGui::Checkbox("##landDisplay", &hasLandBorder);
 
-				//land borders
-				if (ImGui::CollapsingHeader("Land Borders"))
-				{
-					for (int i = 0; i < tempLand.size(); i++)
-					{
-						ImGui::TextWrapped(tempLand[i].c_str());
-					}
-				}
+				ImGui::Text("Sea Links:\t\t");
+				ImGui::SameLine();
+				ImGui::Checkbox("##seaDisplay", &hasSeaLink);
 
-				//sea links
-				if (ImGui::CollapsingHeader("Sea/Ocean Links"))
-				{
-for (int i = 0; i < tempSea.size(); i++)
-{
-	ImGui::TextWrapped(tempSea[i].c_str());
-}
-				}
+				ImGui::Text("Air Links:\t\t");
+				ImGui::SameLine();
+				ImGui::Checkbox("##airDisplay", &hasAirLink);
 
-				//air links
-				if (ImGui::CollapsingHeader("Air Links"))
-				{
-					for (int i = 0; i < tempAir.size(); i++)
-					{
-						ImGui::TextWrapped(tempAir[i].c_str());
-					}
-				}
+				ImGui::PopItemFlag();
 			}
 		}
 
@@ -1290,7 +1356,7 @@ void GUI::editSimVals()
 		ImGui::Text("Infection rate");
 		ImGui::SameLine();
 		helpMarker("Determines how fast the infection spreads across the simulation");
-		ImGui::SliderInt("##infectionrateslider", &infectionRateSlider, 0, 100, "%.0f%%");
+		ImGui::SliderFloat("##infectionrateslider", &infectionRateSlider, 0.0f, 100.0f, "%.2f%%");
 		ImGui::NewLine();
 
 		naturalDeathRateSlider = 100 - infectionRateSlider;
@@ -1301,13 +1367,37 @@ void GUI::editSimVals()
 		//death rate from infection
 		ImGui::Text("Natural death rate");
 		ImGui::SameLine();
-		helpMarker("Rate at which individuals die from natural causes");
-		ImGui::SliderInt("##naturaldeathslider", &naturalDeathRateSlider, 0, 100, "%.0f%%");
+		helpMarker("Rate at which individuals die from natural causes.\n"
+		"Maximum value is 5%");
+		ImGui::SliderFloat("##naturaldeathslider", &naturalDeathRateSlider, 0.0f, 100.0f, "%.2f%%");
 		ImGui::NewLine();
 
-		infectionRateSlider = 100 - naturalDeathRateSlider;
-		if (naturalDeathRateSlider > 100) { naturalDeathRateSlider = 100; }
+		if (naturalDeathRateSlider > 5) { naturalDeathRateSlider = 2; }
 		if (naturalDeathRateSlider < 0) { naturalDeathRateSlider = 0; }
+		infectionRateSlider = 100 - naturalDeathRateSlider;
+		
+
+		//recovery rate
+		ImGui::Text("Recovery rate");
+		ImGui::SameLine();
+		helpMarker("Rate at which individuals recover from the disease.\n"
+			"Maximum value is 5% if zombies are to be simulated");
+		ImGui::SliderFloat("##recovrateslider", &recoveryRateSlider, 0.0f, 5.0f, "%.2f%%");
+		ImGui::NewLine();
+
+		if (!simulateZombies) { infDeathRateSlider = 100 - recoveryRateSlider; }
+		if (recoveryRateSlider > 5.0f) { recoveryRateSlider = 5.0f; }
+		if (recoveryRateSlider < 0) { recoveryRateSlider = 0.0f; }
+
+		//infection death rate
+		ImGui::Text("Infection death rate");
+		ImGui::SameLine();
+		helpMarker("Rate at which individuals die of the disease");
+		ImGui::SliderFloat("##infdeathrateslider", &infDeathRateSlider, 0.0f, 100.0f - recoveryRateSlider, "%.2f%%");
+
+		if (!simulateZombies) { recoveryRateSlider = 100 - infDeathRateSlider; }
+		if (infDeathRateSlider > 100.0f - recoveryRateSlider) { infDeathRateSlider = 100.0f - recoveryRateSlider; }
+		if (infDeathRateSlider < 0.0f) { infDeathRateSlider = 0.0f; }
 
 		if (simulateZombies)
 		{
@@ -1317,26 +1407,51 @@ void GUI::editSimVals()
 				ImGui::Text("Zombie conversion rate");
 				ImGui::SameLine();
 				helpMarker("Rate at which infected become zombies. This also affects death rate.");
-				ImGui::SliderFloat("##zconversionrate", &zconvertionRate, 0.0f, 1.0f, "zombie conversion rate: %.2f");
+				ImGui::SliderFloat("##zconversionrateslider", &zconversionRate, 0.0f, 100.0f, "%.2f%%");
 				ImGui::NewLine();
 
-				//death rate from zombie attack
-				ImGui::Text("Zombie death rate");
+				zconversionRate = 100 - (recoveryRateSlider + infDeathRateSlider);
+
+				//death rate of zombies
+				ImGui::Text("Zombie elimination rate");
 				ImGui::SameLine();
-				helpMarker("Rate at which people die from zombie attacks");
-				ImGui::SliderFloat("##zdeathrate", &zdeathRate, 0.0f, 1.0f, "zomnoe death rate: %.2f");
+				helpMarker("Rate at which zombies are TEMPORARILY removed");
+				ImGui::SliderFloat("##zdeathrateslider", &zdeathRate, 0.0f, 10.0f, "%.2f%%");
 				ImGui::NewLine();
+
+				if (zdeathRate > 10.0f) { zdeathRate = 10.0f; }
+				if (zdeathRate < 0.0f) { zdeathRate = 0.0f; }
+
+				//removal rate of zombies
+				ImGui::Text("Zombie removal rate");
+				ImGui::SameLine();
+				helpMarker("Rate at which zombies are PERMANENTLY removed");
+				ImGui::SliderFloat("##zremoverateslider", &zremoveRate, 0.0f, 10.0f, "%.2f%%");
+
+				if (zremoveRate > 10.0f) { zremoveRate = 10.0f; }
+				if (zremoveRate < 0.0f) { zremoveRate = 0.0f; }
+
+				ImGui::Text("Decay rate");
+				ImGui::SameLine();
+				helpMarker("Rate at which dead entities decay.\n"
+					"Used to determine how fast zombies die out in a simulation");
+				ImGui::SliderFloat("##decayrateslider", &corpseDecayRate, 0.0f, 2.5f, "%.2f%%");
+
+				if (corpseDecayRate > 2.5f) { corpseDecayRate = 2.5f; }
+				if (corpseDecayRate < 0.0f) { corpseDecayRate = 0.0f; }
+
+				ImGui::Text("Reanimation rate");
+				ImGui::SameLine();
+				helpMarker("Rate at which dead infected are reanimated into zombies");
+				ImGui::SliderFloat("##reanimatuinslider", &reanimationRate, 0.0f, 100.0f, "%.2f%%");
+
+				if (reanimationRate > 100.0f) { reanimationRate = 100.0f; }
+				if (reanimationRate < 0.0f) { reanimationRate = 0.0f; }
 
 				//rate of infected dying
 				ImGui::TreePop();
 			}
-		}
-		else
-		{
-
-		}
-
-		
+		}		
 
 		ImGui::TreePop();
 	}
@@ -1375,6 +1490,79 @@ void GUI::editSimVals()
 	}
 
 	ImGui::End();
+}
+
+void GUI::simulate()
+{
+	bool noInfectedError = true;
+
+	//check if any country(ies) have any infected population
+	for (int i = 0; i < countryList.size(); i++)
+	{
+		if (countryList[i].infected > 0)
+		{
+			noInfectedError = false;
+			break;
+		}
+	}
+
+	//show an error that no infected country is set
+	if (noInfectedError)
+	{
+		ImGui::OpenPopup("Cannot run simulation");
+	}
+	else
+	{
+		for (int i = 0; i < countryList.size(); i++)
+		{
+			countrySim(i);
+		}
+
+		//increment simulation frame
+		simFrame++;
+	}
+
+	//show error
+	bool error = true;
+	if (ImGui::BeginPopupModal("Cannot run simulation", &error, ImGuiWindowFlags_NoResize))
+	{
+		ImGui::SetWindowSize(ImVec2(400, 150));
+
+		if (noInfectedError)
+		{
+			ImGui::TextWrapped("No country is infected\n");
+		}
+
+		//close popup
+		ImGui::Separator();
+		if (ImGui::Button("Close", ImVec2(ImGui::GetWindowWidth(), 20)))
+		{
+			ImGui::CloseCurrentPopup();
+			run = false;
+		}
+		ImGui::Separator();
+		ImGui::EndPopup();
+	}
+}
+
+void GUI::countrySim(int countryNum)
+{
+	countryList[countryNum].simulate(
+		simulateZombies,
+		simFrame,
+		infectionRateSlider,
+		naturalDeathRateSlider,
+		recoveryRateSlider,
+		infDeathRateSlider,
+		zconversionRate,
+		zdeathRate,
+		zremoveRate,
+		corpseDecayRate,
+		reanimationRate,
+		allowLandInfect,
+		allowSeaInfect,
+		allowAirInfect,
+		countryList);
 }
 
 /**
@@ -1444,6 +1632,11 @@ void GUI::ctrlN()
 void GUI::ctrlO()
 {
 	openSimWindow = true;
+}
+
+void GUI::spaceBar()
+{
+	run ^= 1;
 }
 
 /**

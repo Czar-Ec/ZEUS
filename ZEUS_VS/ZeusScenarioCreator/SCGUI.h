@@ -2405,7 +2405,7 @@ bool SCGUI::doesCountryExist(std::string id)
 void SCGUI::eyedropTool()
 {
 	//source of this function: 
-	//https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor
+	/*https://stackoverflow.com/questions/3078919/how-do-i-get-the-pixel-color-under-the-cursor */
 	POINT p;
 	BOOL b;
 

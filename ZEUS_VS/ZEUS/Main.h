@@ -360,6 +360,12 @@ void Main::mainLoop()
 					{
 						gui.zoom(ZOOM_OUT);
 					}
+
+					//pausing the simulation
+					if (eventMain.key.keysym.sym == SDLK_SPACE)
+					{
+						gui.spaceBar();
+					}
 					break;
 
 				///////////////////////////////////////////////////////////////////////////
@@ -445,7 +451,9 @@ void Main::mainLoop()
 */
 void Main::updateMain()
 {
-	//render gui	
+	//infobox
+	gui.infoBox();
+	//render gui
 	gui.render(window, renderer);
 }
 
