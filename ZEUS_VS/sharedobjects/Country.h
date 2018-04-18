@@ -107,7 +107,8 @@ private:
 	//zombie functions
 	void zombieSpread(float zconversionRate);
 	void zombieInfect();
-	void zombieDecay(float corpseDecayRate);
+	void zombieDecay(float zdeathRate);
+	void zombieReanimation(float reanimationRate);
 
 	#pragma region Country Attributes
 	//country unique ID
@@ -549,7 +550,8 @@ void Country::simulate(bool simulateZombies, int simFrame, float infRate, float 
 				//if zombiePop is more than 0
 				if (zombiePop > 0)
 				{
-
+					zombieDecay(zdeathRate);
+					zombieReanimation(reanimationRate);
 				}
 			}
 		}
@@ -751,9 +753,9 @@ void Country::deathRates(bool simulateZombies, float infDeathRate)
 void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect, std::vector<Country> &countryList)
 {
 	//small chance to infect another country
-	float randChance = rand() % 5000;
+	float randChance = rand() % 500;
 
-	if (randChance <= 1)
+	if (randChance <= 1 && ((float)population / (float)infectedPop) > 0.2)
 	{
 		//booleans to see if another country was infected
 		bool infectionHasSpread = false;
@@ -764,7 +766,7 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 		if (allowLandInfect && !infectionHasSpread && randLand <= 10)
 		{
 			//only loop if there are land borders
-			while (tempLandBorder.size() > 0)
+			while (tempLandBorder.size() > 0 && !infectionHasSpread)
 			{
 				//shuffle the land border
 				std::random_shuffle(tempLandBorder.begin(), tempLandBorder.end());
@@ -776,21 +778,12 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 					//compare IDs
 					if (tempLandBorder.back() == countryList[i].getID())
 					{
-						//check if infected
-						if (countryList[i].infected)
-						{
-							//remove if already infected
-							tempLandBorder.pop_back();
-						}
-						else
-						{
-							//infect the country
-							int randAmountPeople = 1;
-							population -= randAmountPeople;
-							infectedPop -= randAmountPeople;
-							countryList[i].receiveInfection(randAmountPeople);
-							infectionHasSpread = true;
-						}
+						//infect the country
+						int randAmountPeople = 1;
+						population -= randAmountPeople;
+						infectedPop -= randAmountPeople;
+						countryList[i].receiveInfection(randAmountPeople);
+						infectionHasSpread = true;
 					}
 				}
 			}
@@ -802,7 +795,7 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 		if (allowSeaInfect && !infectionHasSpread && randSea <= 1)
 		{
 			//only loop if there are sea links
-			while (tempSeaLink.size() > 0)
+			while (tempSeaLink.size() > 0 && !infectionHasSpread)
 			{
 				//shuffle sea links
 				std::random_shuffle(tempSeaLink.begin(), tempSeaLink.end());
@@ -812,21 +805,12 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 					//compare ID
 					if (tempSeaLink.back() == countryList[i].getID())
 					{
-						//check if infected
-						if (countryList[i].infected)
-						{
-							//remove if already infected
-							tempSeaLink.pop_back();
-						}
-						else
-						{
-							//infect the country
-							int randAmountPeople = 1;
-							population -= randAmountPeople;
-							infectedPop -= randAmountPeople;
-							countryList[i].receiveInfection(randAmountPeople);
-							infectionHasSpread = true;
-						}
+						//infect the country
+						int randAmountPeople = 1;
+						population -= randAmountPeople;
+						infectedPop -= randAmountPeople;
+						countryList[i].receiveInfection(randAmountPeople);
+						infectionHasSpread = true;
 					}
 				}
 			}
@@ -838,7 +822,7 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 		if (allowAirInfect && !infectionHasSpread)
 		{
 			//only loop if there are air links
-			while (tempAirLink.size() > 0)
+			while (tempAirLink.size() > 0 && !infectionHasSpread)
 			{
 				//shuffle air links
 				std::random_shuffle(tempAirLink.begin(), tempAirLink.end());
@@ -848,21 +832,12 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 					//compare ID
 					if (tempAirLink.back() == countryList[i].getID())
 					{
-						//check if infected
-						if (countryList[i].infected)
-						{
-							//remove if already infected
-							tempAirLink.pop_back();
-						}
-						else
-						{
-							//infect the country
-							int randAmountPeople = 1;
-							population -= randAmountPeople;
-							infectedPop -= randAmountPeople;
-							countryList[i].receiveInfection(randAmountPeople);
-							infectionHasSpread = true;
-						}
+						//infect the country
+						int randAmountPeople = 1;
+						population -= randAmountPeople;
+						infectedPop -= randAmountPeople;
+						countryList[i].receiveInfection(randAmountPeople);
+						infectionHasSpread = true;
 					}
 				}
 			}
@@ -875,7 +850,7 @@ void Country::zombieSpread(float zconversionRate)
 	//random chances for infected to turn into zombies
 	float randChance = rand() % 250;
 
-	if (randChance <= 1)
+	if (randChance <= 1 && infectedPop >= 250)
 	{
 		//random conversion rate
 		float randConvRate = getRand(0, zconversionRate / 100);
@@ -931,6 +906,54 @@ void Country::zombieInfect()
 		{
 			infectedPop += zombieCount;
 			healthyPop -= zombieCount;
+		}
+	}
+}
+
+inline void Country::zombieDecay(float zdeathRate)
+{
+	//random chance
+	float randChance = rand() % 400;
+	if (randChance <= 1)
+	{
+		//random amount of zombies
+		int randAmount = rand() % 1000;
+
+		randAmount *= zdeathRate;
+
+		if (randAmount >= zombiePop)
+		{
+			removedPop += zombiePop;
+			zombiePop = 0;
+		}
+		else
+		{
+			removedPop += randAmount;
+			zombiePop -= randAmount;
+		}
+	}
+}
+
+void Country::zombieReanimation(float reanimationRate)
+{
+	//random chance
+	float randChance = rand() % 400;
+	if (randChance <= 1)
+	{
+		//random amount of zombies
+		int randAmount = rand() % 1000;
+
+		randAmount *= reanimationRate;
+
+		if (randAmount >= deadPop)
+		{
+			zombiePop += deadPop;
+			deadPop = 0;
+		}
+		else
+		{
+			zombiePop += randAmount;
+			deadPop -= randAmount;
 		}
 	}
 }
