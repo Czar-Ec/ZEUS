@@ -104,6 +104,11 @@ private:
 	//spread to other countries
 	void infectCountries(bool allowLandInfect, bool allowSeaInfect, bool allowAirInfect, std::vector<Country> &countrylist);
 
+	//zombie functions
+	void zombieSpread(float zconversionRate);
+	void zombieInfect();
+	void zombieDecay(float corpseDecayRate);
+
 	#pragma region Country Attributes
 	//country unique ID
 	std::string id;
@@ -530,10 +535,22 @@ void Country::simulate(bool simulateZombies, int simFrame, float infRate, float 
 
 			deathRates(simulateZombies, infDeathRate);
 
-			//if over 1% of the population is infected, spread to other countries
-			if (((float)population / (float)infectedPop) > 0.01)
+			//if over 5% of the population is infected, spread to other countries
+			if (((float)population / (float)infectedPop) > 0.05)
 			{
 				infectCountries(allowLandInfect, allowSeaInfect, allowAirInfect, countryList);
+			}
+
+			//if zombies are being simulated
+			if (simulateZombies && ((float)population / (float)infectedPop) > 0.3)
+			{
+				zombieSpread(zconversionRate);
+
+				//if zombiePop is more than 0
+				if (zombiePop > 0)
+				{
+
+				}
 			}
 		}
 	}
@@ -573,7 +590,7 @@ void Country::naturalDeaths(bool simulateZombies, float naturalDeathRate)
 
 		
 		//check if the healthy pop if the death will not give negative values
-		int populationToRemove = healthyPop * getRand(0, naturalDeathRate);
+		int populationToRemove = healthyPop * getRand(0, naturalDeathRate / 100);
 
 		//prevents small populations from not dying out
 		if (populationToRemove == 0)
@@ -849,6 +866,71 @@ void Country::infectCountries(bool allowLandInfect, bool allowSeaInfect, bool al
 					}
 				}
 			}
+		}
+	}
+}
+
+void Country::zombieSpread(float zconversionRate)
+{
+	//random chances for infected to turn into zombies
+	float randChance = rand() % 250;
+
+	if (randChance <= 1)
+	{
+		//random conversion rate
+		float randConvRate = getRand(0, zconversionRate / 100);
+
+		int zombieCount = 0;
+		zombieCount = infectedPop * randConvRate;
+
+		if (zombieCount == 0) { zombieCount = 1; }
+
+		//ensures that the zombies does not exceed the infectedPop
+		if (zombieCount >= infectedPop)
+		{
+			zombiePop += infectedPop;
+			infectedPop = 0;
+		}
+		else if (zombieCount < 0)
+		{
+			zombiePop += zombieCount;
+			infectedPop -= zombieCount;
+		}
+		else
+		{
+			zombiePop += zombieCount;
+			infectedPop -= zombieCount;
+		}
+	}
+}
+
+void Country::zombieInfect()
+{
+	float randChance = rand() % 200;
+
+	if (randChance <= 1)
+	{
+		float randInfect = getRand(0, 100);
+		float zombieCount = 0;
+		zombieCount = randInfect * healthyPop;
+
+		if (zombieCount == 0) { zombieCount = 1; }
+
+		//ensures that the infected does not exceed the healthyPop
+		if (zombieCount >= healthyPop)
+		{
+			infectedPop += healthyPop;
+			healthyPop = 0;
+		}
+		else if (zombieCount < 0)
+		{
+			healthyPop += zombieCount;
+			infectedPop -= zombieCount;
+		}
+		else
+		{
+			infectedPop += zombieCount;
+			healthyPop -= zombieCount;
 		}
 	}
 }
