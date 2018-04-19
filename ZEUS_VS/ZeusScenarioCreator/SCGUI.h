@@ -85,11 +85,17 @@ public:
 	void eyedropTool();
 
 	//Control functions
-	void zoom(int zoomType);	//function to allow zooming
-	void pan(SDL_Point *mPos, int motionX, int motionY);	//function to allow panning of the map
-	void panLimiting();	//ensures the pan is limited within the relevant zone of the texture
+	//function to allow zooming
+	void zoom(int zoomType);	
 
-	void mouseOver();	//mouse over helps identify a country of where there could be one
+	//function to allow panning of the map
+	void pan(SDL_Point *mPos, int motionX, int motionY);
+
+	//ensures the pan is limited within the relevant zone of the texture
+	void panLimiting();	
+
+	//mouse over helps identify a country of where there could be one
+	void mouseOver();	
 	void leftClick();
 
 	//shortcut controls
