@@ -29,8 +29,8 @@ Global
 		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Debug|x86.Build.0 = Debug|Win32
 		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x64.ActiveCfg = Release|x64
 		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x64.Build.0 = Release|x64
-		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x86.ActiveCfg = Debug|Win32
-		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x86.Build.0 = Debug|Win32
+		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x86.ActiveCfg = Release|Win32
+		{DE8FE773-55BE-4A9E-8741-401A8A0A3F27}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

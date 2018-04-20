@@ -3,116 +3,184 @@
   imgui_draw.cpp
   imgui_impl_sdl.cpp
   main.cpp
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(138): warning C4244: 'return': conversion from '__int64' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(146): warning C4244: 'return': conversion from '__int64' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(109): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(110): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(265): warning C4091: 'static ': ignored on left of 'SCGUI' when no variable is declared
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(468): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(485): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(385): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(428): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(472): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(589): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(598): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(678): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(688): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(702): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(729): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(736): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(759): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(768): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(779): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(797): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(806): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(833): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(854): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(862): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(887): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(905): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(906): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(910): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(911): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(919): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(925): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(943): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/Country.h(949): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/DataHandler.h(72): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(488): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\../sharedobjects/DataHandler.h(268): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(141): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(142): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(304): warning C4091: 'static ': ignored on left of 'SCGUI' when no variable is declared
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(482): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(508): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(497): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(519): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(500): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(522): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(503): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(539): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(506): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(557): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(560): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(571): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(580): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(662): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(731): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(734): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(751): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(754): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(684): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(513): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(814): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(593): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(815): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(596): warning C4244: '=': conversion from 'unsigned __int64' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(693): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(714): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(729): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(743): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(762): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(937): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(791): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(808): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(938): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(811): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(956): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(820): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(957): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(823): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(974): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(826): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(976): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(829): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(994): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(880): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(883): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(894): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(903): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(986): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(996): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1056): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1104): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1125): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1146): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1185): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1223): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1234): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1245): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1345): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1059): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1347): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1077): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1358): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1078): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1361): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1081): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1364): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1087): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1367): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1009): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1150): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1388): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1495): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1151): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1496): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1282): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1514): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1283): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1516): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1301): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1533): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1302): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1535): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1319): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1553): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1321): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1555): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1339): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1659): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1684): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1711): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1737): warning C4018: '>': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1755): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1766): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1777): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1834): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1863): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1922): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2006): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2007): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(275): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(402): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(413): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(347): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(348): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(349): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(350): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1341): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1449): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1470): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1491): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1531): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1576): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1590): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1604): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1715): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1717): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1731): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1734): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1737): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1740): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1761): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1788): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1903): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1904): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1922): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1924): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1941): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1943): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1961): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(1963): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2065): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2090): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2117): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2143): warning C4018: '>': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2163): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2206): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2225): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2244): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2359): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2395): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2445): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2535): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2536): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2648): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2760): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2782): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2785): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2794): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2797): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2800): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2803): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2854): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2857): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2868): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCGUI.h(2877): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(273): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(396): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeusscenariocreator\SCMain.h(407): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
   Generating code
-  All 1395 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 1651 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   ZeusScenarioCreator.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Release\ZeusScenarioCreator.exe
