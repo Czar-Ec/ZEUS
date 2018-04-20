@@ -24,6 +24,7 @@ public:
 	~Country();
 
 	//getters and setters for the country data
+	#pragma region SETTERS AND GETTERS
 	std::string getID();
 	void setID(std::string newID);
 
@@ -59,6 +60,8 @@ public:
 	void linkAir(std::string id);
 	void removeLinkAir(std::string id);
 	std::vector<std::string> getAirLinks();
+
+#pragma endregion
 
 	//get simulation variables
 	unsigned long long int getHealthyPop() { return healthyPop; }

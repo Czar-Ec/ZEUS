@@ -1,29 +1,31 @@
 ﻿  main.cpp
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(381): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(424): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(468): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(584): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(593): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(673): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(683): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(697): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(724): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(731): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(754): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(763): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(774): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(792): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(801): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(828): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(849): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(857): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(882): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(900): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(901): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(905): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(906): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(914): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(920): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(382): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(425): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(469): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(586): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(595): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(675): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(685): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(699): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(726): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(733): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(756): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(765): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(776): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(794): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(803): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(830): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(851): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(859): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(884): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(902): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(903): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(907): warning C4244: '+=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(908): warning C4244: '-=': conversion from 'float' to 'unsigned __int64', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(916): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(922): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(940): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(946): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(72): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
 c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(268): warning C4018: '<': signed/unsigned mismatch
