@@ -157,6 +157,7 @@
     <ClInclude Include="..\sharedobjects\stb_truetype.h" />
     <ClInclude Include="..\sharedobjects\UX.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="IconsFontAwesome4.h" />
     <ClInclude Include="Main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

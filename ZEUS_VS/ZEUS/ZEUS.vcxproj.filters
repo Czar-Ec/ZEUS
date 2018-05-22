@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Objects">
       <UniqueIdentifier>{5fcb5b97-46bf-4e1c-8ff4-01b6afc5484f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FontAwesome">
+      <UniqueIdentifier>{a69286c8-3a7b-4119-bf83-aa6490a8e763}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="..\sharedobjects\stb_truetype.h">
       <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="IconsFontAwesome4.h">
+      <Filter>Header Files\FontAwesome</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

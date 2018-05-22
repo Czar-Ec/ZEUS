@@ -40,6 +40,7 @@
 #include "../sharedobjects/Country.h"
 #include "../sharedobjects/DataHandler.h"
 #include "../sharedobjects/UX.h"
+#include "IconsFontAwesome4.h"
 
 /**
 * GUI Class
@@ -75,6 +76,7 @@ static class GUI
 		//run simulations
 		void simulate();
 		void countrySim(int countryNum);
+		void resetSim();
 
 		//render items
 		void render(SDL_Window *window, SDL_Renderer *renderer);
@@ -495,16 +497,7 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 
 		if (ImGui::MenuItem("Reset"))
 		{
-			//reset all country values
-			for (int i = 0; i < countryList.size(); i++)
-			{
-				countryList[i].resetSimVal();
-			}
-
-			//reset simulation frame
-			simFrame = 0;
-
-			run = false;
+			resetSim();
 		}
 
 		ImGui::EndMenu();
@@ -990,9 +983,29 @@ void GUI::infoBox()
 	//running sim
 	ImGui::Separator();
 	ImGui::Separator();
+	ImGui::NewLine();
 	ImGui::Text("Simulation status: ");
 	ImGui::SameLine();
 	ImGui::Text(run ? "Running" : "Paused");
+
+	if (ImGui::Button(ICON_FA_PLAY, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	{
+		run = true;
+	}
+	ImGui::SameLine(); 
+	
+	if (ImGui::Button(ICON_FA_PAUSE, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	{
+		run = false;
+	}
+	ImGui::SameLine(); 
+	
+	if (ImGui::Button(ICON_FA_REFRESH, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	{
+		resetSim();
+	}
+
+	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::Separator();
 
@@ -1563,6 +1576,20 @@ void GUI::countrySim(int countryNum)
 		allowSeaInfect,
 		allowAirInfect,
 		countryList);
+}
+
+void GUI::resetSim()
+{
+	//reset all country values
+	for (int i = 0; i < countryList.size(); i++)
+	{
+		countryList[i].resetSimVal();
+	}
+
+	//reset simulation frame
+	simFrame = 0;
+
+	run = false;
 }
 
 /**
