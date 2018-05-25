@@ -988,19 +988,19 @@ void GUI::infoBox()
 	ImGui::SameLine();
 	ImGui::Text(run ? "Running" : "Paused");
 
-	if (ImGui::Button(ICON_FA_PLAY, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	if (ImGui::Button(ICON_FA_PLAY, ImVec2(infoBoxRect.w / 3 - 10, 32)))
 	{
 		run = true;
 	}
 	ImGui::SameLine(); 
 	
-	if (ImGui::Button(ICON_FA_PAUSE, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	if (ImGui::Button(ICON_FA_PAUSE, ImVec2(infoBoxRect.w / 3 - 10, 32)))
 	{
 		run = false;
 	}
 	ImGui::SameLine(); 
 	
-	if (ImGui::Button(ICON_FA_REFRESH, ImVec2(ImGui::GetWindowWidth() / 3 - 10, 32)))
+	if (ImGui::Button(ICON_FA_REFRESH, ImVec2(infoBoxRect.w / 3 - 10, 32)))
 	{
 		resetSim();
 	}

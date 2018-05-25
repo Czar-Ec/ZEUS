@@ -49,6 +49,9 @@ c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(668): warning C4996: 'strcpy': T
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(964): warning C4018: '<': signed/unsigned mismatch
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(979): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(981): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(991): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(997): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1003): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1250): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
 c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1306): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
