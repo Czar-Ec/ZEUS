@@ -40,7 +40,7 @@
 #include "../sharedobjects/Country.h"
 #include "../sharedobjects/DataHandler.h"
 #include "../sharedobjects/UX.h"
-#include "IconsFontAwesome4.h"
+#include "../sharedobjects/IconsFontAwesome4.h"
 
 /**
 * GUI Class
@@ -61,6 +61,9 @@ static class GUI
 
 		//info box
 		void infoBox();
+
+		//tool bar
+		void toolBar();
 
 		//menu bar functions
 		void newSim(SDL_Renderer *renderer);
@@ -105,6 +108,10 @@ static class GUI
 
 		//information box rect
 		SDL_Rect infoBoxRect;
+
+		//toolbar rect
+		SDL_Rect toolbarRect;
+		bool showToolBar;
 
 		//bool for menubar windows
 		bool newSimWindow, openSimWindow;
@@ -286,6 +293,8 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 				vp.w / 4,
 				vp.h };
 
+	toolbarRect = { 0, 0, winX, 50 };
+
 	//set zoom to 1
 	//zoomVal = 1;
 
@@ -301,6 +310,8 @@ GUI::GUI(SDL_Renderer *renderer, int winX, int winY)
 	//pref window not open unless chosen
 	aPrefWin = false;
 
+	//toolbar
+	showToolBar = true;
 
 	//background colour
 	bkgColour = ImColor(0, 0, 44);
@@ -477,6 +488,11 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		if (ImGui::MenuItem("View all countries"))
 		{
 			viewCountries = true;
+		}
+
+		if (ImGui::MenuItem("Toolbar"))
+		{
+			showToolBar ^= 1;
 		}
 
 		ImGui::EndMenu();
@@ -945,6 +961,11 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 		ImGui::End();
 	}
 
+	if (showToolBar)
+	{
+		toolBar();
+	}
+
 	//if the user wants to create a new simulation
 	newSim(renderer);
 
@@ -992,18 +1013,21 @@ void GUI::infoBox()
 	{
 		run = true;
 	}
+	tooltip("Run Simulation");
 	ImGui::SameLine(); 
 	
 	if (ImGui::Button(ICON_FA_PAUSE, ImVec2(infoBoxRect.w / 3 - 10, 32)))
 	{
 		run = false;
 	}
+	tooltip("Pause Simulation");
 	ImGui::SameLine(); 
 	
 	if (ImGui::Button(ICON_FA_REFRESH, ImVec2(infoBoxRect.w / 3 - 10, 32)))
 	{
 		resetSim();
 	}
+	tooltip("Reset Simulation");
 
 	ImGui::NewLine();
 	ImGui::Separator();
@@ -1015,9 +1039,9 @@ void GUI::infoBox()
 	if (ImGui::CollapsingHeader("World Statistics"))
 	{
 		//total countries
-		ImGui::TextWrapped("Number of Countries: %d", totalCountries);
+		ImGui::Text("Number of Countries: %d", totalCountries);
 		//total world population
-		ImGui::TextWrapped("Total World Population: %llu", worldPopulation);
+		ImGui::Text("Total World Population: %llu", worldPopulation);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1031,9 +1055,9 @@ void GUI::infoBox()
 		ImGui::Separator();
 		ImGui::Separator();
 		//country ID
-		ImGui::TextWrapped("ID: %s", curCountry.getID().c_str());
+		ImGui::Text("ID: %s", curCountry.getID().c_str());
 		//country Name
-		ImGui::TextWrapped("Name: %s", curCountry.getCountryName().c_str());
+		ImGui::Text("Name: %s", curCountry.getCountryName().c_str());
 		ImGui::Separator();
 		ImGui::Separator();
 
@@ -1042,30 +1066,30 @@ void GUI::infoBox()
 		{
 			//country Population
 			ImGui::NewLine();
-			ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
+			ImGui::Text("Population: %d", curCountry.getPopulation());
 			ImGui::NewLine();
 
 			if (ImGui::CollapsingHeader("Simulation Statistics"))
 			{
-				ImGui::TextWrapped("Healthy: %d", curCountry.getHealthyPop());
+				ImGui::Text("Healthy: %d", curCountry.getHealthyPop());
 				ImGui::NewLine();
 
-				ImGui::TextWrapped("Infected: %d", curCountry.getInfectedPop());
+				ImGui::Text("Infected: %d", curCountry.getInfectedPop());
 				ImGui::NewLine();
 
-				ImGui::TextWrapped("Dead: %d", curCountry.getDeadPop());
+				ImGui::Text("Dead: %d", curCountry.getDeadPop());
 				ImGui::NewLine();
 
 				if (simulateZombies)
 				{
-					ImGui::TextWrapped("Zombie: %d", curCountry.getZombiePop());
+					ImGui::Text("Zombie: %d", curCountry.getZombiePop());
 					ImGui::NewLine();
 
-					ImGui::TextWrapped("Removed");
+					ImGui::Text("Removed");
 					ImGui::SameLine();
 					helpMarker("The individuals that can no longer be animated therefore removed from the simulation");
 					ImGui::SameLine();
-					ImGui::TextWrapped(": %d", curCountry.getRemovedPop());
+					ImGui::Text(": %d", curCountry.getRemovedPop());
 					ImGui::NewLine();
 				}
 			}			
@@ -1073,19 +1097,19 @@ void GUI::infoBox()
 			//country economy
 			if (ImGui::CollapsingHeader("Country Economy"))
 			{
-				ImGui::TextWrapped("All values in Million US Dollars ($)");
+				ImGui::Text("All values in Million US Dollars ($)");
 				ImGui::Separator();
 				ImGui::Separator();
 				ImGui::NewLine();
 
 				//country GDP
-				ImGui::TextWrapped("Gross Domestic Product: %d", curCountry.getGDP());
+				ImGui::Text("Gross Domestic Product: %d", curCountry.getGDP());
 
 				//country military spending
-				ImGui::TextWrapped("Military Spending: %d", curCountry.getMilitaryBudget());
+				ImGui::Text("Military Spending: %d", curCountry.getMilitaryBudget());
 
 				//country research budget
-				ImGui::TextWrapped("Research Budget: %d", curCountry.getResearchBudget());
+				ImGui::Text("Research Budget: %d", curCountry.getResearchBudget());
 			}
 
 			//country climate
@@ -1117,7 +1141,7 @@ void GUI::infoBox()
 					break;
 				}
 				//show to sidebar
-				ImGui::TextWrapped("Temperature: %s", temperature.c_str());
+				ImGui::Text("Temperature: %s", temperature.c_str());
 
 				ImGui::NewLine();
 
@@ -1138,7 +1162,7 @@ void GUI::infoBox()
 					break;
 				}
 				//show to sidebar
-				ImGui::TextWrapped("Humidity: %s", humidity.c_str());
+				ImGui::Text("Humidity: %s", humidity.c_str());
 				ImGui::NewLine();
 			}
 
@@ -1198,6 +1222,32 @@ void GUI::infoBox()
 
 	ImGui::End();
 
+}
+
+/**
+* toolBar
+* function which displays the toolbar for easier controls
+*/
+void GUI::toolBar()
+{
+	ImGui::Begin("toolbar", NULL,
+		ImGuiWindowFlags_NoCollapse
+		| ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoScrollbar);
+	//set the side bar position, which is on the infobox rect
+	ImGui::SetWindowPos("toolbar", ImVec2(toolbarRect.x, toolbarRect.y));
+	//set the side bar size
+	ImGui::SetWindowSize("toolbar", ImVec2(toolbarRect.w, toolbarRect.h));
+
+	if (ImGui::Button(ICON_FA_FILE, ImVec2(30, 30)))
+	{
+		
+	}
+	tooltip("New Simulation");
+
+	ImGui::End();
 }
 
 /**
@@ -1472,7 +1522,7 @@ void GUI::editSimVals()
 	//allowing infection of other countries via specific connections
 	if (ImGui::TreeNode("Country Border Settings"))
 	{
-		ImGui::TextWrapped("Uncheck any of the settings to stop the simulation spreading via these country connections.");
+		ImGui::Text("Uncheck any of the settings to stop the simulation spreading via these country connections.");
 		helpMarker(
 			" Note that removing the ability to spread via certain connections may make it impossible to infect countries "
 			" more speifically, islands (if the sea links option is disabled)");
@@ -1543,7 +1593,7 @@ void GUI::simulate()
 
 		if (noInfectedError)
 		{
-			ImGui::TextWrapped("No country is infected\n");
+			ImGui::Text("No country is infected\n");
 		}
 
 		//close popup
@@ -1605,11 +1655,18 @@ void GUI::render(SDL_Window *window, SDL_Renderer *renderer)
 	vp.y = ((int)ImGui::GetIO().DisplaySize.y) * 0.125;
 	vp.w = ((int)ImGui::GetIO().DisplaySize.x) * 0.75;
 	vp.h = ((int)ImGui::GetIO().DisplaySize.y) * 0.75;
+	
+	//update toolbar size
+	toolbarRect.x = 0;
+	toolbarRect.y = 20;
+	toolbarRect.w = ((int)ImGui::GetIO().DisplaySize.x);
+	toolbarRect.h = 50;
+
 	//update info box rect
 	infoBoxRect.x = vp.w;
-	infoBoxRect.y = 20;
+	infoBoxRect.y = 15 + toolbarRect.h;
 	infoBoxRect.w = ((int)ImGui::GetIO().DisplaySize.x) / 4;
-	infoBoxRect.h = ((int)ImGui::GetIO().DisplaySize.y) - 20;
+	infoBoxRect.h = ((int)ImGui::GetIO().DisplaySize.y) - (toolbarRect.h + 15);
 
 	//gets the world size
 	SDL_GetWindowSize(window, &worldX, &worldY);

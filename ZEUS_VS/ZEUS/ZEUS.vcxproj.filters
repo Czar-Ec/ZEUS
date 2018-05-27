@@ -83,7 +83,7 @@
     <ClInclude Include="..\sharedobjects\stb_truetype.h">
       <Filter>Header Files\IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="IconsFontAwesome4.h">
+    <ClInclude Include="..\sharedobjects\IconsFontAwesome4.h">
       <Filter>Header Files\FontAwesome</Filter>
     </ClInclude>
   </ItemGroup>

@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="..\sharedobjects\Country.h" />
     <ClInclude Include="..\sharedobjects\DataHandler.h" />
+    <ClInclude Include="..\sharedobjects\IconsFontAwesome4.h" />
     <ClInclude Include="..\sharedobjects\imconfig.h" />
     <ClInclude Include="..\sharedobjects\imgui.h" />
     <ClInclude Include="..\sharedobjects\imgui_impl_sdl.h" />
@@ -157,7 +158,6 @@
     <ClInclude Include="..\sharedobjects\stb_truetype.h" />
     <ClInclude Include="..\sharedobjects\UX.h" />
     <ClInclude Include="GUI.h" />
-    <ClInclude Include="IconsFontAwesome4.h" />
     <ClInclude Include="Main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

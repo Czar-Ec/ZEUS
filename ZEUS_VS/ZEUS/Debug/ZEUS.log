@@ -29,52 +29,54 @@ c:\users\user\documents\zeus\zeus_vs\sharedobjects\country.h(949): warning C4244
 c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(72): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
 c:\users\user\documents\zeus\zeus_vs\sharedobjects\datahandler.h(268): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(173): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(174): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(256): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(635): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(646): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(885): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(887): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(907): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(909): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(929): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(931): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(455): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(180): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(181): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(263): warning C4091: 'static ': ignored on left of 'GUI' when no variable is declared
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(651): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(662): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(901): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(903): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(923): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(925): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(945): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(947): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(466): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(665): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(681): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(668): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(684): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(964): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(979): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(981): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(991): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(997): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1003): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1250): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(985): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1000): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1002): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1012): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1019): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1026): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1240): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1242): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1300): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1306): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1356): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1307): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1357): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1513): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1515): warning C4804: '>': unsafe use of type 'bool' in operation
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1529): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1584): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1605): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1606): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1607): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1624): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1720): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1814): warning C4018: '<': signed/unsigned mismatch
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1884): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1885): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(289): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(434): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(445): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(386): warning C4390: ';': empty controlled statement found; is this the intent?
-c:\users\user\documents\zeus\zeus_vs\zeus\main.h(387): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1563): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1565): warning C4804: '>': unsafe use of type 'bool' in operation
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1579): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1634): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1655): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1656): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1657): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1681): warning C4244: 'argument': conversion from 'float' to 'Uint8', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1777): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1871): warning C4018: '<': signed/unsigned mismatch
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1941): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\gui.h(1942): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(291): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(436): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(447): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
 c:\users\user\documents\zeus\zeus_vs\zeus\main.h(388): warning C4390: ';': empty controlled statement found; is this the intent?
 c:\users\user\documents\zeus\zeus_vs\zeus\main.h(389): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(390): warning C4390: ';': empty controlled statement found; is this the intent?
+c:\users\user\documents\zeus\zeus_vs\zeus\main.h(391): warning C4390: ';': empty controlled statement found; is this the intent?
   ZEUS.vcxproj -> C:\Users\User\Documents\ZEUS\ZEUS_VS\Debug\ZEUS.exe

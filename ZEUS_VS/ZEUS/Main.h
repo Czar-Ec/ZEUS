@@ -26,7 +26,7 @@
 
 //other items
 #include "GUI.h"
-#include "IconsFontAwesome4.h"
+#include "../sharedobjects/IconsFontAwesome4.h"
 
 /**
 * Main Class
@@ -176,6 +176,8 @@ void Main::init()
 
 		//get display size
 		SDL_GetWindowSize(window, &winX, &winY);
+
+		SDL_SetWindowMinimumSize(window, 1080, 608);
 
 		//check if window was created
 		if (window == NULL)
