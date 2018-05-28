@@ -490,10 +490,22 @@ void GUI::menuBar(bool &appRun, SDL_Renderer *renderer)
 			viewCountries = true;
 		}
 
-		if (ImGui::MenuItem("Toolbar"))
+		//toolbar has a tick if displayed
+		if (showToolBar)
 		{
-			showToolBar ^= 1;
+			if (ImGui::MenuItem("Toolbar ", "", showToolBar))
+			{
+				showToolBar ^= 1;
+			}
 		}
+		else
+		{
+			if (ImGui::MenuItem("Toolbar"))
+			{
+				showToolBar ^= 1;
+			}
+		}
+		
 
 		ImGui::EndMenu();
 	}
@@ -1041,7 +1053,7 @@ void GUI::infoBox()
 		//total countries
 		ImGui::Text("Number of Countries: %d", totalCountries);
 		//total world population
-		ImGui::Text("Total World Population: %llu", worldPopulation);
+		ImGui::TextWrapped("Total World Population: %llu", worldPopulation);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1057,7 +1069,7 @@ void GUI::infoBox()
 		//country ID
 		ImGui::Text("ID: %s", curCountry.getID().c_str());
 		//country Name
-		ImGui::Text("Name: %s", curCountry.getCountryName().c_str());
+		ImGui::TextWrapped("Name: %s", curCountry.getCountryName().c_str());
 		ImGui::Separator();
 		ImGui::Separator();
 
@@ -1066,30 +1078,30 @@ void GUI::infoBox()
 		{
 			//country Population
 			ImGui::NewLine();
-			ImGui::Text("Population: %d", curCountry.getPopulation());
+			ImGui::TextWrapped("Population: %d", curCountry.getPopulation());
 			ImGui::NewLine();
 
 			if (ImGui::CollapsingHeader("Simulation Statistics"))
 			{
-				ImGui::Text("Healthy: %d", curCountry.getHealthyPop());
+				ImGui::TextWrapped("Healthy: %d", curCountry.getHealthyPop());
 				ImGui::NewLine();
 
-				ImGui::Text("Infected: %d", curCountry.getInfectedPop());
+				ImGui::TextWrapped("Infected: %d", curCountry.getInfectedPop());
 				ImGui::NewLine();
 
-				ImGui::Text("Dead: %d", curCountry.getDeadPop());
+				ImGui::TextWrapped("Dead: %d", curCountry.getDeadPop());
 				ImGui::NewLine();
 
 				if (simulateZombies)
 				{
-					ImGui::Text("Zombie: %d", curCountry.getZombiePop());
+					ImGui::TextWrapped("Zombie: %d", curCountry.getZombiePop());
 					ImGui::NewLine();
 
 					ImGui::Text("Removed");
 					ImGui::SameLine();
 					helpMarker("The individuals that can no longer be animated therefore removed from the simulation");
 					ImGui::SameLine();
-					ImGui::Text(": %d", curCountry.getRemovedPop());
+					ImGui::TextWrapped(": %d", curCountry.getRemovedPop());
 					ImGui::NewLine();
 				}
 			}			
@@ -1097,19 +1109,19 @@ void GUI::infoBox()
 			//country economy
 			if (ImGui::CollapsingHeader("Country Economy"))
 			{
-				ImGui::Text("All values in Million US Dollars ($)");
+				ImGui::TextWrapped("All values in Million US Dollars ($)");
 				ImGui::Separator();
 				ImGui::Separator();
 				ImGui::NewLine();
 
 				//country GDP
-				ImGui::Text("Gross Domestic Product: %d", curCountry.getGDP());
+				ImGui::TextWrapped("Gross Domestic Product: %d", curCountry.getGDP());
 
 				//country military spending
-				ImGui::Text("Military Spending: %d", curCountry.getMilitaryBudget());
+				ImGui::TextWrapped("Military Spending: %d", curCountry.getMilitaryBudget());
 
 				//country research budget
-				ImGui::Text("Research Budget: %d", curCountry.getResearchBudget());
+				ImGui::TextWrapped("Research Budget: %d", curCountry.getResearchBudget());
 			}
 
 			//country climate
@@ -1241,11 +1253,41 @@ void GUI::toolBar()
 	//set the side bar size
 	ImGui::SetWindowSize("toolbar", ImVec2(toolbarRect.w, toolbarRect.h));
 
+	//New Simulation Button
 	if (ImGui::Button(ICON_FA_FILE, ImVec2(30, 30)))
 	{
-		
+		newSimWindow = true;
 	}
 	tooltip("New Simulation");
+	ImGui::SameLine();
+
+	//Open Simulation Button
+	if (ImGui::Button(ICON_FA_FOLDER_OPEN, ImVec2(30, 30)))
+	{
+		openSim();
+	}
+	tooltip("Open Simulation");
+	ImGui::SameLine();
+
+	//Save Simulation Button
+	if (ImGui::Button(ICON_FA_FLOPPY_O, ImVec2(30, 30)))
+	{
+
+		std::cout << simPath << std::endl;
+
+		//check if the file was already saved, if not then call save as
+		if (simPath == "")
+		{
+			saveAs();
+		}
+		else
+		{
+			save();
+		}
+	}
+	tooltip("Save Simulation");
+	ImGui::SameLine();
+
 
 	ImGui::End();
 }
