@@ -6,10 +6,10 @@ ZEUS (Zombie/Epidemic Universe Simulator) is a simulator system created to simul
 The system is split into 2 pieces of software; the main simulator and the scenario creator.
 
 ### Scenario Creator:
-![](/preview/SC.png)
+![](/preview/SC.PNG)
 
 ### Simulator:
-![](/preview/Sim.png)
+![](/preview/Sim.PNG)
 
 ## Acknowledgements:
 ### Omar Cornut (ImGUI MIT License)
