@@ -1,5 +1,6 @@
 # ZEUS Zombie/Epidemic Universe Simulator
 ## Final Year Project 2018
+### Achieved 75% (Unmoderated - final result by June 18 2018)
 
 ZEUS (Zombie/Epidemic Universe Simulator) is a simulator system created to simulate the spread of a disease / zombie-causing disease around the world. The default scenarios in the simulator involvemaps for the world and sections of the world.
 
