@@ -1288,6 +1288,18 @@ void GUI::toolBar()
 	tooltip("Save Simulation");
 	ImGui::SameLine();
 
+	ImGui::Text("Map View: ");
+
+	ImGui::SameLine();
+
+	//combo box information
+	const char *options[] =
+	{"Country Information", "Infection Spread", "Zombie Spread", "Sandwich Spread"};
+	static int mapViewCombo = 0;
+	ImGui::PushItemWidth(200);
+	ImGui::Combo("##mapviewcombo", &mapViewCombo, options, IM_ARRAYSIZE(options));
+	
+
 
 	ImGui::End();
 }
