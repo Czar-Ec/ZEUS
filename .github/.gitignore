@@ -1,0 +1,11 @@
+/bin/
+*.ipch
+
+#generated files
+/ZEUS_VS/Debug/
+/ZEUS_VS/Release/
+
+#imgui ini flies
+/ZEUS_VS/res/dat/imgui.ini
+/ZEUS_VS/res/img/imgui.ini
+/ZEUS_VS/res/scenarios/imgui.ini
