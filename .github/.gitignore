@@ -1,11 +1,19 @@
+#generated files
 /bin/
 *.ipch
-
-#generated files
-/ZEUS_VS/Debug/
-/ZEUS_VS/Release/
+.ilk
+.iobj
+.ipdb
+.pdb
 
 #imgui ini flies
-/ZEUS_VS/res/dat/imgui.ini
-/ZEUS_VS/res/img/imgui.ini
-/ZEUS_VS/res/scenarios/imgui.ini
+/imgui.ini
+
+# debug and release logs
+/ZEUS_VS/ZEUS/Debug/
+/ZEUS_VS/ZEUS/Release/
+
+ZEUS_VS/ZEUSScenarioCreator/Debug/
+ZEUS_VS/ZEUSScenarioCreator/Release/
+
+/x64/
