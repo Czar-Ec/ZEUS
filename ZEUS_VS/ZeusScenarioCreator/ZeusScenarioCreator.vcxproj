@@ -149,6 +149,7 @@
     <ClInclude Include="..\sharedobjects\stb_textedit.h" />
     <ClInclude Include="..\sharedobjects\stb_truetype.h" />
     <ClInclude Include="..\sharedobjects\UX.h" />
+    <ClInclude Include="Region.h" />
     <ClInclude Include="SCGUI.h" />
     <ClInclude Include="SCMain.h" />
   </ItemGroup>
