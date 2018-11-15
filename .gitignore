@@ -1,16 +1,28 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
+﻿#generated files
+/bin/
 *.ipch
-*.obj
+.ilk
+.iobj
+.ipdb
+.pdb
 *.tlog
-*.pdb
 *.log
 *.idb
-*.ilk
 *.db-wal
 *.db-shm
 *.opendb
 *.sqlite
 *.db
+
+
+#imgui ini flies
+/imgui.ini
+
+# debug and release logs
+/ZEUS_VS/ZEUS/Debug/
+/ZEUS_VS/ZEUS/Release/
+
+ZEUS_VS/ZEUSScenarioCreator/Debug/
+ZEUS_VS/ZEUSScenarioCreator/Release/
+
+/x64/
